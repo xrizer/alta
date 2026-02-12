@@ -14,6 +14,7 @@ type AttendanceService interface {
 	GetByID(id string) (*dto.AttendanceResponse, error)
 	GetByEmployeeID(employeeID string) ([]dto.AttendanceResponse, error)
 	GetByEmployeeIDAndMonth(employeeID string, month, year int) ([]dto.AttendanceResponse, error)
+	GetByMonth(month, year int) ([]dto.AttendanceResponse, error)
 	ClockIn(req dto.ClockInRequest) (*dto.AttendanceResponse, error)
 	ClockOut(id string, req dto.ClockOutRequest) (*dto.AttendanceResponse, error)
 	Create(req dto.CreateAttendanceRequest) (*dto.AttendanceResponse, error)
@@ -60,6 +61,14 @@ func (s *attendanceService) GetByEmployeeID(employeeID string) ([]dto.Attendance
 
 func (s *attendanceService) GetByEmployeeIDAndMonth(employeeID string, month, year int) ([]dto.AttendanceResponse, error) {
 	attendances, err := s.attRepo.FindByEmployeeIDAndMonth(employeeID, month, year)
+	if err != nil {
+		return nil, err
+	}
+	return dto.ToAttendanceResponses(attendances), nil
+}
+
+func (s *attendanceService) GetByMonth(month, year int) ([]dto.AttendanceResponse, error) {
+	attendances, err := s.attRepo.FindByMonth(month, year)
 	if err != nil {
 		return nil, err
 	}

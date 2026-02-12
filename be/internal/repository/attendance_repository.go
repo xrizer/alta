@@ -14,6 +14,7 @@ type AttendanceRepository interface {
 	FindByEmployeeIDAndDate(employeeID string, date time.Time) (*model.Attendance, error)
 	FindByEmployeeID(employeeID string) ([]model.Attendance, error)
 	FindByEmployeeIDAndMonth(employeeID string, month, year int) ([]model.Attendance, error)
+	FindByMonth(month, year int) ([]model.Attendance, error)
 	FindByDate(date time.Time) ([]model.Attendance, error)
 	FindAll() ([]model.Attendance, error)
 	Update(att *model.Attendance) error
@@ -65,6 +66,16 @@ func (r *attendanceRepository) FindByEmployeeIDAndMonth(employeeID string, month
 	if err := r.preload(r.db).
 		Where("employee_id = ? AND EXTRACT(MONTH FROM date) = ? AND EXTRACT(YEAR FROM date) = ?", employeeID, month, year).
 		Order("date ASC").Find(&attendances).Error; err != nil {
+		return nil, err
+	}
+	return attendances, nil
+}
+
+func (r *attendanceRepository) FindByMonth(month, year int) ([]model.Attendance, error) {
+	var attendances []model.Attendance
+	if err := r.preload(r.db).
+		Where("EXTRACT(MONTH FROM date) = ? AND EXTRACT(YEAR FROM date) = ?", month, year).
+		Order("date DESC, created_at DESC").Find(&attendances).Error; err != nil {
 		return nil, err
 	}
 	return attendances, nil

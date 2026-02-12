@@ -22,33 +22,48 @@ export default function AttendancePage() {
 
   const fetchData = useCallback(async () => {
     try {
-      // Get my employee record
-      const empRes = await employeeService.getMyEmployee();
-      if (empRes.success && empRes.data) {
-        setMyEmployee(empRes.data);
+      setError("");
 
-        if (isAdminOrHr) {
-          const res = await attendanceService.getAttendances({ month, year });
-          if (res.success && res.data) setAttendances(res.data);
-        } else {
-          const res = await attendanceService.getAttendances({
-            employee_id: empRes.data.id,
-            month,
-            year,
-          });
-          if (res.success && res.data) setAttendances(res.data);
+      // Try to get my employee record (admin may not have one — that's ok)
+      let empData: Employee | null = null;
+      try {
+        const empRes = await employeeService.getMyEmployee();
+        if (empRes.success && empRes.data) {
+          empData = empRes.data;
+          setMyEmployee(empData);
         }
+      } catch {
+        // Admin/HR users may not have an employee record
+      }
 
-        // Check today's attendance
-        const today = new Date().toISOString().split("T")[0];
-        const todayRes = await attendanceService.getAttendances({
-          employee_id: empRes.data.id,
-          month: now.getMonth() + 1,
-          year: now.getFullYear(),
+      // Fetch attendance list
+      if (isAdminOrHr) {
+        const res = await attendanceService.getAttendances({ month, year });
+        if (res.success) setAttendances(res.data || []);
+      } else if (empData) {
+        const res = await attendanceService.getAttendances({
+          employee_id: empData.id,
+          month,
+          year,
         });
-        if (todayRes.success && todayRes.data) {
-          const todayAtt = todayRes.data.find((a) => a.date === today);
-          if (todayAtt) setTodayAttendance(todayAtt);
+        if (res.success) setAttendances(res.data || []);
+      }
+
+      // Check today's attendance for clock in/out card
+      if (empData) {
+        const today = new Date().toISOString().split("T")[0];
+        try {
+          const todayRes = await attendanceService.getAttendances({
+            employee_id: empData.id,
+            month: new Date().getMonth() + 1,
+            year: new Date().getFullYear(),
+          });
+          if (todayRes.success && todayRes.data) {
+            const todayAtt = todayRes.data.find((a: Attendance) => a.date?.startsWith(today));
+            if (todayAtt) setTodayAttendance(todayAtt);
+          }
+        } catch {
+          // Non-critical — clock in/out card just won't show today's record
         }
       }
     } catch {
@@ -56,7 +71,8 @@ export default function AttendancePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [isAdminOrHr, month, year, now]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdminOrHr, month, year]);
 
   useEffect(() => {
     fetchData();

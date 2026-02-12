@@ -31,12 +31,22 @@ export default function PayrollPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [payrollRes, empRes] = await Promise.all([
+      setError("");
+      // Fetch payrolls and employees independently so one failure doesn't block the other
+      const [payrollRes, empRes] = await Promise.allSettled([
         payrollService.getPayrolls({ month, year }),
         employeeService.getEmployees(),
       ]);
-      if (payrollRes.success && payrollRes.data) setPayrolls(payrollRes.data);
-      if (empRes.success && empRes.data) setEmployees(empRes.data);
+      if (payrollRes.status === "fulfilled" && payrollRes.value.success) {
+        setPayrolls(payrollRes.value.data || []);
+      }
+      if (empRes.status === "fulfilled" && empRes.value.success) {
+        setEmployees(empRes.value.data || []);
+      }
+      // Show error only if both failed
+      if (payrollRes.status === "rejected" && empRes.status === "rejected") {
+        setError("Failed to fetch data");
+      }
     } catch {
       setError("Failed to fetch data");
     } finally {

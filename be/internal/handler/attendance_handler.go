@@ -23,15 +23,28 @@ func (h *AttendanceHandler) GetAll(c *fiber.Ctx) error {
 	monthStr := c.Query("month")
 	yearStr := c.Query("year")
 
-	if employeeID != "" && monthStr != "" && yearStr != "" {
-		month, err := strconv.Atoi(monthStr)
+	// Parse month/year if provided
+	var month, year int
+	var hasMonth, hasYear bool
+	if monthStr != "" {
+		m, err := strconv.Atoi(monthStr)
 		if err != nil {
 			return response.Error(c, fiber.StatusBadRequest, "Invalid month format")
 		}
-		year, err := strconv.Atoi(yearStr)
+		month = m
+		hasMonth = true
+	}
+	if yearStr != "" {
+		y, err := strconv.Atoi(yearStr)
 		if err != nil {
 			return response.Error(c, fiber.StatusBadRequest, "Invalid year format")
 		}
+		year = y
+		hasYear = true
+	}
+
+	// Filter by employee + month/year
+	if employeeID != "" && hasMonth && hasYear {
 		attendances, err := h.attService.GetByEmployeeIDAndMonth(employeeID, month, year)
 		if err != nil {
 			return response.Error(c, fiber.StatusInternalServerError, "Failed to fetch attendances")
@@ -39,6 +52,7 @@ func (h *AttendanceHandler) GetAll(c *fiber.Ctx) error {
 		return response.Success(c, fiber.StatusOK, "Attendances retrieved", attendances)
 	}
 
+	// Filter by employee only
 	if employeeID != "" {
 		attendances, err := h.attService.GetByEmployeeID(employeeID)
 		if err != nil {
@@ -47,6 +61,16 @@ func (h *AttendanceHandler) GetAll(c *fiber.Ctx) error {
 		return response.Success(c, fiber.StatusOK, "Attendances retrieved", attendances)
 	}
 
+	// Filter by month/year only (admin view)
+	if hasMonth && hasYear {
+		attendances, err := h.attService.GetByMonth(month, year)
+		if err != nil {
+			return response.Error(c, fiber.StatusInternalServerError, "Failed to fetch attendances")
+		}
+		return response.Success(c, fiber.StatusOK, "Attendances retrieved", attendances)
+	}
+
+	// No filters — return all
 	attendances, err := h.attService.GetAll()
 	if err != nil {
 		return response.Error(c, fiber.StatusInternalServerError, "Failed to fetch attendances")

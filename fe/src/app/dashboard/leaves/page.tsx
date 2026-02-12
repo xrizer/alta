@@ -18,15 +18,20 @@ export default function LeavesPage() {
 
   const fetchData = useCallback(async () => {
     try {
+      setError("");
       if (isAdminOrHr) {
         const res = await leaveService.getLeaves();
-        if (res.success && res.data) setLeaves(res.data);
+        if (res.success) setLeaves(res.data || []);
       } else {
-        const empRes = await employeeService.getMyEmployee();
-        if (empRes.success && empRes.data) {
-          setMyEmployee(empRes.data);
-          const res = await leaveService.getLeaves({ employee_id: empRes.data.id });
-          if (res.success && res.data) setLeaves(res.data);
+        try {
+          const empRes = await employeeService.getMyEmployee();
+          if (empRes.success && empRes.data) {
+            setMyEmployee(empRes.data);
+            const res = await leaveService.getLeaves({ employee_id: empRes.data.id });
+            if (res.success) setLeaves(res.data || []);
+          }
+        } catch {
+          // Employee record not found for this user
         }
       }
     } catch {
