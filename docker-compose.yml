@@ -1,0 +1,77 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: hris-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: hris
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Go Backend
+  backend:
+    build:
+      context: ./be
+      dockerfile: Dockerfile
+    container_name: hris-backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: hris
+      DB_SSLMODE: disable
+      JWT_SECRET: hris-jwt-secret-prod-change-me
+      JWT_REFRESH_SECRET: hris-jwt-refresh-secret-prod-change-me
+      JWT_ACCESS_EXPIRY: 15m
+      JWT_REFRESH_EXPIRY: 168h
+      APP_PORT: 8080
+      CORS_ORIGINS: http://136.112.30.58,http://localhost:3000
+      ADMIN_EMAIL: admin@hris.com
+      ADMIN_PASSWORD: admin123
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: ./fe
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: /api
+    container_name: hris-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: hris-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  postgres_data:
