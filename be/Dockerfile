@@ -27,9 +27,6 @@ RUN apk --no-cache add ca-certificates
 # Copy binary from builder
 COPY --from=builder /app/server .
 
-# Copy .env file
-COPY .env .
-
 EXPOSE 8080
 
 CMD ["./server"]
