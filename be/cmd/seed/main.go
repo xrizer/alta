@@ -19,6 +19,10 @@ func main() {
 
 	log.Println("🌱 Starting HRIS database seed...")
 
+	// ── 0. Clean previous seed data (for idempotent re-runs) ─
+	log.Println("→ Cleaning previous seed data...")
+	cleanSeedData(db)
+
 	// ── 1. Users ──────────────────────────────────────────────
 	log.Println("→ Seeding users...")
 	users := seedUsers(db)
@@ -74,6 +78,62 @@ func main() {
 	log.Println("  Employee: siti@altanova.co.id / password123")
 	log.Println("  Employee: andi@altanova.co.id / password123")
 	log.Println("══════════════════════════════════════════════")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Clean seed data (reverse FK order for safe re-runs)
+// ═══════════════════════════════════════════════════════════════
+
+func cleanSeedData(db *gorm.DB) {
+	// The seed users are identified by their emails (excluding the admin which is pre-existing)
+	seedEmails := []string{
+		"hr@altanova.co.id",
+		"budi@altanova.co.id",
+		"siti@altanova.co.id",
+		"andi@altanova.co.id",
+		"rina@altanova.co.id",
+		"fajar@altanova.co.id",
+		"maya@altanova.co.id",
+		"rizky@altanova.co.id",
+	}
+
+	// Find seed user IDs
+	var seedUserIDs []string
+	db.Model(&model.User{}).Where("email IN ?", seedEmails).Pluck("id", &seedUserIDs)
+
+	// Find seed employee IDs (employees linked to seed users)
+	var seedEmployeeIDs []string
+	if len(seedUserIDs) > 0 {
+		db.Model(&model.Employee{}).Where("user_id IN ?", seedUserIDs).Pluck("id", &seedEmployeeIDs)
+	}
+
+	// Delete in reverse FK order
+	if len(seedEmployeeIDs) > 0 {
+		db.Unscoped().Where("employee_id IN ?", seedEmployeeIDs).Delete(&model.Payroll{})
+		db.Unscoped().Where("employee_id IN ?", seedEmployeeIDs).Delete(&model.Leave{})
+		db.Unscoped().Where("employee_id IN ?", seedEmployeeIDs).Delete(&model.Attendance{})
+		db.Unscoped().Where("employee_id IN ?", seedEmployeeIDs).Delete(&model.EmployeeSalary{})
+		db.Unscoped().Where("id IN ?", seedEmployeeIDs).Delete(&model.Employee{})
+	}
+
+	// Delete company-level data by company name
+	var companyID string
+	db.Model(&model.Company{}).Where("name = ?", "PT Alta Nova Indonesia").Pluck("id", &companyID)
+
+	if companyID != "" {
+		db.Unscoped().Where("company_id = ?", companyID).Delete(&model.Holiday{})
+		db.Unscoped().Where("company_id = ?", companyID).Delete(&model.Shift{})
+		db.Unscoped().Where("company_id = ?", companyID).Delete(&model.Position{})
+		db.Unscoped().Where("company_id = ?", companyID).Delete(&model.Department{})
+		db.Unscoped().Where("id = ?", companyID).Delete(&model.Company{})
+	}
+
+	// Delete seed users (not admin)
+	if len(seedUserIDs) > 0 {
+		db.Unscoped().Where("id IN ?", seedUserIDs).Delete(&model.User{})
+	}
+
+	log.Println("  ✓ Previous seed data cleaned")
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -679,10 +739,14 @@ func seedLeaves(db *gorm.DB, employees []model.Employee, users []model.User) {
 		if l.ApprovedBy != "" {
 			leave.ApprovedBy = l.ApprovedBy
 			leave.ApprovedAt = &approvedAt
-		}
-
-		if err := db.Create(&leave).Error; err != nil {
-			log.Printf("  ⚠ Leave error for %s: %v", employees[l.EmpIndex].EmployeeNumber, err)
+			if err := db.Create(&leave).Error; err != nil {
+				log.Printf("  ⚠ Leave error for %s: %v", employees[l.EmpIndex].EmployeeNumber, err)
+			}
+		} else {
+			// Omit approved_by to avoid inserting empty string into UUID column
+			if err := db.Omit("approved_by").Create(&leave).Error; err != nil {
+				log.Printf("  ⚠ Leave error for %s: %v", employees[l.EmpIndex].EmployeeNumber, err)
+			}
 		}
 	}
 
