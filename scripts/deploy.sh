@@ -9,33 +9,44 @@ set -e
 VM_IP="136.112.30.58"
 VM_USER="aqshol"          # Change to your GCP SSH username
 REMOTE_DIR="~/hris"
+PROJECT_DIR="/Users/aqshol/Documents/self/alta"
 
 echo "=========================================="
 echo "  Deploying HRIS to $VM_IP"
 echo "=========================================="
 
-# Step 1: Copy project files to VM
-echo "[1/3] Copying files to VM..."
-gcloud compute scp --recurse \
-  --zone=us-central1-c \
-  /Users/aqshol/Documents/self/alta/be \
-  /Users/aqshol/Documents/self/alta/fe \
-  /Users/aqshol/Documents/self/alta/nginx \
-  /Users/aqshol/Documents/self/alta/docker-compose.yml \
-  /Users/aqshol/Documents/self/alta/scripts \
-  sample-instance:${REMOTE_DIR}/
+# Step 1: Create a clean tarball excluding build artifacts
+echo "[1/4] Packaging project files..."
+cd "$PROJECT_DIR"
+tar czf /tmp/hris-deploy.tar.gz \
+  --exclude='fe/node_modules' \
+  --exclude='fe/.next' \
+  --exclude='be/tmp' \
+  --exclude='be/seed' \
+  --exclude='.git' \
+  be fe nginx docker-compose.yml scripts
 
-# Step 2: Build and start containers on VM
-echo "[2/3] Building and starting containers..."
+# Step 2: Copy tarball to VM
+echo "[2/4] Copying to VM..."
+gcloud compute scp \
+  --zone=us-central1-c \
+  /tmp/hris-deploy.tar.gz \
+  sample-instance:/tmp/hris-deploy.tar.gz
+
+# Step 3: Extract and build on VM
+echo "[3/4] Extracting and building containers..."
 gcloud compute ssh sample-instance \
   --zone=us-central1-c \
-  --command="cd ${REMOTE_DIR} && docker compose up -d --build"
+  --command="mkdir -p ${REMOTE_DIR} && cd ${REMOTE_DIR} && tar xzf /tmp/hris-deploy.tar.gz && rm /tmp/hris-deploy.tar.gz && docker compose up -d --build"
 
-# Step 3: Check status
-echo "[3/3] Checking container status..."
+# Step 4: Check status
+echo "[4/4] Checking container status..."
 gcloud compute ssh sample-instance \
   --zone=us-central1-c \
   --command="cd ${REMOTE_DIR} && docker compose ps"
+
+# Clean up local tarball
+rm -f /tmp/hris-deploy.tar.gz
 
 echo ""
 echo "=========================================="

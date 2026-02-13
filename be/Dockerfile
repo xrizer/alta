@@ -13,8 +13,9 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build binary
+# Build binaries
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/server ./cmd/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/seed ./cmd/seed/main.go
 
 # Runtime stage
 FROM alpine:3.19
@@ -24,8 +25,9 @@ WORKDIR /app
 # Install ca-certificates for HTTPS calls
 RUN apk --no-cache add ca-certificates
 
-# Copy binary from builder
+# Copy binaries from builder
 COPY --from=builder /app/server .
+COPY --from=builder /app/seed .
 
 EXPOSE 8080
 
