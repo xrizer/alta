@@ -338,9 +338,9 @@ func seedShifts(db *gorm.DB, companyID string) map[string]model.Shift {
 		StartTime string
 		EndTime   string
 	}{
-		{"Regular (09:00 - 18:00)", "09:00:00", "18:00:00"},
-		{"Morning (07:00 - 16:00)", "07:00:00", "16:00:00"},
-		{"Flexible (10:00 - 19:00)", "10:00:00", "19:00:00"},
+		{"Regular (09:00 - 18:00)", "2000-01-01 09:00:00+00", "2000-01-01 18:00:00+00"},
+		{"Morning (07:00 - 16:00)", "2000-01-01 07:00:00+00", "2000-01-01 16:00:00+00"},
+		{"Flexible (10:00 - 19:00)", "2000-01-01 10:00:00+00", "2000-01-01 19:00:00+00"},
 	}
 
 	shifts := make(map[string]model.Shift)
