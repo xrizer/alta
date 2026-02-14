@@ -50,6 +50,9 @@ func main() {
 	attService := service.NewAttendanceService(attRepo, empRepo)
 	leaveService := service.NewLeaveService(leaveRepo, empRepo)
 	payrollService := service.NewPayrollService(payrollRepo, empRepo, empSalaryRepo, attRepo)
+	orgService := service.NewOrganizationService(companyRepo)
+	menuAccessRepo := repository.NewMenuAccessRepository(db)
+	menuAccessService := service.NewMenuAccessService(menuAccessRepo, userRepo)
 
 	// Handlers
 	authHandler := handler.NewAuthHandler(authService)
@@ -64,6 +67,8 @@ func main() {
 	attHandler := handler.NewAttendanceHandler(attService, empService)
 	leaveHandler := handler.NewLeaveHandler(leaveService)
 	payrollHandler := handler.NewPayrollHandler(payrollService)
+	orgHandler := handler.NewOrganizationHandler(orgService)
+	menuAccessHandler := handler.NewMenuAccessHandler(menuAccessService)
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
@@ -187,6 +192,17 @@ func main() {
 	payrolls.Put("/:id", middleware.RoleMiddleware("admin"), payrollHandler.Update)
 	payrolls.Put("/:id/status", middleware.RoleMiddleware("admin"), payrollHandler.UpdateStatus)
 	payrolls.Delete("/:id", middleware.RoleMiddleware("admin"), payrollHandler.Delete)
+
+	// Organization structure routes (admin, hr only)
+	organization := api.Group("/organization", middleware.AuthMiddleware(cfg), middleware.RoleMiddleware("admin", "hr"))
+	organization.Get("/structure", orgHandler.GetStructure)
+
+	// Menu access routes
+	menuAccess := api.Group("/menu-access", middleware.AuthMiddleware(cfg))
+	menuAccess.Get("/me", menuAccessHandler.GetMyMenus)
+	menuAccess.Get("/", middleware.RoleMiddleware("admin"), menuAccessHandler.GetAll)
+	menuAccess.Post("/", middleware.RoleMiddleware("admin"), menuAccessHandler.Set)
+	menuAccess.Delete("/:user_id", middleware.RoleMiddleware("admin"), menuAccessHandler.Delete)
 
 	log.Printf("Server starting on port %s", cfg.AppPort)
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", cfg.AppPort)))

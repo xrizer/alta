@@ -10,6 +10,7 @@ type CompanyRepository interface {
 	Create(company *model.Company) error
 	FindByID(id string) (*model.Company, error)
 	FindAll() ([]model.Company, error)
+	FindWithStructure(companyID string) (*model.Company, error)
 	Update(company *model.Company) error
 	Delete(id string) error
 }
@@ -40,6 +41,23 @@ func (r *companyRepository) FindAll() ([]model.Company, error) {
 		return nil, err
 	}
 	return companies, nil
+}
+
+func (r *companyRepository) FindWithStructure(companyID string) (*model.Company, error) {
+	var company model.Company
+	if err := r.db.
+		Preload("Departments", func(db *gorm.DB) *gorm.DB {
+			return db.Where("is_active = ?", true).Order("name")
+		}).
+		Preload("Departments.Positions", func(db *gorm.DB) *gorm.DB {
+			return db.Where("is_active = ?", true).Order("name")
+		}).
+		Preload("Departments.Positions.Employees").
+		Preload("Departments.Positions.Employees.User").
+		First(&company, "id = ?", companyID).Error; err != nil {
+		return nil, err
+	}
+	return &company, nil
 }
 
 func (r *companyRepository) Update(company *model.Company) error {

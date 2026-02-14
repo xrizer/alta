@@ -4,59 +4,81 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 
+interface NavItem {
+  name: string;
+  href: string;
+  roles: string[];
+  key: string;
+}
+
 interface NavSection {
   title: string;
-  items: { name: string; href: string; roles: string[] }[];
+  items: NavItem[];
 }
 
 const navigation: NavSection[] = [
   {
     title: "General",
     items: [
-      { name: "Dashboard", href: "/dashboard", roles: ["admin", "hr", "employee"] },
+      { name: "Dashboard", href: "/dashboard", roles: ["admin", "hr", "employee"], key: "dashboard" },
     ],
   },
   {
     title: "Organization",
     items: [
-      { name: "Companies", href: "/dashboard/companies", roles: ["admin", "hr"] },
-      { name: "Departments", href: "/dashboard/departments", roles: ["admin", "hr"] },
-      { name: "Positions", href: "/dashboard/positions", roles: ["admin", "hr"] },
-      { name: "Shifts", href: "/dashboard/shifts", roles: ["admin", "hr"] },
+      { name: "Companies", href: "/dashboard/companies", roles: ["admin", "hr"], key: "companies" },
+      { name: "Departments", href: "/dashboard/departments", roles: ["admin", "hr"], key: "departments" },
+      { name: "Positions", href: "/dashboard/positions", roles: ["admin", "hr"], key: "positions" },
+      { name: "Shifts", href: "/dashboard/shifts", roles: ["admin", "hr"], key: "shifts" },
+      { name: "Organization Structure", href: "/dashboard/organization-structure", roles: ["admin", "hr"], key: "organization_structure" },
     ],
   },
   {
     title: "People",
     items: [
-      { name: "Users", href: "/dashboard/users", roles: ["admin", "hr"] },
-      { name: "Employees", href: "/dashboard/employees", roles: ["admin", "hr"] },
+      { name: "Users", href: "/dashboard/users", roles: ["admin", "hr"], key: "users" },
+      { name: "Employees", href: "/dashboard/employees", roles: ["admin", "hr"], key: "employees" },
     ],
   },
   {
     title: "Time & Attendance",
     items: [
-      { name: "Attendance", href: "/dashboard/attendance", roles: ["admin", "hr", "employee"] },
-      { name: "Leaves", href: "/dashboard/leaves", roles: ["admin", "hr", "employee"] },
+      { name: "Attendance", href: "/dashboard/attendance", roles: ["admin", "hr", "employee"], key: "attendance" },
+      { name: "Leaves", href: "/dashboard/leaves", roles: ["admin", "hr", "employee"], key: "leaves" },
     ],
   },
   {
     title: "Payroll",
     items: [
-      { name: "Payroll", href: "/dashboard/payroll", roles: ["admin", "hr"] },
+      { name: "Payroll", href: "/dashboard/payroll", roles: ["admin", "hr"], key: "payroll" },
+    ],
+  },
+  {
+    title: "Administration",
+    items: [
+      { name: "Menu Access Policy", href: "/dashboard/menu-access", roles: ["admin"], key: "menu_access_policy" },
     ],
   },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, allowedMenuKeys } = useAuth();
 
   const filteredSections = navigation
     .map((section) => ({
       ...section,
-      items: section.items.filter(
-        (item) => user && item.roles.includes(user.role)
-      ),
+      items: section.items.filter((item) => {
+        if (!user) return false;
+
+        // If user has custom menu access configured, use that
+        if (allowedMenuKeys !== null) {
+          return allowedMenuKeys.includes(item.key);
+        }
+
+        // Otherwise fall back to role-based access
+        return item.roles.includes(user.role);
+      }),
     }))
     .filter((section) => section.items.length > 0);
 

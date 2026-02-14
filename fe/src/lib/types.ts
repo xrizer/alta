@@ -292,6 +292,49 @@ export interface CreateLeaveRequest {
   attachment?: string;
 }
 
+// Organization Structure
+export interface OrgEmployeeNode {
+  id: string;
+  employee_number: string;
+  user_name: string;
+}
+
+export interface OrgPositionNode {
+  id: string;
+  name: string;
+  employees: OrgEmployeeNode[];
+}
+
+export interface OrgDepartmentNode {
+  id: string;
+  name: string;
+  positions: OrgPositionNode[];
+}
+
+export interface OrgStructureResponse {
+  company_id: string;
+  company_name: string;
+  departments: OrgDepartmentNode[];
+}
+
+// Menu Access
+export interface MenuAccessConfig {
+  user_id: string;
+  user_name: string;
+  user_email: string;
+  user_role: string;
+  menu_keys: string[];
+}
+
+export interface SetMenuAccessRequest {
+  user_id: string;
+  menu_keys: string[];
+}
+
+export interface UserMenuKeysResponse {
+  menu_keys: string[];
+}
+
 // Payroll
 export type PayrollStatus = "draft" | "processed" | "paid";
 

@@ -16,6 +16,7 @@ type Position struct {
 	Name         string         `gorm:"type:varchar(255);not null" json:"name"`
 	BaseSalary   float64        `gorm:"type:decimal(15,2);default:0" json:"base_salary"`
 	IsActive     bool           `gorm:"default:true" json:"is_active"`
+	Employees    []Employee     `gorm:"foreignKey:PositionID" json:"employees,omitempty"`
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`

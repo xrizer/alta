@@ -14,6 +14,7 @@ type Department struct {
 	Name        string         `gorm:"type:varchar(255);not null" json:"name"`
 	Description string         `gorm:"type:text" json:"description"`
 	IsActive    bool           `gorm:"default:true" json:"is_active"`
+	Positions   []Position     `gorm:"foreignKey:DepartmentID" json:"positions,omitempty"`
 	CreatedAt   time.Time      `json:"created_at"`
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
