@@ -2,17 +2,20 @@
 
 import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Company } from "@/lib/types";
+import { Company, Department } from "@/lib/types";
 import * as positionService from "@/services/position-service";
 import * as companyService from "@/services/company-service";
+import * as departmentService from "@/services/department-service";
 
 export default function CreatePositionPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [form, setForm] = useState({
     company_id: "",
+    department_id: "",
     name: "",
     base_salary: "",
   });
@@ -29,6 +32,24 @@ export default function CreatePositionPage() {
     fetchCompanies();
   }, []);
 
+  // Fetch departments when company changes
+  useEffect(() => {
+    if (!form.company_id) {
+      setDepartments([]);
+      setForm((prev) => ({ ...prev, department_id: "" }));
+      return;
+    }
+    const fetchDepartments = async () => {
+      try {
+        const res = await departmentService.getDepartments(form.company_id);
+        if (res.success && res.data) setDepartments(res.data.filter((d) => d.is_active));
+      } catch {
+        setDepartments([]);
+      }
+    };
+    fetchDepartments();
+  }, [form.company_id]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -40,6 +61,7 @@ export default function CreatePositionPage() {
     try {
       const res = await positionService.createPosition({
         company_id: form.company_id,
+        department_id: form.department_id || undefined,
         name: form.name,
         base_salary: form.base_salary ? Number(form.base_salary) : undefined,
       });
@@ -73,6 +95,21 @@ export default function CreatePositionPage() {
               <option value="">Select company</option>
               {companies.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Department</label>
+            <select
+              name="department_id"
+              value={form.department_id}
+              onChange={handleChange}
+              disabled={!form.company_id}
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+            >
+              <option value="">Select department</option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>{d.name}</option>
               ))}
             </select>
           </div>

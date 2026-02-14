@@ -29,7 +29,7 @@ func (r *positionRepository) Create(pos *model.Position) error {
 
 func (r *positionRepository) FindByID(id string) (*model.Position, error) {
 	var pos model.Position
-	if err := r.db.Preload("Company").First(&pos, "id = ?", id).Error; err != nil {
+	if err := r.db.Preload("Company").Preload("Department").First(&pos, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &pos, nil
@@ -37,7 +37,7 @@ func (r *positionRepository) FindByID(id string) (*model.Position, error) {
 
 func (r *positionRepository) FindByCompanyID(companyID string) ([]model.Position, error) {
 	var positions []model.Position
-	if err := r.db.Preload("Company").Where("company_id = ?", companyID).Order("created_at DESC").Find(&positions).Error; err != nil {
+	if err := r.db.Preload("Company").Preload("Department").Where("company_id = ?", companyID).Order("created_at DESC").Find(&positions).Error; err != nil {
 		return nil, err
 	}
 	return positions, nil
@@ -45,7 +45,7 @@ func (r *positionRepository) FindByCompanyID(companyID string) ([]model.Position
 
 func (r *positionRepository) FindAll() ([]model.Position, error) {
 	var positions []model.Position
-	if err := r.db.Preload("Company").Order("created_at DESC").Find(&positions).Error; err != nil {
+	if err := r.db.Preload("Company").Preload("Department").Order("created_at DESC").Find(&positions).Error; err != nil {
 		return nil, err
 	}
 	return positions, nil

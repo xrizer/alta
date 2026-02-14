@@ -62,10 +62,11 @@ func (s *positionService) Create(req dto.CreatePositionRequest) (*dto.PositionRe
 	}
 
 	pos := &model.Position{
-		CompanyID:  req.CompanyID,
-		Name:       req.Name,
-		BaseSalary: req.BaseSalary,
-		IsActive:   true,
+		CompanyID:    req.CompanyID,
+		DepartmentID: req.DepartmentID,
+		Name:         req.Name,
+		BaseSalary:   req.BaseSalary,
+		IsActive:     true,
 	}
 
 	if err := s.posRepo.Create(pos); err != nil {
@@ -88,6 +89,9 @@ func (s *positionService) Update(id string, req dto.UpdatePositionRequest) (*dto
 		return nil, errors.New("position not found")
 	}
 
+	if req.DepartmentID != "" {
+		pos.DepartmentID = req.DepartmentID
+	}
 	if req.Name != "" {
 		pos.Name = req.Name
 	}

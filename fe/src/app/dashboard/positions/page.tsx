@@ -76,6 +76,7 @@ export default function PositionsPage() {
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Company</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Department</th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Base Salary</th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
               {isAdmin && <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>}
@@ -86,6 +87,7 @@ export default function PositionsPage() {
               <tr key={position.id} className="hover:bg-gray-50">
                 <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{position.name}</td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{position.company?.name || "-"}</td>
+                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{position.department?.name || "-"}</td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatSalary(position.base_salary)}</td>
                 <td className="whitespace-nowrap px-6 py-4">
                   <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${position.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
@@ -106,7 +108,7 @@ export default function PositionsPage() {
             ))}
             {positions.length === 0 && (
               <tr>
-                <td colSpan={isAdmin ? 5 : 4} className="px-6 py-8 text-center text-sm text-gray-500">No positions found</td>
+                <td colSpan={isAdmin ? 6 : 5} className="px-6 py-8 text-center text-sm text-gray-500">No positions found</td>
               </tr>
             )}
           </tbody>

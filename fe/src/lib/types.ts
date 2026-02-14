@@ -110,6 +110,8 @@ export interface Position {
   id: string;
   company_id: string;
   company?: Company;
+  department_id: string;
+  department?: Department;
   name: string;
   base_salary: number;
   is_active: boolean;
@@ -119,11 +121,13 @@ export interface Position {
 
 export interface CreatePositionRequest {
   company_id: string;
+  department_id?: string;
   name: string;
   base_salary?: number;
 }
 
 export interface UpdatePositionRequest {
+  department_id?: string;
   name?: string;
   base_salary?: number;
   is_active?: boolean;
