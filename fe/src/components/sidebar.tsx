@@ -90,7 +90,7 @@ export default function Sidebar() {
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         {filteredSections.map((section) => (
           <div key={section.title} className="mb-4">
-            <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <p className="mb-1 px-3 text-xs font-bold uppercase tracking-wider text-gray-900">
               {section.title}
             </p>
             <div className="space-y-1">
