@@ -22,7 +22,8 @@ export default function AttendancePage() {
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
-  const [specificDate, setSpecificDate] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   // Column search filters
   const [searchDate, setSearchDate] = useState("");
@@ -36,6 +37,10 @@ export default function AttendancePage() {
   // Sort state
   const [sortKey, setSortKey] = useState<SortKey>("date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
 
   // Import state
   const [isImporting, setIsImporting] = useState(false);
@@ -190,9 +195,12 @@ export default function AttendancePage() {
   const filteredAndSorted = useMemo(() => {
     let filtered = [...attendances];
 
-    // Specific date filter
-    if (specificDate) {
-      filtered = filtered.filter((a) => a.date === specificDate);
+    // Date range filter
+    if (startDate) {
+      filtered = filtered.filter((a) => a.date >= startDate);
+    }
+    if (endDate) {
+      filtered = filtered.filter((a) => a.date <= endDate);
     }
 
     // Column search filters
@@ -255,7 +263,20 @@ export default function AttendancePage() {
     });
 
     return filtered;
-  }, [attendances, specificDate, searchDate, searchEmployee, searchClockIn, searchClockOut, searchStatus, searchOvertime, searchNotes, sortKey, sortDir]);
+  }, [attendances, startDate, endDate, searchDate, searchEmployee, searchClockIn, searchClockOut, searchStatus, searchOvertime, searchNotes, sortKey, sortDir]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [startDate, endDate, searchDate, searchEmployee, searchClockIn, searchClockOut, searchStatus, searchOvertime, searchNotes, sortKey, sortDir, month, year, perPage]);
+
+  // Pagination
+  const totalItems = filteredAndSorted.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedData = filteredAndSorted.slice((safePage - 1) * perPage, safePage * perPage);
+  const startItem = totalItems === 0 ? 0 : (safePage - 1) * perPage + 1;
+  const endItem = Math.min(safePage * perPage, totalItems);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -360,16 +381,23 @@ export default function AttendancePage() {
           })}
         </select>
         <div className="flex items-center gap-2">
+          <label className="text-sm text-gray-600">From</label>
           <input
             type="date"
-            value={specificDate}
-            onChange={(e) => setSpecificDate(e.target.value)}
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
             className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900"
-            placeholder="Filter by date"
           />
-          {specificDate && (
+          <label className="text-sm text-gray-600">To</label>
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900"
+          />
+          {(startDate || endDate) && (
             <button
-              onClick={() => setSpecificDate("")}
+              onClick={() => { setStartDate(""); setEndDate(""); }}
               className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-500 hover:bg-gray-50"
             >
               Clear
@@ -478,7 +506,7 @@ export default function AttendancePage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredAndSorted.map((att) => (
+              {paginatedData.map((att) => (
                 <tr key={att.id} className="hover:bg-gray-50">
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{att.date}</td>
                   {isAdminOrHr && <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{att.employee?.user?.name || "-"}</td>}
@@ -493,11 +521,65 @@ export default function AttendancePage() {
                   <td className="px-6 py-4 text-sm text-gray-500">{att.notes || "-"}</td>
                 </tr>
               ))}
-              {filteredAndSorted.length === 0 && (
+              {paginatedData.length === 0 && (
                 <tr><td colSpan={isAdminOrHr ? 7 : 6} className="px-6 py-8 text-center text-sm text-gray-500">No attendance records found</td></tr>
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between border-t border-gray-200 px-6 py-3">
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-gray-600">Rows per page:</label>
+            <select
+              value={perPage}
+              onChange={(e) => setPerPage(Number(e.target.value))}
+              className="rounded border border-gray-300 px-2 py-1 text-sm text-gray-900"
+            >
+              {[5, 10, 25, 50, 100].map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600">
+              {startItem}–{endItem} of {totalItems}
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={safePage <= 1}
+                className="rounded border border-gray-300 px-2 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                &laquo;
+              </button>
+              <button
+                onClick={() => setCurrentPage(safePage - 1)}
+                disabled={safePage <= 1}
+                className="rounded border border-gray-300 px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Prev
+              </button>
+              <span className="px-2 text-sm text-gray-700">
+                Page {safePage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(safePage + 1)}
+                disabled={safePage >= totalPages}
+                className="rounded border border-gray-300 px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+              <button
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={safePage >= totalPages}
+                className="rounded border border-gray-300 px-2 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                &raquo;
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
