@@ -28,17 +28,25 @@ func (h *AttendanceHandler) GetAll(c *fiber.Ctx) error {
 	employeeID := c.Query("employee_id")
 	monthStr := c.Query("month")
 	yearStr := c.Query("year")
+	startDate := c.Query("start_date")
+	endDate := c.Query("end_date")
 
-	// Parse month/year if provided
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	limit, _ := strconv.Atoi(c.Query("limit", "10"))
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 10
+	}
+
 	var month, year int
-	var hasMonth, hasYear bool
 	if monthStr != "" {
 		m, err := strconv.Atoi(monthStr)
 		if err != nil {
 			return response.Error(c, fiber.StatusBadRequest, "Invalid month format")
 		}
 		month = m
-		hasMonth = true
 	}
 	if yearStr != "" {
 		y, err := strconv.Atoi(yearStr)
@@ -46,42 +54,13 @@ func (h *AttendanceHandler) GetAll(c *fiber.Ctx) error {
 			return response.Error(c, fiber.StatusBadRequest, "Invalid year format")
 		}
 		year = y
-		hasYear = true
 	}
 
-	// Filter by employee + month/year
-	if employeeID != "" && hasMonth && hasYear {
-		attendances, err := h.attService.GetByEmployeeIDAndMonth(employeeID, month, year)
-		if err != nil {
-			return response.Error(c, fiber.StatusInternalServerError, "Failed to fetch attendances")
-		}
-		return response.Success(c, fiber.StatusOK, "Attendances retrieved", attendances)
-	}
-
-	// Filter by employee only
-	if employeeID != "" {
-		attendances, err := h.attService.GetByEmployeeID(employeeID)
-		if err != nil {
-			return response.Error(c, fiber.StatusInternalServerError, "Failed to fetch attendances")
-		}
-		return response.Success(c, fiber.StatusOK, "Attendances retrieved", attendances)
-	}
-
-	// Filter by month/year only (admin view)
-	if hasMonth && hasYear {
-		attendances, err := h.attService.GetByMonth(month, year)
-		if err != nil {
-			return response.Error(c, fiber.StatusInternalServerError, "Failed to fetch attendances")
-		}
-		return response.Success(c, fiber.StatusOK, "Attendances retrieved", attendances)
-	}
-
-	// No filters — return all
-	attendances, err := h.attService.GetAll()
+	result, err := h.attService.GetAllPaginated(page, limit, employeeID, month, year, startDate, endDate)
 	if err != nil {
 		return response.Error(c, fiber.StatusInternalServerError, "Failed to fetch attendances")
 	}
-	return response.Success(c, fiber.StatusOK, "Attendances retrieved", attendances)
+	return response.Success(c, fiber.StatusOK, "Attendances retrieved", result)
 }
 
 func (h *AttendanceHandler) GetByID(c *fiber.Ctx) error {

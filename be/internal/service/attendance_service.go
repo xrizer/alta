@@ -11,6 +11,7 @@ import (
 
 type AttendanceService interface {
 	GetAll() ([]dto.AttendanceResponse, error)
+	GetAllPaginated(page, limit int, employeeID string, month, year int, startDate, endDate string) (*dto.PaginatedAttendanceResponse, error)
 	GetByID(id string) (*dto.AttendanceResponse, error)
 	GetByEmployeeID(employeeID string) ([]dto.AttendanceResponse, error)
 	GetByEmployeeIDAndMonth(employeeID string, month, year int) ([]dto.AttendanceResponse, error)
@@ -40,6 +41,26 @@ func (s *attendanceService) GetAll() ([]dto.AttendanceResponse, error) {
 		return nil, err
 	}
 	return dto.ToAttendanceResponses(attendances), nil
+}
+
+func (s *attendanceService) GetAllPaginated(page, limit int, employeeID string, month, year int, startDate, endDate string) (*dto.PaginatedAttendanceResponse, error) {
+	attendances, total, err := s.attRepo.FindAllPaginated(page, limit, employeeID, month, year, startDate, endDate)
+	if err != nil {
+		return nil, err
+	}
+
+	totalPages := int(total) / limit
+	if int(total)%limit > 0 {
+		totalPages++
+	}
+
+	return &dto.PaginatedAttendanceResponse{
+		Data:       dto.ToAttendanceResponses(attendances),
+		Page:       page,
+		Limit:      limit,
+		TotalItems: total,
+		TotalPages: totalPages,
+	}, nil
 }
 
 func (s *attendanceService) GetByID(id string) (*dto.AttendanceResponse, error) {

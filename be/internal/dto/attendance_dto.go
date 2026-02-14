@@ -74,6 +74,14 @@ func ToAttendanceResponse(a *model.Attendance) AttendanceResponse {
 	return resp
 }
 
+type PaginatedAttendanceResponse struct {
+	Data       []AttendanceResponse `json:"data"`
+	Page       int                  `json:"page"`
+	Limit      int                  `json:"limit"`
+	TotalItems int64                `json:"total_items"`
+	TotalPages int                  `json:"total_pages"`
+}
+
 func ToAttendanceResponses(attendances []model.Attendance) []AttendanceResponse {
 	responses := make([]AttendanceResponse, len(attendances))
 	for i, a := range attendances {

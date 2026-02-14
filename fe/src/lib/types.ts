@@ -259,6 +259,14 @@ export interface Attendance {
   updated_at: string;
 }
 
+export interface PaginatedAttendanceResponse {
+  data: Attendance[];
+  page: number;
+  limit: number;
+  total_items: number;
+  total_pages: number;
+}
+
 // Leave
 export type LeaveType = "cuti_tahunan" | "cuti_sakit" | "cuti_melahirkan" | "cuti_besar" | "izin" | "dinas_luar";
 export type LeaveStatus = "pending" | "approved" | "rejected";

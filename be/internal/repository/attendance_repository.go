@@ -17,6 +17,7 @@ type AttendanceRepository interface {
 	FindByMonth(month, year int) ([]model.Attendance, error)
 	FindByDate(date time.Time) ([]model.Attendance, error)
 	FindAll() ([]model.Attendance, error)
+	FindAllPaginated(page, limit int, employeeID string, month, year int, startDate, endDate string) ([]model.Attendance, int64, error)
 	Update(att *model.Attendance) error
 	Delete(id string) error
 }
@@ -95,6 +96,36 @@ func (r *attendanceRepository) FindAll() ([]model.Attendance, error) {
 		return nil, err
 	}
 	return attendances, nil
+}
+
+func (r *attendanceRepository) FindAllPaginated(page, limit int, employeeID string, month, year int, startDate, endDate string) ([]model.Attendance, int64, error) {
+	query := r.db.Model(&model.Attendance{})
+
+	if employeeID != "" {
+		query = query.Where("employee_id = ?", employeeID)
+	}
+	if month > 0 && year > 0 {
+		query = query.Where("EXTRACT(MONTH FROM date) = ? AND EXTRACT(YEAR FROM date) = ?", month, year)
+	}
+	if startDate != "" {
+		query = query.Where("date >= ?", startDate)
+	}
+	if endDate != "" {
+		query = query.Where("date <= ?", endDate)
+	}
+
+	var total int64
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	var attendances []model.Attendance
+	offset := (page - 1) * limit
+	if err := r.preload(query).Order("date DESC, created_at DESC").Limit(limit).Offset(offset).Find(&attendances).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return attendances, total, nil
 }
 
 func (r *attendanceRepository) Update(att *model.Attendance) error {

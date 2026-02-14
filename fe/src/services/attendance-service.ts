@@ -1,15 +1,23 @@
 import api from "@/lib/api";
-import { ApiResponse, Attendance } from "@/lib/types";
+import { ApiResponse, Attendance, PaginatedAttendanceResponse } from "@/lib/types";
 
 export async function getAttendances(params?: {
   employee_id?: string;
   month?: number;
   year?: number;
-}): Promise<ApiResponse<Attendance[]>> {
+  page?: number;
+  limit?: number;
+  start_date?: string;
+  end_date?: string;
+}): Promise<ApiResponse<PaginatedAttendanceResponse>> {
   const searchParams = new URLSearchParams();
   if (params?.employee_id) searchParams.set("employee_id", params.employee_id);
   if (params?.month) searchParams.set("month", params.month.toString());
   if (params?.year) searchParams.set("year", params.year.toString());
+  if (params?.page) searchParams.set("page", params.page.toString());
+  if (params?.limit) searchParams.set("limit", params.limit.toString());
+  if (params?.start_date) searchParams.set("start_date", params.start_date);
+  if (params?.end_date) searchParams.set("end_date", params.end_date);
   const query = searchParams.toString() ? `?${searchParams.toString()}` : "";
   const response = await api.get(`/attendances${query}`);
   return response.data;

@@ -47,6 +47,10 @@ export default function AttendancePage() {
   const [importResult, setImportResult] = useState<{ imported: number; total: number; errors: string[] } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Server-side pagination metadata
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
   const fetchData = useCallback(async () => {
     try {
       setError("");
@@ -62,16 +66,33 @@ export default function AttendancePage() {
         // Admin/HR users may not have an employee record
       }
 
+      const params: {
+        employee_id?: string;
+        month: number;
+        year: number;
+        page: number;
+        limit: number;
+        start_date?: string;
+        end_date?: string;
+      } = { month, year, page: currentPage, limit: perPage };
+      if (startDate) params.start_date = startDate;
+      if (endDate) params.end_date = endDate;
+
       if (isAdminOrHr) {
-        const res = await attendanceService.getAttendances({ month, year });
-        if (res.success) setAttendances(res.data || []);
+        const res = await attendanceService.getAttendances(params);
+        if (res.success && res.data) {
+          setAttendances(res.data.data || []);
+          setTotalItems(res.data.total_items);
+          setTotalPages(res.data.total_pages);
+        }
       } else if (empData) {
-        const res = await attendanceService.getAttendances({
-          employee_id: empData.id,
-          month,
-          year,
-        });
-        if (res.success) setAttendances(res.data || []);
+        params.employee_id = empData.id;
+        const res = await attendanceService.getAttendances(params);
+        if (res.success && res.data) {
+          setAttendances(res.data.data || []);
+          setTotalItems(res.data.total_items);
+          setTotalPages(res.data.total_pages);
+        }
       }
 
       if (empData) {
@@ -81,9 +102,11 @@ export default function AttendancePage() {
             employee_id: empData.id,
             month: new Date().getMonth() + 1,
             year: new Date().getFullYear(),
+            page: 1,
+            limit: 31,
           });
           if (todayRes.success && todayRes.data) {
-            const todayAtt = todayRes.data.find((a: Attendance) => a.date?.startsWith(today));
+            const todayAtt = todayRes.data.data.find((a: Attendance) => a.date?.startsWith(today));
             if (todayAtt) setTodayAttendance(todayAtt);
           }
         } catch {
@@ -96,7 +119,7 @@ export default function AttendancePage() {
       setIsLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdminOrHr, month, year]);
+  }, [isAdminOrHr, month, year, currentPage, perPage, startDate, endDate]);
 
   useEffect(() => {
     fetchData();
@@ -191,17 +214,9 @@ export default function AttendancePage() {
     cuti: "bg-indigo-100 text-indigo-800",
   };
 
-  // Filter and sort attendances
+  // Filter and sort attendances (column search + sort are client-side on current page)
   const filteredAndSorted = useMemo(() => {
     let filtered = [...attendances];
-
-    // Date range filter
-    if (startDate) {
-      filtered = filtered.filter((a) => a.date >= startDate);
-    }
-    if (endDate) {
-      filtered = filtered.filter((a) => a.date <= endDate);
-    }
 
     // Column search filters
     if (searchDate) {
@@ -263,18 +278,16 @@ export default function AttendancePage() {
     });
 
     return filtered;
-  }, [attendances, startDate, endDate, searchDate, searchEmployee, searchClockIn, searchClockOut, searchStatus, searchOvertime, searchNotes, sortKey, sortDir]);
+  }, [attendances, searchDate, searchEmployee, searchClockIn, searchClockOut, searchStatus, searchOvertime, searchNotes, sortKey, sortDir]);
 
-  // Reset to page 1 when filters change
+  // Reset to page 1 when server-side filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [startDate, endDate, searchDate, searchEmployee, searchClockIn, searchClockOut, searchStatus, searchOvertime, searchNotes, sortKey, sortDir, month, year, perPage]);
+  }, [startDate, endDate, month, year, perPage]);
 
-  // Pagination
-  const totalItems = filteredAndSorted.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
-  const safePage = Math.min(currentPage, totalPages);
-  const paginatedData = filteredAndSorted.slice((safePage - 1) * perPage, safePage * perPage);
+  // Pagination uses server-side values; column search/sort are client-side on the current page
+  const displayData = filteredAndSorted;
+  const safePage = Math.min(currentPage, Math.max(1, totalPages));
   const startItem = totalItems === 0 ? 0 : (safePage - 1) * perPage + 1;
   const endItem = Math.min(safePage * perPage, totalItems);
 
@@ -506,7 +519,7 @@ export default function AttendancePage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {paginatedData.map((att) => (
+              {displayData.map((att) => (
                 <tr key={att.id} className="hover:bg-gray-50">
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{att.date}</td>
                   {isAdminOrHr && <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{att.employee?.user?.name || "-"}</td>}
@@ -521,7 +534,7 @@ export default function AttendancePage() {
                   <td className="px-6 py-4 text-sm text-gray-500">{att.notes || "-"}</td>
                 </tr>
               ))}
-              {paginatedData.length === 0 && (
+              {displayData.length === 0 && (
                 <tr><td colSpan={isAdminOrHr ? 7 : 6} className="px-6 py-8 text-center text-sm text-gray-500">No attendance records found</td></tr>
               )}
             </tbody>
