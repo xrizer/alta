@@ -25,14 +25,8 @@ export default function AttendancePage() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // Column search filters
-  const [searchDate, setSearchDate] = useState("");
-  const [searchEmployee, setSearchEmployee] = useState("");
-  const [searchClockIn, setSearchClockIn] = useState("");
-  const [searchClockOut, setSearchClockOut] = useState("");
-  const [searchStatus, setSearchStatus] = useState("");
-  const [searchOvertime, setSearchOvertime] = useState("");
-  const [searchNotes, setSearchNotes] = useState("");
+  // Global search filter
+  const [globalSearch, setGlobalSearch] = useState("");
 
   // Sort state
   const [sortKey, setSortKey] = useState<SortKey>("date");
@@ -214,38 +208,31 @@ export default function AttendancePage() {
     cuti: "bg-indigo-100 text-indigo-800",
   };
 
-  // Filter and sort attendances (column search + sort are client-side on current page)
+  // Filter and sort attendances (global search + sort are client-side on current page)
   const filteredAndSorted = useMemo(() => {
     let filtered = [...attendances];
 
-    // Column search filters
-    if (searchDate) {
-      filtered = filtered.filter((a) => a.date?.toLowerCase().includes(searchDate.toLowerCase()));
-    }
-    if (searchEmployee) {
-      filtered = filtered.filter((a) =>
-        (a.employee?.user?.name || "").toLowerCase().includes(searchEmployee.toLowerCase())
-      );
-    }
-    if (searchClockIn) {
-      filtered = filtered.filter((a) => formatTime(a.clock_in).includes(searchClockIn));
-    }
-    if (searchClockOut) {
-      filtered = filtered.filter((a) => formatTime(a.clock_out).includes(searchClockOut));
-    }
-    if (searchStatus) {
-      filtered = filtered.filter((a) => a.status?.toLowerCase().includes(searchStatus.toLowerCase()));
-    }
-    if (searchOvertime) {
+    // Global search filter — matches against all visible columns
+    if (globalSearch) {
+      const q = globalSearch.toLowerCase();
       filtered = filtered.filter((a) => {
-        const val = a.overtime_hours > 0 ? `${a.overtime_hours}h` : "-";
-        return val.toLowerCase().includes(searchOvertime.toLowerCase());
+        const date = (a.date || "").toLowerCase();
+        const employee = (a.employee?.user?.name || "").toLowerCase();
+        const clockIn = formatTime(a.clock_in).toLowerCase();
+        const clockOut = formatTime(a.clock_out).toLowerCase();
+        const status = (a.status || "").toLowerCase();
+        const overtime = a.overtime_hours > 0 ? `${a.overtime_hours}h` : "-";
+        const notes = (a.notes || "").toLowerCase();
+        return (
+          date.includes(q) ||
+          employee.includes(q) ||
+          clockIn.includes(q) ||
+          clockOut.includes(q) ||
+          status.includes(q) ||
+          overtime.toLowerCase().includes(q) ||
+          notes.includes(q)
+        );
       });
-    }
-    if (searchNotes) {
-      filtered = filtered.filter((a) =>
-        (a.notes || "").toLowerCase().includes(searchNotes.toLowerCase())
-      );
     }
 
     // Sort
@@ -278,7 +265,7 @@ export default function AttendancePage() {
     });
 
     return filtered;
-  }, [attendances, searchDate, searchEmployee, searchClockIn, searchClockOut, searchStatus, searchOvertime, searchNotes, sortKey, sortDir]);
+  }, [attendances, globalSearch, sortKey, sortDir]);
 
   // Reset to page 1 when server-side filters change
   useEffect(() => {
@@ -417,6 +404,15 @@ export default function AttendancePage() {
             </button>
           )}
         </div>
+        <div className="ml-auto">
+          <input
+            type="text"
+            placeholder="Search all columns..."
+            value={globalSearch}
+            onChange={(e) => setGlobalSearch(e.target.value)}
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 w-64"
+          />
+        </div>
       </div>
 
       {/* Attendance Table */}
@@ -447,74 +443,6 @@ export default function AttendancePage() {
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none" onClick={() => handleSort("notes")}>
                   Notes<SortIcon columnKey="notes" />
-                </th>
-              </tr>
-              {/* Column Search Row */}
-              <tr className="bg-gray-50">
-                <th className="px-6 py-2">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchDate}
-                    onChange={(e) => setSearchDate(e.target.value)}
-                    className="w-full rounded border border-gray-300 px-2 py-1 text-xs font-normal text-gray-700"
-                  />
-                </th>
-                {isAdminOrHr && (
-                  <th className="px-6 py-2">
-                    <input
-                      type="text"
-                      placeholder="Search..."
-                      value={searchEmployee}
-                      onChange={(e) => setSearchEmployee(e.target.value)}
-                      className="w-full rounded border border-gray-300 px-2 py-1 text-xs font-normal text-gray-700"
-                    />
-                  </th>
-                )}
-                <th className="px-6 py-2">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchClockIn}
-                    onChange={(e) => setSearchClockIn(e.target.value)}
-                    className="w-full rounded border border-gray-300 px-2 py-1 text-xs font-normal text-gray-700"
-                  />
-                </th>
-                <th className="px-6 py-2">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchClockOut}
-                    onChange={(e) => setSearchClockOut(e.target.value)}
-                    className="w-full rounded border border-gray-300 px-2 py-1 text-xs font-normal text-gray-700"
-                  />
-                </th>
-                <th className="px-6 py-2">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchStatus}
-                    onChange={(e) => setSearchStatus(e.target.value)}
-                    className="w-full rounded border border-gray-300 px-2 py-1 text-xs font-normal text-gray-700"
-                  />
-                </th>
-                <th className="px-6 py-2">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchOvertime}
-                    onChange={(e) => setSearchOvertime(e.target.value)}
-                    className="w-full rounded border border-gray-300 px-2 py-1 text-xs font-normal text-gray-700"
-                  />
-                </th>
-                <th className="px-6 py-2">
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    value={searchNotes}
-                    onChange={(e) => setSearchNotes(e.target.value)}
-                    className="w-full rounded border border-gray-300 px-2 py-1 text-xs font-normal text-gray-700"
-                  />
                 </th>
               </tr>
             </thead>
