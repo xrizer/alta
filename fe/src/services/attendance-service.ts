@@ -58,3 +58,16 @@ export async function deleteAttendance(
   const response = await api.delete(`/attendances/${id}`);
   return response.data;
 }
+
+export async function importAttendance(
+  file: File
+): Promise<
+  ApiResponse<{ imported: number; total: number; errors: string[] }>
+> {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await api.post("/attendances/import", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+}

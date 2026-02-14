@@ -61,7 +61,7 @@ func main() {
 	empHandler := handler.NewEmployeeHandler(empService)
 	empSalaryHandler := handler.NewEmployeeSalaryHandler(empSalaryService)
 	holidayHandler := handler.NewHolidayHandler(holidayService)
-	attHandler := handler.NewAttendanceHandler(attService)
+	attHandler := handler.NewAttendanceHandler(attService, empService)
 	leaveHandler := handler.NewLeaveHandler(leaveService)
 	payrollHandler := handler.NewPayrollHandler(payrollService)
 
@@ -166,6 +166,7 @@ func main() {
 	attendances.Post("/clock-in", attHandler.ClockIn)
 	attendances.Put("/:id/clock-out", attHandler.ClockOut)
 	attendances.Post("/", middleware.RoleMiddleware("admin", "hr"), attHandler.Create)
+	attendances.Post("/import", middleware.RoleMiddleware("admin", "hr"), attHandler.Import)
 	attendances.Put("/:id", middleware.RoleMiddleware("admin", "hr"), attHandler.Update)
 	attendances.Delete("/:id", middleware.RoleMiddleware("admin"), attHandler.Delete)
 
