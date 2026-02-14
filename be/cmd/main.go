@@ -166,7 +166,7 @@ func main() {
 
 	// Attendance routes
 	attendances := api.Group("/attendances", middleware.AuthMiddleware(cfg))
-	attendances.Get("/", middleware.RoleMiddleware("admin", "hr"), attHandler.GetAll)
+	attendances.Get("/", attHandler.GetAll)
 	attendances.Get("/:id", attHandler.GetByID)
 	attendances.Post("/clock-in", attHandler.ClockIn)
 	attendances.Put("/:id/clock-out", attHandler.ClockOut)
@@ -177,7 +177,7 @@ func main() {
 
 	// Leave routes
 	leaves := api.Group("/leaves", middleware.AuthMiddleware(cfg))
-	leaves.Get("/", middleware.RoleMiddleware("admin", "hr"), leaveHandler.GetAll)
+	leaves.Get("/", leaveHandler.GetAll)
 	leaves.Get("/:id", leaveHandler.GetByID)
 	leaves.Post("/", leaveHandler.Create)
 	leaves.Put("/:id", leaveHandler.Update)

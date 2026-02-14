@@ -56,12 +56,14 @@ func ToLeaveResponse(l *model.Leave) LeaveResponse {
 		Reason:          l.Reason,
 		Attachment:      l.Attachment,
 		Status:          l.Status,
-		ApprovedBy:      l.ApprovedBy,
 		RejectionReason: l.RejectionReason,
 		CreatedAt:       l.CreatedAt.Format("2006-01-02T15:04:05Z"),
 		UpdatedAt:       l.UpdatedAt.Format("2006-01-02T15:04:05Z"),
 	}
 
+	if l.ApprovedBy != nil {
+		resp.ApprovedBy = *l.ApprovedBy
+	}
 	if l.ApprovedAt != nil {
 		resp.ApprovedAt = l.ApprovedAt.Format("2006-01-02T15:04:05Z")
 	}

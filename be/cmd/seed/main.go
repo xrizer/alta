@@ -737,16 +737,11 @@ func seedLeaves(db *gorm.DB, employees []model.Employee, users []model.User) {
 		}
 
 		if l.ApprovedBy != "" {
-			leave.ApprovedBy = l.ApprovedBy
+			leave.ApprovedBy = &l.ApprovedBy
 			leave.ApprovedAt = &approvedAt
-			if err := db.Create(&leave).Error; err != nil {
-				log.Printf("  ⚠ Leave error for %s: %v", employees[l.EmpIndex].EmployeeNumber, err)
-			}
-		} else {
-			// Omit approved_by to avoid inserting empty string into UUID column
-			if err := db.Omit("approved_by").Create(&leave).Error; err != nil {
-				log.Printf("  ⚠ Leave error for %s: %v", employees[l.EmpIndex].EmployeeNumber, err)
-			}
+		}
+		if err := db.Create(&leave).Error; err != nil {
+			log.Printf("  ⚠ Leave error for %s: %v", employees[l.EmpIndex].EmployeeNumber, err)
 		}
 	}
 

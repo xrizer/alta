@@ -37,7 +37,7 @@ type Leave struct {
 	Reason          string         `gorm:"type:text;not null" json:"reason"`
 	Attachment      string         `gorm:"type:varchar(255)" json:"attachment"`
 	Status          LeaveStatus    `gorm:"type:varchar(20);not null;default:'pending'" json:"status"`
-	ApprovedBy      string         `gorm:"type:uuid" json:"approved_by"`
+	ApprovedBy      *string        `gorm:"type:uuid" json:"approved_by"`
 	Approver        *User          `gorm:"foreignKey:ApprovedBy" json:"approver,omitempty"`
 	ApprovedAt      *time.Time     `gorm:"type:timestamp" json:"approved_at"`
 	RejectionReason string         `gorm:"type:text" json:"rejection_reason"`

@@ -174,7 +174,7 @@ func (s *leaveService) Approve(id string, approverID string, req dto.ApproveLeav
 
 	now := time.Now()
 	leave.Status = req.Status
-	leave.ApprovedBy = approverID
+	leave.ApprovedBy = &approverID
 	leave.ApprovedAt = &now
 
 	if req.Status == model.LeaveStatusRejected {
