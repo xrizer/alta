@@ -37,7 +37,7 @@ func main() {
 
 	// ── 4. Positions ──────────────────────────────────────────
 	log.Println("→ Seeding positions...")
-	positions := seedPositions(db, company.ID)
+	positions := seedPositions(db, company.ID, departments)
 
 	// ── 5. Shifts ─────────────────────────────────────────────
 	log.Println("→ Seeding shifts...")
@@ -292,30 +292,32 @@ func seedDepartments(db *gorm.DB, companyID string) map[string]model.Department 
 // Positions
 // ═══════════════════════════════════════════════════════════════
 
-func seedPositions(db *gorm.DB, companyID string) map[string]model.Position {
+func seedPositions(db *gorm.DB, companyID string, departments map[string]model.Department) map[string]model.Position {
 	posData := []struct {
-		Name       string
-		BaseSalary float64
+		Name           string
+		DepartmentName string
+		BaseSalary     float64
 	}{
-		{"Software Engineer", 12000000},
-		{"Senior Software Engineer", 18000000},
-		{"Engineering Manager", 25000000},
-		{"HR Manager", 20000000},
-		{"HR Staff", 8000000},
-		{"Finance Manager", 22000000},
-		{"Accountant", 10000000},
-		{"Marketing Manager", 20000000},
-		{"Marketing Staff", 8500000},
-		{"Operations Manager", 18000000},
+		{"Software Engineer", "Engineering", 12000000},
+		{"Senior Software Engineer", "Engineering", 18000000},
+		{"Engineering Manager", "Engineering", 25000000},
+		{"HR Manager", "Human Resources", 20000000},
+		{"HR Staff", "Human Resources", 8000000},
+		{"Finance Manager", "Finance & Accounting", 22000000},
+		{"Accountant", "Finance & Accounting", 10000000},
+		{"Marketing Manager", "Marketing", 20000000},
+		{"Marketing Staff", "Marketing", 8500000},
+		{"Operations Manager", "Operations", 18000000},
 	}
 
 	positions := make(map[string]model.Position)
 	for _, p := range posData {
 		pos := model.Position{
-			CompanyID:  companyID,
-			Name:       p.Name,
-			BaseSalary: p.BaseSalary,
-			IsActive:   true,
+			CompanyID:    companyID,
+			DepartmentID: departments[p.DepartmentName].ID,
+			Name:         p.Name,
+			BaseSalary:   p.BaseSalary,
+			IsActive:     true,
 		}
 		if err := db.Create(&pos).Error; err != nil {
 			log.Printf("  ⚠ Position %s error: %v", p.Name, err)
@@ -566,8 +568,8 @@ func seedEmployeeSalaries(db *gorm.DB, employees []model.Employee) {
 			BPJSKesCompany:     kesCo,
 			BPJSTKJHTEmployee:  jhtEmp,
 			BPJSTKJHTCompany:   jhtCo,
-			BPJSTKJKK:         jkk,
-			BPJSTKJKM:         jkm,
+			BPJSTKJKK:          jkk,
+			BPJSTKJKM:          jkm,
 			BPJSTKJPEmployee:   jpEmp,
 			BPJSTKJPCompany:    jpCo,
 			EffectiveDate:      effectiveDate,
