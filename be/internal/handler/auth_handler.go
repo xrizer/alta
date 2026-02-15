@@ -18,6 +18,17 @@ func NewAuthHandler(authService service.AuthService) *AuthHandler {
 	return &AuthHandler{authService: authService}
 }
 
+// Login godoc
+// @Summary User login
+// @Description Authenticate user with email and password, returns access token and sets refresh token in cookie
+// @Tags Authentication
+// @Accept json
+// @Produce json
+// @Param request body dto.LoginRequest true "Login credentials"
+// @Success 200 {object} response.Response{data=dto.TokenResponse} "Login successful"
+// @Failure 400 {object} response.Response "Invalid request body"
+// @Failure 401 {object} response.Response "Unauthorized"
+// @Router /auth/login [post]
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	var req dto.LoginRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -46,6 +57,14 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Login successful", tokenResp)
 }
 
+// Refresh godoc
+// @Summary Refresh access token
+// @Description Generate new access token using refresh token from cookie
+// @Tags Authentication
+// @Produce json
+// @Success 200 {object} response.Response{data=dto.TokenResponse} "Token refreshed"
+// @Failure 401 {object} response.Response "Unauthorized - refresh token not found or invalid"
+// @Router /auth/refresh [post]
 func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 	refreshToken := c.Cookies("refresh_token")
 	if refreshToken == "" {
@@ -70,6 +89,14 @@ func (h *AuthHandler) Refresh(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Token refreshed", tokenResp)
 }
 
+// Logout godoc
+// @Summary User logout
+// @Description Clear refresh token cookie to logout user
+// @Tags Authentication
+// @Security Bearer
+// @Produce json
+// @Success 200 {object} response.Response "Logged out successfully"
+// @Router /auth/logout [post]
 func (h *AuthHandler) Logout(c *fiber.Ctx) error {
 	c.Cookie(&fiber.Cookie{
 		Name:     "refresh_token",
