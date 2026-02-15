@@ -12,11 +12,34 @@ import (
 	"hris-backend/internal/service"
 	"hris-backend/pkg/hash"
 
+	_ "hris-backend/docs" // swagger docs
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
 	"gorm.io/gorm"
 )
+
+// @title HRIS API
+// @version 1.0
+// @description Human Resource Information System API with authentication and comprehensive HRIS modules
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.email support@hris.com
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:8080
+// @BasePath /api
+// @schemes http https
+
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 
 func main() {
 	cfg := config.Load()
@@ -203,6 +226,9 @@ func main() {
 	menuAccess.Get("/", middleware.RoleMiddleware("admin"), menuAccessHandler.GetAll)
 	menuAccess.Post("/", middleware.RoleMiddleware("admin"), menuAccessHandler.Set)
 	menuAccess.Delete("/:user_id", middleware.RoleMiddleware("admin"), menuAccessHandler.Delete)
+
+	// Swagger documentation
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
 	log.Printf("Server starting on port %s", cfg.AppPort)
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", cfg.AppPort)))
