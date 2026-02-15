@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
+import { useState, useEffect } from "react";
+import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 interface NavItem {
   name: string;
@@ -65,6 +67,39 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { user, allowedMenuKeys } = useAuth();
 
+  // State to track which sections are expanded
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+
+  // Initialize expanded state from localStorage or default to all expanded
+  useEffect(() => {
+    const stored = localStorage.getItem("sidebar-expanded-sections");
+    if (stored) {
+      setExpandedSections(JSON.parse(stored));
+    } else {
+      // Default: all sections expanded
+      const defaultExpanded = navigation.reduce(
+        (acc, section) => ({ ...acc, [section.title]: true }),
+        {}
+      );
+      setExpandedSections(defaultExpanded);
+    }
+  }, []);
+
+  // Save to localStorage whenever expanded state changes
+  useEffect(() => {
+    if (Object.keys(expandedSections).length > 0) {
+      localStorage.setItem("sidebar-expanded-sections", JSON.stringify(expandedSections));
+    }
+  }, [expandedSections]);
+
+  // Toggle section expand/collapse
+  const toggleSection = (sectionTitle: string) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [sectionTitle]: !prev[sectionTitle],
+    }));
+  };
+
   const filteredSections = navigation
     .map((section) => ({
       ...section,
@@ -88,33 +123,51 @@ export default function Sidebar() {
         <h1 className="text-xl font-bold text-blue-600">HRIS</h1>
       </div>
       <nav className="flex-1 overflow-y-auto px-3 py-4">
-        {filteredSections.map((section) => (
-          <div key={section.title} className="mb-4">
-            <p className="mb-1 px-3 text-xs font-bold uppercase tracking-wider text-gray-900">
-              {section.title}
-            </p>
-            <div className="space-y-1">
-              {section.items.map((item) => {
-                const isActive =
-                  pathname === item.href ||
-                  (item.href !== "/dashboard" && pathname.startsWith(item.href));
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                      isActive
-                        ? "bg-blue-50 text-blue-700"
-                        : "text-gray-700 hover:bg-gray-100"
-                    }`}
-                  >
-                    {item.name}
-                  </Link>
-                );
-              })}
+        {filteredSections.map((section) => {
+          const isExpanded = expandedSections[section.title] ?? true;
+
+          return (
+            <div key={section.title} className="mb-2">
+              <button
+                onClick={() => toggleSection(section.title)}
+                className="mb-1 flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider text-gray-900 transition-colors hover:bg-gray-100"
+              >
+                <span>{section.title}</span>
+                {isExpanded ? (
+                  <ChevronDownIcon className="h-4 w-4 text-gray-600" />
+                ) : (
+                  <ChevronRightIcon className="h-4 w-4 text-gray-600" />
+                )}
+              </button>
+              <div
+                className={`overflow-hidden transition-all duration-200 ease-in-out ${
+                  isExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+                }`}
+              >
+                <div className="space-y-1">
+                  {section.items.map((item) => {
+                    const isActive =
+                      pathname === item.href ||
+                      (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                          isActive
+                            ? "bg-blue-50 text-blue-700"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </nav>
     </aside>
   );
