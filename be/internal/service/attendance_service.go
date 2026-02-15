@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"hris-backend/internal/dto"
@@ -24,14 +25,55 @@ type AttendanceService interface {
 }
 
 type attendanceService struct {
-	attRepo repository.AttendanceRepository
-	empRepo repository.EmployeeRepository
+	attRepo   repository.AttendanceRepository
+	empRepo   repository.EmployeeRepository
+	shiftRepo repository.ShiftRepository
 }
 
-func NewAttendanceService(attRepo repository.AttendanceRepository, empRepo repository.EmployeeRepository) AttendanceService {
+func NewAttendanceService(attRepo repository.AttendanceRepository, empRepo repository.EmployeeRepository, shiftRepo repository.ShiftRepository) AttendanceService {
 	return &attendanceService{
-		attRepo: attRepo,
-		empRepo: empRepo,
+		attRepo:   attRepo,
+		empRepo:   empRepo,
+		shiftRepo: shiftRepo,
+	}
+}
+
+// calculateAttendanceStatus determines the status based on clock-in time and shift start time
+func calculateAttendanceStatus(clockIn time.Time, shiftStartTime string) (model.AttendanceStatus, error) {
+	// Parse shift start time (format: "HH:MM" or "HH:MM:SS")
+	var hour, minute int
+	_, err := fmt.Sscanf(shiftStartTime, "%d:%d", &hour, &minute)
+	if err != nil {
+		return model.AttendanceHadir, err
+	}
+
+	// Create the expected shift start time on the same date as clock-in
+	shiftStart := time.Date(
+		clockIn.Year(),
+		clockIn.Month(),
+		clockIn.Day(),
+		hour,
+		minute,
+		0,
+		0,
+		clockIn.Location(),
+	)
+
+	// Calculate the difference in minutes
+	diff := clockIn.Sub(shiftStart).Minutes()
+
+	// Grace period: 5 minutes before or after shift start is considered "on time"
+	const gracePeriod = 5.0
+
+	if diff < -gracePeriod {
+		// Clocked in more than 5 minutes early
+		return model.AttendanceEarlyIn, nil
+	} else if diff <= gracePeriod {
+		// Clocked in within grace period (5 minutes before to 5 minutes after)
+		return model.AttendanceOnTime, nil
+	} else {
+		// Clocked in more than 5 minutes late
+		return model.AttendanceLateIn, nil
 	}
 }
 
@@ -111,13 +153,27 @@ func (s *attendanceService) ClockIn(req dto.ClockInRequest) (*dto.AttendanceResp
 		return nil, errors.New("already clocked in today")
 	}
 
+	// Get employee's shift to determine expected start time
+	shift, err := s.shiftRepo.FindByID(emp.ShiftID)
+	if err != nil {
+		return nil, errors.New("shift not found for employee")
+	}
+
 	now := time.Now()
+
+	// Calculate attendance status based on clock-in time vs shift start time
+	status, err := calculateAttendanceStatus(now, shift.StartTime)
+	if err != nil {
+		// If there's an error parsing shift time, default to "hadir"
+		status = model.AttendanceHadir
+	}
+
 	att := &model.Attendance{
 		EmployeeID: req.EmployeeID,
 		ShiftID:    emp.ShiftID,
 		Date:       today,
 		ClockIn:    &now,
-		Status:     model.AttendanceHadir,
+		Status:     status,
 		Notes:      req.Notes,
 	}
 

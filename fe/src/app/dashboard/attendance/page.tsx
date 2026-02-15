@@ -206,6 +206,21 @@ export default function AttendancePage() {
     izin: "bg-blue-100 text-blue-800",
     sakit: "bg-purple-100 text-purple-800",
     cuti: "bg-indigo-100 text-indigo-800",
+    early_in: "bg-cyan-100 text-cyan-800",
+    on_time: "bg-green-100 text-green-800",
+    late_in: "bg-orange-100 text-orange-800",
+  };
+
+  const statusLabels: Record<string, string> = {
+    hadir: "Hadir",
+    terlambat: "Terlambat",
+    alpha: "Alpha",
+    izin: "Izin",
+    sakit: "Sakit",
+    cuti: "Cuti",
+    early_in: "Early In",
+    on_time: "On Time",
+    late_in: "Late In",
   };
 
   // Filter and sort attendances (global search + sort are client-side on current page)
@@ -455,7 +470,7 @@ export default function AttendancePage() {
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatTime(att.clock_out)}</td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${statusColors[att.status] || "bg-gray-100 text-gray-800"}`}>
-                      {att.status}
+                      {statusLabels[att.status] || att.status}
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{att.overtime_hours > 0 ? `${att.overtime_hours}h` : "-"}</td>

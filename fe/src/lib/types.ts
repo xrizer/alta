@@ -242,7 +242,7 @@ export interface UpdateEmployeeRequest {
 }
 
 // Attendance
-export type AttendanceStatus = "hadir" | "alpha" | "terlambat" | "izin" | "sakit" | "cuti";
+export type AttendanceStatus = "hadir" | "alpha" | "terlambat" | "izin" | "sakit" | "cuti" | "early_in" | "on_time" | "late_in";
 
 export interface Attendance {
   id: string;
