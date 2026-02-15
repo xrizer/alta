@@ -47,7 +47,7 @@ func main() {
 	empService := service.NewEmployeeService(empRepo, userRepo, companyRepo, deptRepo, posRepo, shiftRepo)
 	empSalaryService := service.NewEmployeeSalaryService(empSalaryRepo, empRepo)
 	holidayService := service.NewHolidayService(holidayRepo, companyRepo)
-	attService := service.NewAttendanceService(attRepo, empRepo)
+	attService := service.NewAttendanceService(attRepo, empRepo, shiftRepo)
 	leaveService := service.NewLeaveService(leaveRepo, empRepo)
 	payrollService := service.NewPayrollService(payrollRepo, empRepo, empSalaryRepo, attRepo)
 	orgService := service.NewOrganizationService(companyRepo)

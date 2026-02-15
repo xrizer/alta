@@ -16,6 +16,9 @@ const (
 	AttendanceIzin      AttendanceStatus = "izin"
 	AttendanceSakit     AttendanceStatus = "sakit"
 	AttendanceCuti      AttendanceStatus = "cuti"
+	AttendanceEarlyIn   AttendanceStatus = "early_in"
+	AttendanceOnTime    AttendanceStatus = "on_time"
+	AttendanceLateIn    AttendanceStatus = "late_in"
 )
 
 type Attendance struct {
