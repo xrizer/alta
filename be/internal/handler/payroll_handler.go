@@ -18,6 +18,19 @@ func NewPayrollHandler(payrollService service.PayrollService) *PayrollHandler {
 	return &PayrollHandler{payrollService: payrollService}
 }
 
+// GetAll godoc
+// @Summary Get all payrolls
+// @Description Retrieve all payroll records, optionally filtered by employee, month, and year
+// @Tags Payrolls
+// @Security Bearer
+// @Produce json
+// @Param employee_id query string false "Filter by employee ID"
+// @Param month query int false "Filter by month (1-12)"
+// @Param year query int false "Filter by year"
+// @Success 200 {object} response.Response{data=[]dto.PayrollResponse} "Payrolls retrieved"
+// @Failure 400 {object} response.Response "Invalid month or year format"
+// @Failure 500 {object} response.Response "Failed to fetch payrolls"
+// @Router /payrolls [get]
 func (h *PayrollHandler) GetAll(c *fiber.Ctx) error {
 	employeeID := c.Query("employee_id")
 	monthStr := c.Query("month")
@@ -54,6 +67,16 @@ func (h *PayrollHandler) GetAll(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Payrolls retrieved", payrolls)
 }
 
+// GetByID godoc
+// @Summary Get payroll by ID
+// @Description Retrieve a payroll record by its ID
+// @Tags Payrolls
+// @Security Bearer
+// @Produce json
+// @Param id path string true "Payroll ID"
+// @Success 200 {object} response.Response{data=dto.PayrollResponse} "Payroll retrieved"
+// @Failure 404 {object} response.Response "Payroll not found"
+// @Router /payrolls/{id} [get]
 func (h *PayrollHandler) GetByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 	payroll, err := h.payrollService.GetByID(id)
@@ -63,6 +86,17 @@ func (h *PayrollHandler) GetByID(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Payroll retrieved", payroll)
 }
 
+// Generate godoc
+// @Summary Generate payroll
+// @Description Generate a payroll record for an employee for a specific month and year
+// @Tags Payrolls
+// @Security Bearer
+// @Accept json
+// @Produce json
+// @Param request body dto.GeneratePayrollRequest true "Payroll generation data"
+// @Success 201 {object} response.Response{data=dto.PayrollResponse} "Payroll generated"
+// @Failure 400 {object} response.Response "Invalid request"
+// @Router /payrolls/generate [post]
 func (h *PayrollHandler) Generate(c *fiber.Ctx) error {
 	var req dto.GeneratePayrollRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -88,6 +122,18 @@ func (h *PayrollHandler) Generate(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusCreated, "Payroll generated", payroll)
 }
 
+// Update godoc
+// @Summary Update a payroll
+// @Description Update an existing payroll record by ID
+// @Tags Payrolls
+// @Security Bearer
+// @Accept json
+// @Produce json
+// @Param id path string true "Payroll ID"
+// @Param request body dto.UpdatePayrollRequest true "Payroll data"
+// @Success 200 {object} response.Response{data=dto.PayrollResponse} "Payroll updated"
+// @Failure 400 {object} response.Response "Invalid request"
+// @Router /payrolls/{id} [put]
 func (h *PayrollHandler) Update(c *fiber.Ctx) error {
 	id := c.Params("id")
 
@@ -103,6 +149,18 @@ func (h *PayrollHandler) Update(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Payroll updated", payroll)
 }
 
+// UpdateStatus godoc
+// @Summary Update payroll status
+// @Description Update the status of a payroll record (draft, processed, paid)
+// @Tags Payrolls
+// @Security Bearer
+// @Accept json
+// @Produce json
+// @Param id path string true "Payroll ID"
+// @Param request body dto.PayrollStatusRequest true "Status data"
+// @Success 200 {object} response.Response{data=dto.PayrollResponse} "Payroll status updated"
+// @Failure 400 {object} response.Response "Invalid request or status"
+// @Router /payrolls/{id}/status [put]
 func (h *PayrollHandler) UpdateStatus(c *fiber.Ctx) error {
 	id := c.Params("id")
 
@@ -126,6 +184,16 @@ func (h *PayrollHandler) UpdateStatus(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Payroll status updated", payroll)
 }
 
+// Delete godoc
+// @Summary Delete a payroll
+// @Description Delete a payroll record by ID
+// @Tags Payrolls
+// @Security Bearer
+// @Produce json
+// @Param id path string true "Payroll ID"
+// @Success 200 {object} response.Response "Payroll deleted"
+// @Failure 400 {object} response.Response "Failed to delete"
+// @Router /payrolls/{id} [delete]
 func (h *PayrollHandler) Delete(c *fiber.Ctx) error {
 	id := c.Params("id")
 

@@ -24,6 +24,23 @@ func NewAttendanceHandler(attService service.AttendanceService, empService servi
 	return &AttendanceHandler{attService: attService, empService: empService}
 }
 
+// GetAll godoc
+// @Summary Get all attendances
+// @Description Retrieve all attendance records with optional filters and pagination
+// @Tags Attendances
+// @Security Bearer
+// @Produce json
+// @Param employee_id query string false "Filter by employee ID"
+// @Param month query int false "Filter by month (1-12)"
+// @Param year query int false "Filter by year"
+// @Param start_date query string false "Filter start date (YYYY-MM-DD)"
+// @Param end_date query string false "Filter end date (YYYY-MM-DD)"
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Items per page" default(10)
+// @Success 200 {object} response.Response{data=dto.PaginatedAttendanceResponse} "Attendances retrieved"
+// @Failure 400 {object} response.Response "Invalid month or year format"
+// @Failure 500 {object} response.Response "Failed to fetch attendances"
+// @Router /attendances [get]
 func (h *AttendanceHandler) GetAll(c *fiber.Ctx) error {
 	employeeID := c.Query("employee_id")
 	monthStr := c.Query("month")
@@ -63,6 +80,16 @@ func (h *AttendanceHandler) GetAll(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Attendances retrieved", result)
 }
 
+// GetByID godoc
+// @Summary Get attendance by ID
+// @Description Retrieve an attendance record by its ID
+// @Tags Attendances
+// @Security Bearer
+// @Produce json
+// @Param id path string true "Attendance ID"
+// @Success 200 {object} response.Response{data=dto.AttendanceResponse} "Attendance retrieved"
+// @Failure 404 {object} response.Response "Attendance not found"
+// @Router /attendances/{id} [get]
 func (h *AttendanceHandler) GetByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 	att, err := h.attService.GetByID(id)
@@ -72,6 +99,17 @@ func (h *AttendanceHandler) GetByID(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Attendance retrieved", att)
 }
 
+// ClockIn godoc
+// @Summary Clock in
+// @Description Record clock-in time for an employee
+// @Tags Attendances
+// @Security Bearer
+// @Accept json
+// @Produce json
+// @Param request body dto.ClockInRequest true "Clock-in data"
+// @Success 201 {object} response.Response{data=dto.AttendanceResponse} "Clock in successful"
+// @Failure 400 {object} response.Response "Invalid request or already clocked in"
+// @Router /attendances/clock-in [post]
 func (h *AttendanceHandler) ClockIn(c *fiber.Ctx) error {
 	var req dto.ClockInRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -89,6 +127,18 @@ func (h *AttendanceHandler) ClockIn(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusCreated, "Clock in successful", att)
 }
 
+// ClockOut godoc
+// @Summary Clock out
+// @Description Record clock-out time for an existing attendance record
+// @Tags Attendances
+// @Security Bearer
+// @Accept json
+// @Produce json
+// @Param id path string true "Attendance ID"
+// @Param request body dto.ClockOutRequest true "Clock-out data"
+// @Success 200 {object} response.Response{data=dto.AttendanceResponse} "Clock out successful"
+// @Failure 400 {object} response.Response "Invalid request or already clocked out"
+// @Router /attendances/{id}/clock-out [put]
 func (h *AttendanceHandler) ClockOut(c *fiber.Ctx) error {
 	id := c.Params("id")
 
@@ -104,6 +154,17 @@ func (h *AttendanceHandler) ClockOut(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Clock out successful", att)
 }
 
+// Create godoc
+// @Summary Create an attendance record
+// @Description Manually create an attendance record
+// @Tags Attendances
+// @Security Bearer
+// @Accept json
+// @Produce json
+// @Param request body dto.CreateAttendanceRequest true "Attendance data"
+// @Success 201 {object} response.Response{data=dto.AttendanceResponse} "Attendance created"
+// @Failure 400 {object} response.Response "Invalid request"
+// @Router /attendances [post]
 func (h *AttendanceHandler) Create(c *fiber.Ctx) error {
 	var req dto.CreateAttendanceRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -121,6 +182,18 @@ func (h *AttendanceHandler) Create(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusCreated, "Attendance created", att)
 }
 
+// Update godoc
+// @Summary Update an attendance record
+// @Description Update an existing attendance record by ID
+// @Tags Attendances
+// @Security Bearer
+// @Accept json
+// @Produce json
+// @Param id path string true "Attendance ID"
+// @Param request body dto.UpdateAttendanceRequest true "Attendance data"
+// @Success 200 {object} response.Response{data=dto.AttendanceResponse} "Attendance updated"
+// @Failure 400 {object} response.Response "Invalid request"
+// @Router /attendances/{id} [put]
 func (h *AttendanceHandler) Update(c *fiber.Ctx) error {
 	id := c.Params("id")
 
@@ -136,6 +209,16 @@ func (h *AttendanceHandler) Update(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Attendance updated", att)
 }
 
+// Delete godoc
+// @Summary Delete an attendance record
+// @Description Delete an attendance record by ID
+// @Tags Attendances
+// @Security Bearer
+// @Produce json
+// @Param id path string true "Attendance ID"
+// @Success 200 {object} response.Response "Attendance deleted"
+// @Failure 400 {object} response.Response "Failed to delete"
+// @Router /attendances/{id} [delete]
 func (h *AttendanceHandler) Delete(c *fiber.Ctx) error {
 	id := c.Params("id")
 
@@ -145,6 +228,17 @@ func (h *AttendanceHandler) Delete(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Attendance deleted", nil)
 }
 
+// Import godoc
+// @Summary Import attendances from XLSX
+// @Description Bulk import attendance records from an Excel (.xlsx) file. Required columns: employee_number, date, status. Optional columns: clock_in, clock_out, overtime_hours, notes. Valid statuses: hadir, alpha, terlambat, izin, sakit, cuti.
+// @Tags Attendances
+// @Security Bearer
+// @Accept multipart/form-data
+// @Produce json
+// @Param file formData file true "XLSX file"
+// @Success 200 {object} response.Response "Import result with imported count and errors"
+// @Failure 400 {object} response.Response "Invalid file or data errors"
+// @Router /attendances/import [post]
 func (h *AttendanceHandler) Import(c *fiber.Ctx) error {
 	file, err := c.FormFile("file")
 	if err != nil {
