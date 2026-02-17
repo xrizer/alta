@@ -1,5 +1,273 @@
 basePath: /api
 definitions:
+  dto.ApproveLeaveRequest:
+    properties:
+      rejection_reason:
+        type: string
+      status:
+        $ref: '#/definitions/model.LeaveStatus'
+    required:
+    - status
+    type: object
+  dto.AttendanceResponse:
+    properties:
+      clock_in:
+        type: string
+      clock_out:
+        type: string
+      created_at:
+        type: string
+      date:
+        type: string
+      employee:
+        $ref: '#/definitions/dto.EmployeeResponse'
+      employee_id:
+        type: string
+      id:
+        type: string
+      notes:
+        type: string
+      overtime_hours:
+        type: number
+      shift_id:
+        type: string
+      status:
+        $ref: '#/definitions/model.AttendanceStatus'
+      updated_at:
+        type: string
+    type: object
+  dto.ClockInRequest:
+    properties:
+      employee_id:
+        type: string
+      notes:
+        type: string
+    required:
+    - employee_id
+    type: object
+  dto.ClockOutRequest:
+    properties:
+      notes:
+        type: string
+    type: object
+  dto.CompanyResponse:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      logo:
+        type: string
+      name:
+        type: string
+      npwp:
+        type: string
+      phone:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.CreateAttendanceRequest:
+    properties:
+      clock_in:
+        type: string
+      clock_out:
+        type: string
+      date:
+        type: string
+      employee_id:
+        type: string
+      notes:
+        type: string
+      overtime_hours:
+        type: number
+      shift_id:
+        type: string
+      status:
+        $ref: '#/definitions/model.AttendanceStatus'
+    required:
+    - date
+    - employee_id
+    - status
+    type: object
+  dto.CreateCompanyRequest:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      logo:
+        type: string
+      name:
+        type: string
+      npwp:
+        type: string
+      phone:
+        type: string
+    required:
+    - name
+    type: object
+  dto.CreateDepartmentRequest:
+    properties:
+      company_id:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - company_id
+    - name
+    type: object
+  dto.CreateEmployeeRequest:
+    properties:
+      bank_account:
+        type: string
+      bank_name:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        type: string
+      blood_type:
+        type: string
+      bpjs_kes_no:
+        type: string
+      bpjs_tk_no:
+        type: string
+      company_id:
+        type: string
+      department_id:
+        type: string
+      employee_number:
+        type: string
+      employee_status:
+        $ref: '#/definitions/model.EmployeeStatus'
+      gender:
+        type: string
+      join_date:
+        type: string
+      last_education:
+        type: string
+      marital_status:
+        type: string
+      nik:
+        type: string
+      npwp:
+        type: string
+      position_id:
+        type: string
+      religion:
+        type: string
+      shift_id:
+        type: string
+      user_id:
+        type: string
+    required:
+    - company_id
+    - department_id
+    - employee_number
+    - join_date
+    - position_id
+    - shift_id
+    - user_id
+    type: object
+  dto.CreateEmployeeSalaryRequest:
+    properties:
+      basic_salary:
+        type: number
+      effective_date:
+        type: string
+      employee_id:
+        type: string
+      housing_allowance:
+        type: number
+      meal_allowance:
+        type: number
+      position_allowance:
+        type: number
+      transport_allowance:
+        type: number
+    required:
+    - basic_salary
+    - effective_date
+    - employee_id
+    type: object
+  dto.CreateHolidayRequest:
+    properties:
+      company_id:
+        type: string
+      date:
+        type: string
+      is_national:
+        type: boolean
+      name:
+        type: string
+    required:
+    - company_id
+    - date
+    - name
+    type: object
+  dto.CreateLeaveRequest:
+    properties:
+      attachment:
+        type: string
+      employee_id:
+        type: string
+      end_date:
+        type: string
+      leave_type:
+        $ref: '#/definitions/model.LeaveType'
+      reason:
+        type: string
+      start_date:
+        type: string
+      total_days:
+        type: integer
+    required:
+    - employee_id
+    - end_date
+    - leave_type
+    - reason
+    - start_date
+    - total_days
+    type: object
+  dto.CreatePositionRequest:
+    properties:
+      base_salary:
+        type: number
+      company_id:
+        type: string
+      department_id:
+        type: string
+      name:
+        type: string
+    required:
+    - company_id
+    - name
+    type: object
+  dto.CreateShiftRequest:
+    properties:
+      company_id:
+        type: string
+      end_time:
+        type: string
+      name:
+        type: string
+      start_time:
+        type: string
+    required:
+    - company_id
+    - end_time
+    - name
+    - start_time
+    type: object
   dto.CreateUserRequest:
     properties:
       address:
@@ -26,6 +294,194 @@ definitions:
     - password
     - role
     type: object
+  dto.DepartmentResponse:
+    properties:
+      company:
+        $ref: '#/definitions/dto.CompanyResponse'
+      company_id:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.EmployeeResponse:
+    properties:
+      bank_account:
+        type: string
+      bank_name:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        type: string
+      blood_type:
+        type: string
+      bpjs_kes_no:
+        type: string
+      bpjs_tk_no:
+        type: string
+      company:
+        $ref: '#/definitions/dto.CompanyResponse'
+      company_id:
+        type: string
+      created_at:
+        type: string
+      department:
+        $ref: '#/definitions/dto.DepartmentResponse'
+      department_id:
+        type: string
+      employee_number:
+        type: string
+      employee_status:
+        $ref: '#/definitions/model.EmployeeStatus'
+      gender:
+        type: string
+      id:
+        type: string
+      join_date:
+        type: string
+      last_education:
+        type: string
+      marital_status:
+        type: string
+      nik:
+        type: string
+      npwp:
+        type: string
+      position:
+        $ref: '#/definitions/dto.PositionResponse'
+      position_id:
+        type: string
+      religion:
+        type: string
+      resign_date:
+        type: string
+      shift:
+        $ref: '#/definitions/dto.ShiftResponse'
+      shift_id:
+        type: string
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/dto.UserResponse'
+      user_id:
+        type: string
+    type: object
+  dto.EmployeeSalaryResponse:
+    properties:
+      basic_salary:
+        type: number
+      bpjs_kes_company:
+        type: number
+      bpjs_kes_employee:
+        type: number
+      bpjs_tk_jht_company:
+        type: number
+      bpjs_tk_jht_employee:
+        type: number
+      bpjs_tk_jkk:
+        type: number
+      bpjs_tk_jkm:
+        type: number
+      bpjs_tk_jp_company:
+        type: number
+      bpjs_tk_jp_employee:
+        type: number
+      created_at:
+        type: string
+      effective_date:
+        type: string
+      employee_id:
+        type: string
+      housing_allowance:
+        type: number
+      id:
+        type: string
+      meal_allowance:
+        type: number
+      position_allowance:
+        type: number
+      transport_allowance:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  dto.GeneratePayrollRequest:
+    properties:
+      employee_id:
+        type: string
+      month:
+        type: integer
+      year:
+        type: integer
+    required:
+    - employee_id
+    - month
+    - year
+    type: object
+  dto.HolidayResponse:
+    properties:
+      company:
+        $ref: '#/definitions/dto.CompanyResponse'
+      company_id:
+        type: string
+      created_at:
+        type: string
+      date:
+        type: string
+      id:
+        type: string
+      is_national:
+        type: boolean
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.LeaveResponse:
+    properties:
+      approved_at:
+        type: string
+      approved_by:
+        type: string
+      approver:
+        $ref: '#/definitions/dto.UserResponse'
+      attachment:
+        type: string
+      created_at:
+        type: string
+      employee:
+        $ref: '#/definitions/dto.EmployeeResponse'
+      employee_id:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: string
+      leave_type:
+        $ref: '#/definitions/model.LeaveType'
+      reason:
+        type: string
+      rejection_reason:
+        type: string
+      start_date:
+        type: string
+      status:
+        $ref: '#/definitions/model.LeaveStatus'
+      total_days:
+        type: integer
+      updated_at:
+        type: string
+    type: object
   dto.LoginRequest:
     properties:
       email:
@@ -36,6 +492,190 @@ definitions:
     - email
     - password
     type: object
+  dto.MenuAccessResponse:
+    properties:
+      menu_keys:
+        items:
+          type: string
+        type: array
+      user_email:
+        type: string
+      user_id:
+        type: string
+      user_name:
+        type: string
+      user_role:
+        type: string
+    type: object
+  dto.OrgDepartmentNode:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      positions:
+        items:
+          $ref: '#/definitions/dto.OrgPositionNode'
+        type: array
+    type: object
+  dto.OrgEmployeeNode:
+    properties:
+      employee_number:
+        type: string
+      id:
+        type: string
+      user_name:
+        type: string
+    type: object
+  dto.OrgPositionNode:
+    properties:
+      employees:
+        items:
+          $ref: '#/definitions/dto.OrgEmployeeNode'
+        type: array
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  dto.OrgStructureResponse:
+    properties:
+      company_id:
+        type: string
+      company_name:
+        type: string
+      departments:
+        items:
+          $ref: '#/definitions/dto.OrgDepartmentNode'
+        type: array
+    type: object
+  dto.PaginatedAttendanceResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.AttendanceResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total_items:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  dto.PayrollResponse:
+    properties:
+      basic_salary:
+        type: number
+      bpjs_kes_deduction:
+        type: number
+      bpjs_tk_deduction:
+        type: number
+      created_at:
+        type: string
+      employee:
+        $ref: '#/definitions/dto.EmployeeResponse'
+      employee_id:
+        type: string
+      gross_salary:
+        type: number
+      id:
+        type: string
+      net_salary:
+        type: number
+      notes:
+        type: string
+      other_deductions:
+        type: number
+      overtime_pay:
+        type: number
+      paid_at:
+        type: string
+      period_month:
+        type: integer
+      period_year:
+        type: integer
+      pph21:
+        type: number
+      present_days:
+        type: integer
+      status:
+        $ref: '#/definitions/model.PayrollStatus'
+      thr:
+        type: number
+      total_allowances:
+        type: number
+      total_deductions:
+        type: number
+      updated_at:
+        type: string
+      working_days:
+        type: integer
+    type: object
+  dto.PayrollStatusRequest:
+    properties:
+      status:
+        $ref: '#/definitions/model.PayrollStatus'
+    required:
+    - status
+    type: object
+  dto.PositionResponse:
+    properties:
+      base_salary:
+        type: number
+      company:
+        $ref: '#/definitions/dto.CompanyResponse'
+      company_id:
+        type: string
+      created_at:
+        type: string
+      department:
+        $ref: '#/definitions/dto.DepartmentResponse'
+      department_id:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.SetMenuAccessRequest:
+    properties:
+      menu_keys:
+        items:
+          type: string
+        type: array
+      user_id:
+        type: string
+    required:
+    - menu_keys
+    - user_id
+    type: object
+  dto.ShiftResponse:
+    properties:
+      company:
+        $ref: '#/definitions/dto.CompanyResponse'
+      company_id:
+        type: string
+      created_at:
+        type: string
+      end_time:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      start_time:
+        type: string
+      updated_at:
+        type: string
+    type: object
   dto.TokenResponse:
     properties:
       access_token:
@@ -43,6 +683,158 @@ definitions:
       expires_in:
         type: integer
       token_type:
+        type: string
+    type: object
+  dto.UpdateAttendanceRequest:
+    properties:
+      clock_in:
+        type: string
+      clock_out:
+        type: string
+      notes:
+        type: string
+      overtime_hours:
+        type: number
+      shift_id:
+        type: string
+      status:
+        $ref: '#/definitions/model.AttendanceStatus'
+    type: object
+  dto.UpdateCompanyRequest:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      is_active:
+        type: boolean
+      logo:
+        type: string
+      name:
+        type: string
+      npwp:
+        type: string
+      phone:
+        type: string
+    type: object
+  dto.UpdateDepartmentRequest:
+    properties:
+      description:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+    type: object
+  dto.UpdateEmployeeRequest:
+    properties:
+      bank_account:
+        type: string
+      bank_name:
+        type: string
+      birth_date:
+        type: string
+      birth_place:
+        type: string
+      blood_type:
+        type: string
+      bpjs_kes_no:
+        type: string
+      bpjs_tk_no:
+        type: string
+      department_id:
+        type: string
+      employee_status:
+        $ref: '#/definitions/model.EmployeeStatus'
+      gender:
+        type: string
+      last_education:
+        type: string
+      marital_status:
+        type: string
+      nik:
+        type: string
+      npwp:
+        type: string
+      position_id:
+        type: string
+      religion:
+        type: string
+      resign_date:
+        type: string
+      shift_id:
+        type: string
+    type: object
+  dto.UpdateEmployeeSalaryRequest:
+    properties:
+      basic_salary:
+        type: number
+      effective_date:
+        type: string
+      housing_allowance:
+        type: number
+      meal_allowance:
+        type: number
+      position_allowance:
+        type: number
+      transport_allowance:
+        type: number
+    type: object
+  dto.UpdateHolidayRequest:
+    properties:
+      date:
+        type: string
+      is_national:
+        type: boolean
+      name:
+        type: string
+    type: object
+  dto.UpdateLeaveRequest:
+    properties:
+      attachment:
+        type: string
+      end_date:
+        type: string
+      leave_type:
+        $ref: '#/definitions/model.LeaveType'
+      reason:
+        type: string
+      start_date:
+        type: string
+      total_days:
+        type: integer
+    type: object
+  dto.UpdatePayrollRequest:
+    properties:
+      notes:
+        type: string
+      other_deductions:
+        type: number
+      overtime_pay:
+        type: number
+      thr:
+        type: number
+    type: object
+  dto.UpdatePositionRequest:
+    properties:
+      base_salary:
+        type: number
+      department_id:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+    type: object
+  dto.UpdateShiftRequest:
+    properties:
+      end_time:
+        type: string
+      is_active:
+        type: boolean
+      name:
+        type: string
+      start_time:
         type: string
     type: object
   dto.UpdateUserRequest:
@@ -61,6 +853,13 @@ definitions:
         type: string
       role:
         $ref: '#/definitions/model.Role'
+    type: object
+  dto.UserMenuKeysResponse:
+    properties:
+      menu_keys:
+        items:
+          type: string
+        type: array
     type: object
   dto.UserResponse:
     properties:
@@ -83,6 +882,74 @@ definitions:
       updated_at:
         type: string
     type: object
+  model.AttendanceStatus:
+    enum:
+    - hadir
+    - alpha
+    - terlambat
+    - izin
+    - sakit
+    - cuti
+    - early_in
+    - on_time
+    - late_in
+    type: string
+    x-enum-varnames:
+    - AttendanceHadir
+    - AttendanceAlpha
+    - AttendanceTerlambat
+    - AttendanceIzin
+    - AttendanceSakit
+    - AttendanceCuti
+    - AttendanceEarlyIn
+    - AttendanceOnTime
+    - AttendanceLateIn
+  model.EmployeeStatus:
+    enum:
+    - tetap
+    - kontrak
+    - probation
+    type: string
+    x-enum-varnames:
+    - StatusTetap
+    - StatusKontrak
+    - StatusProbation
+  model.LeaveStatus:
+    enum:
+    - pending
+    - approved
+    - rejected
+    type: string
+    x-enum-varnames:
+    - LeaveStatusPending
+    - LeaveStatusApproved
+    - LeaveStatusRejected
+  model.LeaveType:
+    enum:
+    - cuti_tahunan
+    - cuti_sakit
+    - cuti_melahirkan
+    - cuti_besar
+    - izin
+    - dinas_luar
+    type: string
+    x-enum-varnames:
+    - LeaveCutiTahunan
+    - LeaveCutiSakit
+    - LeaveCutiMelahirkan
+    - LeaveCutiBesar
+    - LeaveIzin
+    - LeaveDinasLuar
+  model.PayrollStatus:
+    enum:
+    - draft
+    - processed
+    - paid
+    type: string
+    x-enum-varnames:
+    - PayrollDraft
+    - PayrollProcessed
+    - PayrollPaid
   model.Role:
     enum:
     - admin
@@ -115,6 +982,289 @@ info:
   title: HRIS API
   version: "1.0"
 paths:
+  /attendances:
+    get:
+      description: Retrieve all attendance records with optional filters and pagination
+      parameters:
+      - description: Filter by employee ID
+        in: query
+        name: employee_id
+        type: string
+      - description: Filter by month (1-12)
+        in: query
+        name: month
+        type: integer
+      - description: Filter by year
+        in: query
+        name: year
+        type: integer
+      - description: Filter start date (YYYY-MM-DD)
+        in: query
+        name: start_date
+        type: string
+      - description: Filter end date (YYYY-MM-DD)
+        in: query
+        name: end_date
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Attendances retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.PaginatedAttendanceResponse'
+              type: object
+        "400":
+          description: Invalid month or year format
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to fetch attendances
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get all attendances
+      tags:
+      - Attendances
+    post:
+      consumes:
+      - application/json
+      description: Manually create an attendance record
+      parameters:
+      - description: Attendance data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateAttendanceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Attendance created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AttendanceResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Create an attendance record
+      tags:
+      - Attendances
+  /attendances/{id}:
+    delete:
+      description: Delete an attendance record by ID
+      parameters:
+      - description: Attendance ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Attendance deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed to delete
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Delete an attendance record
+      tags:
+      - Attendances
+    get:
+      description: Retrieve an attendance record by its ID
+      parameters:
+      - description: Attendance ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Attendance retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AttendanceResponse'
+              type: object
+        "404":
+          description: Attendance not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get attendance by ID
+      tags:
+      - Attendances
+    put:
+      consumes:
+      - application/json
+      description: Update an existing attendance record by ID
+      parameters:
+      - description: Attendance ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Attendance data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateAttendanceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Attendance updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AttendanceResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Update an attendance record
+      tags:
+      - Attendances
+  /attendances/{id}/clock-out:
+    put:
+      consumes:
+      - application/json
+      description: Record clock-out time for an existing attendance record
+      parameters:
+      - description: Attendance ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Clock-out data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ClockOutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Clock out successful
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AttendanceResponse'
+              type: object
+        "400":
+          description: Invalid request or already clocked out
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Clock out
+      tags:
+      - Attendances
+  /attendances/clock-in:
+    post:
+      consumes:
+      - application/json
+      description: Record clock-in time for an employee
+      parameters:
+      - description: Clock-in data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ClockInRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Clock in successful
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AttendanceResponse'
+              type: object
+        "400":
+          description: Invalid request or already clocked in
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Clock in
+      tags:
+      - Attendances
+  /attendances/import:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 'Bulk import attendance records from an Excel (.xlsx) file. Required
+        columns: employee_number, date, status. Optional columns: clock_in, clock_out,
+        overtime_hours, notes. Valid statuses: hadir, alpha, terlambat, izin, sakit,
+        cuti.'
+      parameters:
+      - description: XLSX file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Import result with imported count and errors
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Invalid file or data errors
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Import attendances from XLSX
+      tags:
+      - Attendances
   /auth/login:
     post:
       consumes:
@@ -188,6 +1338,1692 @@ paths:
       summary: Refresh access token
       tags:
       - Authentication
+  /companies:
+    get:
+      description: Retrieve all companies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Companies retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.CompanyResponse'
+                  type: array
+              type: object
+        "500":
+          description: Failed to fetch companies
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get all companies
+      tags:
+      - Companies
+    post:
+      consumes:
+      - application/json
+      description: Create a new company
+      parameters:
+      - description: Company data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateCompanyRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Company created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CompanyResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Create a company
+      tags:
+      - Companies
+  /companies/{id}:
+    delete:
+      description: Delete a company by ID
+      parameters:
+      - description: Company ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Company deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed to delete
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Delete a company
+      tags:
+      - Companies
+    get:
+      description: Retrieve a company by its ID
+      parameters:
+      - description: Company ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Company retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CompanyResponse'
+              type: object
+        "404":
+          description: Company not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get company by ID
+      tags:
+      - Companies
+    put:
+      consumes:
+      - application/json
+      description: Update an existing company by ID
+      parameters:
+      - description: Company ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Company data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateCompanyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Company updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CompanyResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Update a company
+      tags:
+      - Companies
+  /departments:
+    get:
+      description: Retrieve all departments, optionally filtered by company
+      parameters:
+      - description: Filter by company ID
+        in: query
+        name: company_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Departments retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.DepartmentResponse'
+                  type: array
+              type: object
+        "500":
+          description: Failed to fetch departments
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get all departments
+      tags:
+      - Departments
+    post:
+      consumes:
+      - application/json
+      description: Create a new department
+      parameters:
+      - description: Department data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateDepartmentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Department created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.DepartmentResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Create a department
+      tags:
+      - Departments
+  /departments/{id}:
+    delete:
+      description: Delete a department by ID
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Department deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed to delete
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Delete a department
+      tags:
+      - Departments
+    get:
+      description: Retrieve a department by its ID
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Department retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.DepartmentResponse'
+              type: object
+        "404":
+          description: Department not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get department by ID
+      tags:
+      - Departments
+    put:
+      consumes:
+      - application/json
+      description: Update an existing department by ID
+      parameters:
+      - description: Department ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Department data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateDepartmentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Department updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.DepartmentResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Update a department
+      tags:
+      - Departments
+  /employee-salaries:
+    get:
+      description: Retrieve all employee salary records, optionally filtered by employee
+      parameters:
+      - description: Filter by employee ID
+        in: query
+        name: employee_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Employee salaries retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.EmployeeSalaryResponse'
+                  type: array
+              type: object
+        "500":
+          description: Failed to fetch employee salaries
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get all employee salaries
+      tags:
+      - Employee Salaries
+    post:
+      consumes:
+      - application/json
+      description: Create a new salary record for an employee
+      parameters:
+      - description: Salary data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateEmployeeSalaryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Employee salary created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.EmployeeSalaryResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Create an employee salary
+      tags:
+      - Employee Salaries
+  /employee-salaries/{id}:
+    delete:
+      description: Delete an employee salary record by ID
+      parameters:
+      - description: Salary ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Employee salary deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed to delete
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Delete an employee salary
+      tags:
+      - Employee Salaries
+    get:
+      description: Retrieve an employee salary record by its ID
+      parameters:
+      - description: Salary ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Employee salary retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.EmployeeSalaryResponse'
+              type: object
+        "404":
+          description: Employee salary not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get employee salary by ID
+      tags:
+      - Employee Salaries
+    put:
+      consumes:
+      - application/json
+      description: Update an existing salary record by ID
+      parameters:
+      - description: Salary ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Salary data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateEmployeeSalaryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Employee salary updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.EmployeeSalaryResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Update an employee salary
+      tags:
+      - Employee Salaries
+  /employee-salaries/employee/{employeeId}/latest:
+    get:
+      description: Retrieve the most recent salary record for a specific employee
+      parameters:
+      - description: Employee ID
+        in: path
+        name: employeeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Latest employee salary retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.EmployeeSalaryResponse'
+              type: object
+        "404":
+          description: Employee salary not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get latest salary for an employee
+      tags:
+      - Employee Salaries
+  /employees:
+    get:
+      description: Retrieve all employees, optionally filtered by company
+      parameters:
+      - description: Filter by company ID
+        in: query
+        name: company_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Employees retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.EmployeeResponse'
+                  type: array
+              type: object
+        "500":
+          description: Failed to fetch employees
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get all employees
+      tags:
+      - Employees
+    post:
+      consumes:
+      - application/json
+      description: Create a new employee record linked to a user account
+      parameters:
+      - description: Employee data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateEmployeeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Employee created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.EmployeeResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Create an employee
+      tags:
+      - Employees
+  /employees/{id}:
+    delete:
+      description: Delete an employee record by ID
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Employee deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed to delete
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Delete an employee
+      tags:
+      - Employees
+    get:
+      description: Retrieve an employee by their ID
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Employee retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.EmployeeResponse'
+              type: object
+        "404":
+          description: Employee not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get employee by ID
+      tags:
+      - Employees
+    put:
+      consumes:
+      - application/json
+      description: Update an existing employee record by ID
+      parameters:
+      - description: Employee ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Employee data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateEmployeeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Employee updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.EmployeeResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Update an employee
+      tags:
+      - Employees
+  /employees/me:
+    get:
+      description: Retrieve the employee profile of the currently authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Employee retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.EmployeeResponse'
+              type: object
+        "404":
+          description: Employee profile not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get my employee profile
+      tags:
+      - Employees
+  /holidays:
+    get:
+      description: Retrieve all holidays, optionally filtered by company and/or year
+      parameters:
+      - description: Filter by company ID
+        in: query
+        name: company_id
+        type: string
+      - description: Filter by year
+        in: query
+        name: year
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Holidays retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.HolidayResponse'
+                  type: array
+              type: object
+        "400":
+          description: Invalid year format
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to fetch holidays
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get all holidays
+      tags:
+      - Holidays
+    post:
+      consumes:
+      - application/json
+      description: Create a new holiday record
+      parameters:
+      - description: Holiday data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateHolidayRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Holiday created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.HolidayResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Create a holiday
+      tags:
+      - Holidays
+  /holidays/{id}:
+    delete:
+      description: Delete a holiday by ID
+      parameters:
+      - description: Holiday ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Holiday deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed to delete
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Delete a holiday
+      tags:
+      - Holidays
+    get:
+      description: Retrieve a holiday by its ID
+      parameters:
+      - description: Holiday ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Holiday retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.HolidayResponse'
+              type: object
+        "404":
+          description: Holiday not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get holiday by ID
+      tags:
+      - Holidays
+    put:
+      consumes:
+      - application/json
+      description: Update an existing holiday by ID
+      parameters:
+      - description: Holiday ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Holiday data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateHolidayRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Holiday updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.HolidayResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Update a holiday
+      tags:
+      - Holidays
+  /leaves:
+    get:
+      description: Retrieve all leave requests, optionally filtered by employee or
+        status
+      parameters:
+      - description: Filter by employee ID
+        in: query
+        name: employee_id
+        type: string
+      - description: Filter by status (e.g. pending)
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Leaves retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.LeaveResponse'
+                  type: array
+              type: object
+        "500":
+          description: Failed to fetch leaves
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get all leave requests
+      tags:
+      - Leaves
+    post:
+      consumes:
+      - application/json
+      description: Submit a new leave request
+      parameters:
+      - description: Leave request data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateLeaveRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Leave request created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.LeaveResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Create a leave request
+      tags:
+      - Leaves
+  /leaves/{id}:
+    delete:
+      description: Delete a leave request by ID
+      parameters:
+      - description: Leave ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Leave request deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed to delete
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Delete a leave request
+      tags:
+      - Leaves
+    get:
+      description: Retrieve a leave request by its ID
+      parameters:
+      - description: Leave ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Leave retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.LeaveResponse'
+              type: object
+        "404":
+          description: Leave not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get leave request by ID
+      tags:
+      - Leaves
+    put:
+      consumes:
+      - application/json
+      description: Update an existing leave request by ID
+      parameters:
+      - description: Leave ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Leave request data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateLeaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Leave request updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.LeaveResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Update a leave request
+      tags:
+      - Leaves
+  /leaves/{id}/approve:
+    put:
+      consumes:
+      - application/json
+      description: Approve or reject a pending leave request (Admin/HR only)
+      parameters:
+      - description: Leave ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Approval data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ApproveLeaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Leave request updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.LeaveResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Approve or reject a leave request
+      tags:
+      - Leaves
+  /menu-access:
+    get:
+      description: Retrieve all user menu access mappings (Admin only)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: All menu access retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.MenuAccessResponse'
+                  type: array
+              type: object
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get all menu access mappings
+      tags:
+      - Menu Access
+    post:
+      consumes:
+      - application/json
+      description: Set the menu keys accessible to a specific user (Admin only)
+      parameters:
+      - description: Menu access data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SetMenuAccessRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Menu access updated
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Set user menu access
+      tags:
+      - Menu Access
+  /menu-access/{user_id}:
+    delete:
+      description: Delete custom menu access for a user, reverting to role defaults
+        (Admin only)
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Menu access reset to defaults
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: user_id is required
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Reset user menu access
+      tags:
+      - Menu Access
+  /menu-access/me:
+    get:
+      description: Retrieve the list of menu keys accessible to the currently authenticated
+        user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Menu access retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserMenuKeysResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get my menu access
+      tags:
+      - Menu Access
+  /organization/structure:
+    get:
+      description: Retrieve the hierarchical organization structure for a company
+        (departments → positions → employees)
+      parameters:
+      - description: Company ID
+        in: query
+        name: company_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Organization structure retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.OrgStructureResponse'
+              type: object
+        "400":
+          description: company_id is required
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Company not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get organization structure
+      tags:
+      - Organization
+  /payrolls:
+    get:
+      description: Retrieve all payroll records, optionally filtered by employee,
+        month, and year
+      parameters:
+      - description: Filter by employee ID
+        in: query
+        name: employee_id
+        type: string
+      - description: Filter by month (1-12)
+        in: query
+        name: month
+        type: integer
+      - description: Filter by year
+        in: query
+        name: year
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payrolls retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.PayrollResponse'
+                  type: array
+              type: object
+        "400":
+          description: Invalid month or year format
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to fetch payrolls
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get all payrolls
+      tags:
+      - Payrolls
+  /payrolls/{id}:
+    delete:
+      description: Delete a payroll record by ID
+      parameters:
+      - description: Payroll ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payroll deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed to delete
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Delete a payroll
+      tags:
+      - Payrolls
+    get:
+      description: Retrieve a payroll record by its ID
+      parameters:
+      - description: Payroll ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payroll retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.PayrollResponse'
+              type: object
+        "404":
+          description: Payroll not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get payroll by ID
+      tags:
+      - Payrolls
+    put:
+      consumes:
+      - application/json
+      description: Update an existing payroll record by ID
+      parameters:
+      - description: Payroll ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Payroll data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdatePayrollRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payroll updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.PayrollResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Update a payroll
+      tags:
+      - Payrolls
+  /payrolls/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Update the status of a payroll record (draft, processed, paid)
+      parameters:
+      - description: Payroll ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Status data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PayrollStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payroll status updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.PayrollResponse'
+              type: object
+        "400":
+          description: Invalid request or status
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Update payroll status
+      tags:
+      - Payrolls
+  /payrolls/generate:
+    post:
+      consumes:
+      - application/json
+      description: Generate a payroll record for an employee for a specific month
+        and year
+      parameters:
+      - description: Payroll generation data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GeneratePayrollRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Payroll generated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.PayrollResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Generate payroll
+      tags:
+      - Payrolls
+  /positions:
+    get:
+      description: Retrieve all positions, optionally filtered by company
+      parameters:
+      - description: Filter by company ID
+        in: query
+        name: company_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Positions retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.PositionResponse'
+                  type: array
+              type: object
+        "500":
+          description: Failed to fetch positions
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get all positions
+      tags:
+      - Positions
+    post:
+      consumes:
+      - application/json
+      description: Create a new position
+      parameters:
+      - description: Position data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreatePositionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Position created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.PositionResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Create a position
+      tags:
+      - Positions
+  /positions/{id}:
+    delete:
+      description: Delete a position by ID
+      parameters:
+      - description: Position ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Position deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed to delete
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Delete a position
+      tags:
+      - Positions
+    get:
+      description: Retrieve a position by its ID
+      parameters:
+      - description: Position ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Position retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.PositionResponse'
+              type: object
+        "404":
+          description: Position not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get position by ID
+      tags:
+      - Positions
+    put:
+      consumes:
+      - application/json
+      description: Update an existing position by ID
+      parameters:
+      - description: Position ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Position data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdatePositionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Position updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.PositionResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Update a position
+      tags:
+      - Positions
+  /shifts:
+    get:
+      description: Retrieve all shifts, optionally filtered by company
+      parameters:
+      - description: Filter by company ID
+        in: query
+        name: company_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Shifts retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.ShiftResponse'
+                  type: array
+              type: object
+        "500":
+          description: Failed to fetch shifts
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get all shifts
+      tags:
+      - Shifts
+    post:
+      consumes:
+      - application/json
+      description: Create a new work shift
+      parameters:
+      - description: Shift data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateShiftRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Shift created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ShiftResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Create a shift
+      tags:
+      - Shifts
+  /shifts/{id}:
+    delete:
+      description: Delete a shift by ID
+      parameters:
+      - description: Shift ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Shift deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed to delete
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Delete a shift
+      tags:
+      - Shifts
+    get:
+      description: Retrieve a shift by its ID
+      parameters:
+      - description: Shift ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Shift retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ShiftResponse'
+              type: object
+        "404":
+          description: Shift not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get shift by ID
+      tags:
+      - Shifts
+    put:
+      consumes:
+      - application/json
+      description: Update an existing shift by ID
+      parameters:
+      - description: Shift ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Shift data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateShiftRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Shift updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ShiftResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Update a shift
+      tags:
+      - Shifts
   /users:
     get:
       description: Retrieve all users (admin and hr only)
