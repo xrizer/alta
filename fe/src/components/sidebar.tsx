@@ -66,13 +66,13 @@ export default function Sidebar() {
       >
         {collapsed ? (
           <div className="flex items-center gap-0.5">
-            <div className="flex-shrink-0 overflow-hidden w-5 h-5">
+            <div className="flex-shrink-0 overflow-hidden w-3.5 h-3.5">
               <Image
                 src="/logo.png"
                 alt="Alta"
                 width={140}
                 height={36}
-                className="h-5 max-w-none object-cover object-left"
+                className="h-3.5 max-w-none object-cover object-left"
                 style={{ width: "auto" }}
               />
             </div>

@@ -9,8 +9,11 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "HRIS - Human Resource Information System",
-  description: "Human Resource Information System",
+  title: "ALTA - Your Friendly HRIS",
+  description: "ALTA - Your Friendly HRIS",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
