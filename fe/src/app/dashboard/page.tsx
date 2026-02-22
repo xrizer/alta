@@ -54,7 +54,7 @@ const deptHeadcountData = [
 const deptGenderData = [
   { name: "Engineering", male: 78, female: 12 },
   { name: "Product & Design", male: 50, female: 52 },
-  { name: "Data & DevOps", count: 8, male: 85, female: 43 },
+  { name: "Data & DevOps", male: 85, female: 43 },
   { name: "Sales & Marketing", male: 11, female: 50 },
   { name: "Customer Support", male: 87, female: 34 },
   { name: "HR & Finance", male: 30, female: 26 },
@@ -111,17 +111,17 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Page Title */}
-      <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
+      <h2 className="text-xl font-bold text-gray-900">Dashboard</h2>
 
       {/* Greeting + Date */}
-      <div className="flex items-start justify-between rounded-xl border border-gray-100 bg-white p-6">
+      <div className="flex items-center justify-between rounded-xl border border-gray-100 bg-white px-6 py-5">
         <div>
-          <h3 className="text-2xl font-bold text-orange-500">
+          <h3 className="text-xl font-bold text-orange-500">
             Halo, {user?.name || "Alta"}!
           </h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-0.5 text-sm text-gray-500">
             Here&apos;s your HR overview for today
           </p>
         </div>
@@ -134,28 +134,30 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="flex items-center gap-3">
-        <span className="text-sm font-semibold text-gray-700">Quick Actions</span>
-        <button className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors">
-          Review Attendance
-        </button>
-        <button className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors">
-          Review Approval
-        </button>
-        <button className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors">
-          Process Payroll
-        </button>
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-bold text-gray-700">Quick Actions</span>
+        <div className="flex items-center gap-3">
+          <button className="rounded-lg bg-orange-500 px-5 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors">
+            Review Attendance
+          </button>
+          <button className="rounded-lg border border-orange-500 px-5 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors">
+            Review Approval
+          </button>
+          <button className="rounded-lg border border-orange-500 px-5 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors">
+            Process Payroll
+          </button>
+        </div>
       </div>
 
       {/* Overview + Notifications */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         {/* Overview Cards */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-3">
           <h3 className="text-lg font-bold text-gray-900">Overview</h3>
 
           {/* Total Employees */}
-          <div className="rounded-xl border border-gray-100 bg-white p-5">
-            <div className="flex items-center gap-8">
+          <div className="rounded-xl border border-gray-100 bg-white px-5 py-4">
+            <div className="flex items-center gap-6">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50">
                   <Users size={20} className="text-orange-500" />
@@ -165,7 +167,7 @@ export default function DashboardPage() {
                   <p className="text-2xl font-bold text-gray-900">80</p>
                 </div>
               </div>
-              <div className="flex gap-6 border-l border-gray-200 pl-6">
+              <div className="flex gap-8 border-l border-gray-200 pl-6">
                 <div>
                   <p className="text-xs text-gray-400">Permanent</p>
                   <p className="text-lg font-bold text-gray-900">60</p>
@@ -182,62 +184,67 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Attendance + Pending */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="rounded-xl border border-gray-100 bg-white p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50">
-                  <CheckCircle size={20} className="text-green-500" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500">Today Attendance</p>
+          {/* Attendance/Pending + Status Breakdown */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Left: Today Attendance + colored status strips */}
+            <div className="space-y-2">
+              <div className="rounded-xl border border-gray-100 bg-white px-5 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50">
+                      <CheckCircle size={20} className="text-green-500" />
+                    </div>
+                    <p className="text-xs text-gray-500">Today Attendance</p>
+                  </div>
                   <p className="text-2xl font-bold text-gray-900">
                     75<span className="text-base font-normal text-gray-400">/80</span>
                   </p>
                 </div>
               </div>
-            </div>
-            <div className="rounded-xl border border-gray-100 bg-white p-5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50">
-                  <Clock size={20} className="text-orange-500" />
+              <div className="overflow-hidden rounded-lg border border-gray-100">
+                <div className="flex items-center justify-between bg-orange-50 px-4 py-2">
+                  <span className="text-sm text-orange-500">Late</span>
+                  <span className="text-base font-bold text-orange-500">10</span>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500">Pending Approval</p>
+              </div>
+              <div className="overflow-hidden rounded-lg border border-gray-100">
+                <div className="flex items-center justify-between bg-green-50 px-4 py-2">
+                  <span className="text-sm text-green-600">On Leave</span>
+                  <span className="text-base font-bold text-green-600">5</span>
+                </div>
+              </div>
+              <div className="overflow-hidden rounded-lg border border-gray-100">
+                <div className="flex items-center justify-between bg-red-50 px-4 py-2">
+                  <span className="text-sm text-red-500">Absent</span>
+                  <span className="text-base font-bold text-red-500">5</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Pending Approval + plain status rows */}
+            <div className="space-y-2">
+              <div className="rounded-xl border border-gray-100 bg-white px-5 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50">
+                      <Clock size={20} className="text-orange-500" />
+                    </div>
+                    <p className="text-xs text-gray-500">Pending Approval</p>
+                  </div>
                   <p className="text-2xl font-bold text-gray-900">8</p>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Status Breakdown */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between rounded-lg bg-white border border-gray-100 px-4 py-2.5">
-                <span className="text-sm text-orange-500">Late</span>
-                <span className="text-lg font-bold text-orange-500">10</span>
-              </div>
-              <div className="flex items-center justify-between rounded-lg bg-white border border-gray-100 px-4 py-2.5">
-                <span className="text-sm text-green-500">On Leave</span>
-                <span className="text-lg font-bold text-green-500">5</span>
-              </div>
-              <div className="flex items-center justify-between rounded-lg bg-white border border-gray-100 px-4 py-2.5">
-                <span className="text-sm text-red-500">Absent</span>
-                <span className="text-lg font-bold text-red-500">5</span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between rounded-lg bg-white border border-gray-100 px-4 py-2.5">
+              <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
                 <span className="text-sm text-gray-600">Leave</span>
-                <span className="text-lg font-bold text-gray-900">2</span>
+                <span className="text-base font-bold text-gray-900">2</span>
               </div>
-              <div className="flex items-center justify-between rounded-lg bg-white border border-gray-100 px-4 py-2.5">
+              <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
                 <span className="text-sm text-gray-600">Permission</span>
-                <span className="text-lg font-bold text-gray-900">2</span>
+                <span className="text-base font-bold text-gray-900">2</span>
               </div>
-              <div className="flex items-center justify-between rounded-lg bg-white border border-gray-100 px-4 py-2.5">
+              <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
                 <span className="text-sm text-gray-600">Reimbursement</span>
-                <span className="text-lg font-bold text-gray-900">4</span>
+                <span className="text-base font-bold text-gray-900">4</span>
               </div>
             </div>
           </div>
@@ -251,13 +258,13 @@ export default function DashboardPage() {
               View All <ChevronRight size={14} />
             </button>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-5">
             {notifications.map((n) => (
               <div key={n.id} className="flex gap-3">
                 <div className="mt-1.5">
                   <span
                     className={`block h-2.5 w-2.5 rounded-full ${
-                      n.type === "error" ? "bg-red-500" : "bg-yellow-500"
+                      n.type === "error" ? "bg-red-500" : "bg-yellow-400"
                     }`}
                   />
                 </div>
@@ -277,21 +284,19 @@ export default function DashboardPage() {
       {/* Analytics */}
       <h3 className="text-lg font-bold text-gray-900">Analytics</h3>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         {/* Attendance Trend */}
         <div className="rounded-xl border border-gray-100 bg-white p-5">
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-sm font-bold text-gray-900">Attendance Trend</h4>
-            <div className="relative">
-              <button
-                onClick={() =>
-                  setTrendPeriod(trendPeriod === "Last Week" ? "This Week" : "Last Week")
-                }
-                className="flex items-center gap-1 rounded-full bg-orange-500 px-3 py-1 text-xs font-medium text-white"
-              >
-                {trendPeriod} <ChevronDown size={14} />
-              </button>
-            </div>
+            <button
+              onClick={() =>
+                setTrendPeriod(trendPeriod === "Last Week" ? "This Week" : "Last Week")
+              }
+              className="flex items-center gap-1 rounded-full bg-orange-500 px-3 py-1 text-xs font-medium text-white"
+            >
+              {trendPeriod} <ChevronDown size={14} />
+            </button>
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={attendanceTrendData}>
@@ -325,37 +330,35 @@ export default function DashboardPage() {
         {/* Employee Status (Donut Chart) */}
         <div className="rounded-xl border border-gray-100 bg-white p-5">
           <h4 className="text-sm font-bold text-gray-900 mb-4">Employee Status</h4>
-          <div className="flex items-center justify-center">
-            <ResponsiveContainer width="100%" height={260}>
-              <PieChart>
-                <Pie
-                  data={employeeStatusData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={95}
-                  paddingAngle={3}
-                  dataKey="value"
-                  label={({ name, value, percent }) =>
-                    `${name} ${value} ${((percent ?? 0) * 100).toFixed(1)}%`
-                  }
-                  labelLine={true}
-                >
-                  {employeeStatusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend
-                  iconType="circle"
-                  iconSize={8}
-                  formatter={(value) => (
-                    <span className="text-xs text-gray-600">{value}</span>
-                  )}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+          <ResponsiveContainer width="100%" height={260}>
+            <PieChart>
+              <Pie
+                data={employeeStatusData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={95}
+                paddingAngle={3}
+                dataKey="value"
+                label={({ name, value, percent }) =>
+                  `${name} ${value} ${((percent ?? 0) * 100).toFixed(1)}%`
+                }
+                labelLine={true}
+              >
+                {employeeStatusData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend
+                iconType="circle"
+                iconSize={8}
+                formatter={(value) => (
+                  <span className="text-xs text-gray-600">{value}</span>
+                )}
+              />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
 
         {/* Department Headcount */}

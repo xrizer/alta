@@ -14,20 +14,31 @@ export default function Sidebar() {
 
   return (
     <aside className={`flex h-screen flex-col border-r border-gray-200 bg-white transition-all duration-300 ${collapsed ? "w-16" : "w-60"}`}>
-      <div className="flex h-16 items-center justify-between border-b border-gray-100 px-4">
-        <Image
-          src="/logo.png"
-          alt="Alta"
-          width={collapsed ? 32 : 140}
-          height={36}
-          className="object-contain"
-        />
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="text-gray-400 hover:text-gray-600"
-        >
-          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-        </button>
+      <div className={`flex h-16 items-center border-b border-gray-100 ${collapsed ? "justify-center px-2" : "justify-between px-4"}`}>
+        {collapsed ? (
+          <button
+            onClick={() => setCollapsed(false)}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            <ChevronRight size={20} />
+          </button>
+        ) : (
+          <>
+            <Image
+              src="/logo.png"
+              alt="Alta"
+              width={140}
+              height={36}
+              className="object-contain"
+            />
+            <button
+              onClick={() => setCollapsed(true)}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <ChevronLeft size={18} />
+            </button>
+          </>
+        )}
       </div>
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         <Link
