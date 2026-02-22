@@ -150,132 +150,134 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Overview */}
-      <div className="space-y-3">
-        <h3 className="text-lg font-bold text-gray-900">Overview</h3>
-
-        {/* Total Employees */}
-        <div className="rounded-xl border border-gray-100 bg-white px-5 py-4">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50">
-                <Users size={20} className="text-orange-500" />
-              </div>
-              <div>
-                <p className="text-xs text-gray-500">Total Employees</p>
-                <p className="text-2xl font-bold text-gray-900">80</p>
-              </div>
-            </div>
-            <div className="flex gap-8 border-l border-gray-200 pl-6">
-              <div>
-                <p className="text-xs text-gray-400">Permanent</p>
-                <p className="text-lg font-bold text-gray-900">60</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Contract</p>
-                <p className="text-lg font-bold text-gray-900">13</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-400">Internship</p>
-                <p className="text-lg font-bold text-gray-900">7</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Attendance/Pending + Status Breakdown */}
-        <div className="grid grid-cols-2 gap-3">
-          {/* Left: Today Attendance + colored status strips */}
-          <div className="space-y-2">
-            <div className="rounded-xl border border-gray-100 bg-white px-5 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50">
-                    <CheckCircle size={20} className="text-green-500" />
-                  </div>
-                  <p className="text-xs text-gray-500">Today Attendance</p>
+      {/* Overview + Notifications */}
+      <h3 className="text-lg font-bold text-gray-900">Overview</h3>
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        {/* Overview Cards */}
+        <div className="lg:col-span-2 space-y-3">
+          {/* Total Employees */}
+          <div className="rounded-xl border border-gray-100 bg-white px-5 py-4">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50">
+                  <Users size={20} className="text-orange-500" />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">
-                  75<span className="text-base font-normal text-gray-400">/80</span>
-                </p>
-              </div>
-            </div>
-            <div className="overflow-hidden rounded-lg border border-gray-100">
-              <div className="flex items-center justify-between bg-orange-50 px-4 py-2">
-                <span className="text-sm text-orange-500">Late</span>
-                <span className="text-base font-bold text-orange-500">10</span>
-              </div>
-            </div>
-            <div className="overflow-hidden rounded-lg border border-gray-100">
-              <div className="flex items-center justify-between bg-green-50 px-4 py-2">
-                <span className="text-sm text-green-600">On Leave</span>
-                <span className="text-base font-bold text-green-600">5</span>
-              </div>
-            </div>
-            <div className="overflow-hidden rounded-lg border border-gray-100">
-              <div className="flex items-center justify-between bg-red-50 px-4 py-2">
-                <span className="text-sm text-red-500">Absent</span>
-                <span className="text-base font-bold text-red-500">5</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right: Pending Approval + plain status rows */}
-          <div className="space-y-2">
-            <div className="rounded-xl border border-gray-100 bg-white px-5 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50">
-                    <Clock size={20} className="text-orange-500" />
-                  </div>
-                  <p className="text-xs text-gray-500">Pending Approval</p>
+                <div>
+                  <p className="text-xs text-gray-500">Total Employees</p>
+                  <p className="text-2xl font-bold text-gray-900">80</p>
                 </div>
-                <p className="text-2xl font-bold text-gray-900">8</p>
+              </div>
+              <div className="flex gap-8 border-l border-gray-200 pl-6">
+                <div>
+                  <p className="text-xs text-gray-400">Permanent</p>
+                  <p className="text-lg font-bold text-gray-900">60</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400">Contract</p>
+                  <p className="text-lg font-bold text-gray-900">13</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400">Internship</p>
+                  <p className="text-lg font-bold text-gray-900">7</p>
+                </div>
               </div>
             </div>
-            <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
-              <span className="text-sm text-gray-600">Leave</span>
-              <span className="text-base font-bold text-gray-900">2</span>
+          </div>
+
+          {/* Attendance/Pending + Status Breakdown */}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Left: Today Attendance + colored status strips */}
+            <div className="space-y-2">
+              <div className="rounded-xl border border-gray-100 bg-white px-5 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50">
+                      <CheckCircle size={20} className="text-green-500" />
+                    </div>
+                    <p className="text-xs text-gray-500">Today Attendance</p>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900">
+                    75<span className="text-base font-normal text-gray-400">/80</span>
+                  </p>
+                </div>
+              </div>
+              <div className="overflow-hidden rounded-lg border border-gray-100">
+                <div className="flex items-center justify-between bg-orange-50 px-4 py-2">
+                  <span className="text-sm text-orange-500">Late</span>
+                  <span className="text-base font-bold text-orange-500">10</span>
+                </div>
+              </div>
+              <div className="overflow-hidden rounded-lg border border-gray-100">
+                <div className="flex items-center justify-between bg-green-50 px-4 py-2">
+                  <span className="text-sm text-green-600">On Leave</span>
+                  <span className="text-base font-bold text-green-600">5</span>
+                </div>
+              </div>
+              <div className="overflow-hidden rounded-lg border border-gray-100">
+                <div className="flex items-center justify-between bg-red-50 px-4 py-2">
+                  <span className="text-sm text-red-500">Absent</span>
+                  <span className="text-base font-bold text-red-500">5</span>
+                </div>
+              </div>
             </div>
-            <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
-              <span className="text-sm text-gray-600">Permission</span>
-              <span className="text-base font-bold text-gray-900">2</span>
-            </div>
-            <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
-              <span className="text-sm text-gray-600">Reimbursement</span>
-              <span className="text-base font-bold text-gray-900">4</span>
+
+            {/* Right: Pending Approval + plain status rows */}
+            <div className="space-y-2">
+              <div className="rounded-xl border border-gray-100 bg-white px-5 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50">
+                      <Clock size={20} className="text-orange-500" />
+                    </div>
+                    <p className="text-xs text-gray-500">Pending Approval</p>
+                  </div>
+                  <p className="text-2xl font-bold text-gray-900">8</p>
+                </div>
+              </div>
+              <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
+                <span className="text-sm text-gray-600">Leave</span>
+                <span className="text-base font-bold text-gray-900">2</span>
+              </div>
+              <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
+                <span className="text-sm text-gray-600">Permission</span>
+                <span className="text-base font-bold text-gray-900">2</span>
+              </div>
+              <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
+                <span className="text-sm text-gray-600">Reimbursement</span>
+                <span className="text-base font-bold text-gray-900">4</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Notifications */}
-      <div className="rounded-xl border border-gray-100 bg-white p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-gray-900">Notifications</h3>
-          <button className="flex items-center gap-1 text-xs font-medium text-blue-500 hover:text-blue-600">
-            View All <ChevronRight size={14} />
-          </button>
-        </div>
-        <div className="space-y-5">
-          {notifications.map((n) => (
-            <div key={n.id} className="flex gap-3">
-              <div className="mt-1.5">
-                <span
-                  className={`block h-2.5 w-2.5 rounded-full ${
-                    n.type === "error" ? "bg-red-500" : "bg-yellow-400"
-                  }`}
-                />
+        {/* Notifications */}
+        <div className="rounded-xl border border-gray-100 bg-white p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-gray-900">Notifications</h3>
+            <button className="flex items-center gap-1 text-xs font-medium text-blue-500 hover:text-blue-600">
+              View All <ChevronRight size={14} />
+            </button>
+          </div>
+          <div className="space-y-5">
+            {notifications.map((n) => (
+              <div key={n.id} className="flex gap-3">
+                <div className="mt-1.5">
+                  <span
+                    className={`block h-2.5 w-2.5 rounded-full ${
+                      n.type === "error" ? "bg-red-500" : "bg-yellow-400"
+                    }`}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900">{n.title}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{n.description}</p>
+                  <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                    <Clock size={11} /> {n.time}
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900">{n.title}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{n.description}</p>
-                <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                  <Clock size={11} /> {n.time}
-                </p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
