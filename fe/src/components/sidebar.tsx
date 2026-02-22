@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
-import { useState, useEffect } from "react";
-import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { Home, ChevronLeft, ChevronRight } from "react-feather";
+import { useState } from "react";
 
 interface NavItem {
   name: string;
   href: string;
   roles: string[];
   key: string;
+  icon?: React.ReactNode;
 }
 
 interface NavSection {
@@ -22,7 +23,7 @@ const navigation: NavSection[] = [
   {
     title: "General",
     items: [
-      { name: "Dashboard", href: "/dashboard", roles: ["admin", "hr", "employee"], key: "dashboard" },
+      { name: "Overview", href: "/dashboard", roles: ["admin", "hr", "employee"], key: "dashboard", icon: <Home size={18} /> },
     ],
   },
   {
@@ -66,108 +67,71 @@ const navigation: NavSection[] = [
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, allowedMenuKeys } = useAuth();
-
-  // State to track which sections are expanded
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
-
-  // Initialize expanded state from localStorage or default to all expanded
-  useEffect(() => {
-    const stored = localStorage.getItem("sidebar-expanded-sections");
-    if (stored) {
-      setExpandedSections(JSON.parse(stored));
-    } else {
-      // Default: all sections expanded
-      const defaultExpanded = navigation.reduce(
-        (acc, section) => ({ ...acc, [section.title]: true }),
-        {}
-      );
-      setExpandedSections(defaultExpanded);
-    }
-  }, []);
-
-  // Save to localStorage whenever expanded state changes
-  useEffect(() => {
-    if (Object.keys(expandedSections).length > 0) {
-      localStorage.setItem("sidebar-expanded-sections", JSON.stringify(expandedSections));
-    }
-  }, [expandedSections]);
-
-  // Toggle section expand/collapse
-  const toggleSection = (sectionTitle: string) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [sectionTitle]: !prev[sectionTitle],
-    }));
-  };
+  const [collapsed, setCollapsed] = useState(false);
 
   const filteredSections = navigation
     .map((section) => ({
       ...section,
       items: section.items.filter((item) => {
         if (!user) return false;
-
-        // If user has custom menu access configured, use that
         if (allowedMenuKeys !== null) {
           return allowedMenuKeys.includes(item.key);
         }
-
-        // Otherwise fall back to role-based access
         return item.roles.includes(user.role);
       }),
     }))
     .filter((section) => section.items.length > 0);
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-gray-200 bg-white">
-      <div className="flex h-16 items-center border-b border-gray-200 px-6">
-        <h1 className="text-xl font-bold text-blue-600">HRIS</h1>
+    <aside className={`flex h-screen flex-col border-r border-gray-200 bg-white transition-all duration-300 ${collapsed ? "w-16" : "w-60"}`}>
+      <div className="flex h-16 items-center justify-between border-b border-gray-100 px-4">
+        <div className="flex items-center gap-2">
+          <svg width="28" height="20" viewBox="0 0 28 20" fill="none">
+            <path d="M2 18L8 2" stroke="#FF6800" strokeWidth="3" strokeLinecap="round" />
+            <path d="M9 18L15 2" stroke="#FF6800" strokeWidth="3" strokeLinecap="round" />
+            <path d="M16 18L22 2" stroke="#FF6800" strokeWidth="3" strokeLinecap="round" />
+          </svg>
+          {!collapsed && <span className="text-lg font-bold text-orange-500">Alta</span>}
+        </div>
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="text-gray-400 hover:text-gray-600"
+        >
+          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+        </button>
       </div>
       <nav className="flex-1 overflow-y-auto px-3 py-4">
-        {filteredSections.map((section) => {
-          const isExpanded = expandedSections[section.title] ?? true;
-
-          return (
-            <div key={section.title} className="mb-2">
-              <button
-                onClick={() => toggleSection(section.title)}
-                className="mb-1 flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wider text-gray-900 transition-colors hover:bg-gray-100"
-              >
-                <span>{section.title}</span>
-                {isExpanded ? (
-                  <ChevronDownIcon className="h-4 w-4 text-gray-600" />
-                ) : (
-                  <ChevronRightIcon className="h-4 w-4 text-gray-600" />
-                )}
-              </button>
-              <div
-                className={`overflow-hidden transition-all duration-200 ease-in-out ${
-                  isExpanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
-                }`}
-              >
-                <div className="space-y-1">
-                  {section.items.map((item) => {
-                    const isActive =
-                      pathname === item.href ||
-                      (item.href !== "/dashboard" && pathname.startsWith(item.href));
-                    return (
-                      <Link
-                        key={item.name}
-                        href={item.href}
-                        className={`flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                          isActive
-                            ? "bg-blue-50 text-blue-700"
-                            : "text-gray-700 hover:bg-gray-100"
-                        }`}
-                      >
-                        {item.name}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
+        {filteredSections.map((section) => (
+          <div key={section.title} className="mb-4">
+            {!collapsed && (
+              <p className="mb-1 px-3 text-xs font-bold uppercase tracking-wider text-gray-900">
+                {section.title}
+              </p>
+            )}
+            <div className="space-y-1">
+              {section.items.map((item) => {
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-orange-50 text-orange-600"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    } ${collapsed ? "justify-center" : ""}`}
+                    title={collapsed ? item.name : undefined}
+                  >
+                    {item.icon && <span className="flex-shrink-0">{item.icon}</span>}
+                    {!collapsed && <span>{item.name}</span>}
+                  </Link>
+                );
+              })}
             </div>
-          );
-        })}
+          </div>
+        ))}
       </nav>
     </aside>
   );
