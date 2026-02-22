@@ -15,8 +15,9 @@ import {
   Shield,
   Briefcase,
   GitBranch,
+  X,
 } from "react-feather";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import {
   getActiveTab,
@@ -40,10 +41,20 @@ const menuIconMap: Record<string, React.ReactNode> = {
   menu_access_policy: <Shield size={18} />,
 };
 
-export default function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
+}
+
+export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
   const { allowedMenuKeys } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
+
+  // Close mobile sidebar on route change
+  useEffect(() => {
+    onMobileClose?.();
+  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activeTab = getActiveTab(pathname);
   const subItems = activeTab
@@ -52,21 +63,19 @@ export default function Sidebar() {
 
   const isDashboardActive = pathname === "/dashboard";
 
-  return (
-    <aside
-      className={`flex h-screen flex-col border-r border-gray-200 bg-white transition-all duration-300 ${
-        collapsed ? "w-16" : "w-60"
-      }`}
-    >
+  const sidebarContent = (
+    <>
       {/* Logo */}
       <div
         className={`flex h-16 items-center border-b border-gray-100 ${
-          collapsed ? "justify-center gap-0 px-2" : "justify-between px-4"
+          collapsed && !mobileOpen
+            ? "justify-center gap-0 px-2"
+            : "justify-between px-4"
         }`}
       >
-        {collapsed ? (
-          <div className="relative flex items-center justify-center w-full">
-            <div className="flex-shrink-0 overflow-hidden w-3.5 h-3.5">
+        {collapsed && !mobileOpen ? (
+          <div className="relative flex w-full items-center justify-center">
+            <div className="h-3.5 w-3.5 flex-shrink-0 overflow-hidden">
               <Image
                 src="/logo.png"
                 alt="Alta"
@@ -92,24 +101,33 @@ export default function Sidebar() {
               height={36}
               className="object-contain"
             />
-            <button
-              onClick={() => setCollapsed(true)}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <ChevronLeft size={18} />
-            </button>
+            {mobileOpen ? (
+              <button
+                onClick={onMobileClose}
+                className="text-gray-400 hover:text-gray-600 md:hidden"
+              >
+                <X size={20} />
+              </button>
+            ) : (
+              <button
+                onClick={() => setCollapsed(true)}
+                className="hidden text-gray-400 hover:text-gray-600 md:block"
+              >
+                <ChevronLeft size={18} />
+              </button>
+            )}
           </>
         )}
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4">
-        {/* Show sub-items when a tab with children is active */}
         {subItems.length > 0 ? (
           <div className="flex flex-col gap-1">
             {subItems.map((sub: SubMenuItem) => {
               const active = isSubItemActive(pathname, sub);
               const icon = menuIconMap[sub.key] || <FileText size={18} />;
+              const isCollapsedDesktop = collapsed && !mobileOpen;
               return (
                 <Link
                   key={sub.key}
@@ -118,31 +136,56 @@ export default function Sidebar() {
                     active
                       ? "bg-orange-50 text-orange-600"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  } ${collapsed ? "justify-center" : ""}`}
-                  title={collapsed ? sub.name : undefined}
+                  } ${isCollapsedDesktop ? "justify-center" : ""}`}
+                  title={isCollapsedDesktop ? sub.name : undefined}
                 >
                   {icon}
-                  {!collapsed && <span>{sub.name}</span>}
+                  {!isCollapsedDesktop && <span>{sub.name}</span>}
                 </Link>
               );
             })}
           </div>
         ) : (
-          /* Dashboard / tabs with no sub-items: show Overview */
           <Link
             href="/dashboard"
             className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
               isDashboardActive
                 ? "bg-orange-50 text-orange-600"
                 : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            } ${collapsed ? "justify-center" : ""}`}
-            title={collapsed ? "Overview" : undefined}
+            } ${collapsed && !mobileOpen ? "justify-center" : ""}`}
+            title={collapsed && !mobileOpen ? "Overview" : undefined}
           >
             <Home size={18} />
-            {!collapsed && <span>Overview</span>}
+            {!(collapsed && !mobileOpen) && <span>Overview</span>}
           </Link>
         )}
       </nav>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <aside
+        className={`hidden md:flex h-screen flex-col border-r border-gray-200 bg-white transition-all duration-300 ${
+          collapsed ? "w-16" : "w-60"
+        }`}
+      >
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/50 md:hidden"
+            onClick={onMobileClose}
+          />
+          <aside className="fixed inset-y-0 left-0 z-50 flex w-60 flex-col bg-white shadow-xl md:hidden">
+            {sidebarContent}
+          </aside>
+        </>
+      )}
+    </>
   );
 }

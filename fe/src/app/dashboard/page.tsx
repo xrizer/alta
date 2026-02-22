@@ -116,34 +116,34 @@ export default function DashboardPage() {
       <h2 className="text-xl font-bold text-gray-900">Dashboard</h2>
 
       {/* Greeting + Date + Quick Actions */}
-      <div className="rounded-xl border border-gray-100 bg-white px-6 py-5 space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="rounded-xl border border-gray-100 bg-white px-4 py-4 space-y-4 md:px-6 md:py-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-xl font-bold text-orange-500">
+            <h3 className="text-lg font-bold text-orange-500 md:text-xl">
               Halo, {user?.name || "Alta"}!
             </h3>
             <p className="mt-0.5 text-sm text-gray-500">
               Here&apos;s your HR overview for today
             </p>
           </div>
-          <div className="text-right">
+          <div className="text-left sm:text-right">
             <p className="text-sm font-semibold text-gray-900">
               {dayName}, {dateStr}
             </p>
-            <p className="text-2xl font-bold text-gray-900">{timeStr}</p>
+            <p className="text-xl font-bold text-gray-900 md:text-2xl">{timeStr}</p>
           </div>
         </div>
         <div className="border-t border-gray-100" />
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-sm font-bold text-gray-700">Quick Actions</span>
-          <div className="flex items-center gap-3">
-            <button className="rounded-lg bg-orange-500 px-5 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors">
+          <div className="flex flex-wrap items-center gap-2 md:gap-3">
+            <button className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors md:px-5">
               Review Attendance
             </button>
-            <button className="rounded-lg border border-orange-500 px-5 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors">
+            <button className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors md:px-5">
               Review Approval
             </button>
-            <button className="rounded-lg border border-orange-500 px-5 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors">
+            <button className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors md:px-5">
               Process Payroll
             </button>
           </div>
@@ -156,8 +156,8 @@ export default function DashboardPage() {
         {/* Overview Cards */}
         <div className="lg:col-span-2 space-y-3">
           {/* Total Employees */}
-          <div className="rounded-xl border border-gray-100 bg-white px-5 py-4">
-            <div className="flex items-center gap-6">
+          <div className="rounded-xl border border-gray-100 bg-white px-4 py-4 md:px-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50">
                   <Users size={20} className="text-orange-500" />
@@ -167,7 +167,7 @@ export default function DashboardPage() {
                   <p className="text-2xl font-bold text-gray-900">80</p>
                 </div>
               </div>
-              <div className="flex gap-8 border-l border-gray-200 pl-6">
+              <div className="flex gap-6 border-t border-gray-200 pt-3 sm:gap-8 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
                 <div>
                   <p className="text-xs text-gray-400">Permanent</p>
                   <p className="text-lg font-bold text-gray-900">60</p>
@@ -185,10 +185,10 @@ export default function DashboardPage() {
           </div>
 
           {/* Attendance/Pending + Status Breakdown */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {/* Left: Today Attendance + colored status strips */}
             <div className="space-y-2">
-              <div className="rounded-xl border border-gray-100 bg-white px-5 py-4">
+              <div className="rounded-xl border border-gray-100 bg-white px-4 py-4 md:px-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50">
@@ -223,7 +223,7 @@ export default function DashboardPage() {
 
             {/* Right: Pending Approval + plain status rows */}
             <div className="space-y-2">
-              <div className="rounded-xl border border-gray-100 bg-white px-5 py-4">
+              <div className="rounded-xl border border-gray-100 bg-white px-4 py-4 md:px-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50">
@@ -251,7 +251,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Notifications */}
-        <div className="rounded-xl border border-gray-100 bg-white p-5">
+        <div className="rounded-xl border border-gray-100 bg-white p-4 md:p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-gray-900">Notifications</h3>
             <button className="flex items-center gap-1 text-xs font-medium text-blue-500 hover:text-blue-600">
@@ -286,7 +286,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         {/* Attendance Trend */}
-        <div className="rounded-xl border border-gray-100 bg-white p-5">
+        <div className="rounded-xl border border-gray-100 bg-white p-4 md:p-5">
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-sm font-bold text-gray-900">Attendance Trend</h4>
             <button
@@ -314,7 +314,7 @@ export default function DashboardPage() {
               />
             </LineChart>
           </ResponsiveContainer>
-          <div className="flex items-center gap-4 mt-2">
+          <div className="flex flex-wrap items-center gap-4 mt-2">
             <span className="flex items-center gap-1.5 text-xs text-gray-500">
               <span className="h-2 w-2 rounded-full bg-indigo-500" /> Permanent
             </span>
@@ -328,10 +328,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Employee Status (Pie Chart) */}
-        <div className="rounded-xl border border-gray-100 bg-white p-5">
+        <div className="rounded-xl border border-gray-100 bg-white p-4 md:p-5">
           <h4 className="text-sm font-bold text-gray-900 text-center mb-2">Employee Status</h4>
-          <div className="flex items-center justify-center">
-            <ResponsiveContainer width="60%" height={220}>
+          <div className="flex flex-col items-center sm:flex-row sm:justify-center">
+            <ResponsiveContainer width="100%" height={220} className="sm:max-w-[60%]">
               <PieChart>
                 <Pie
                   data={employeeStatusData}
@@ -357,7 +357,7 @@ export default function DashboardPage() {
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
-            <div className="flex flex-col gap-3 ml-2">
+            <div className="flex flex-row gap-4 mt-3 sm:mt-0 sm:ml-2 sm:flex-col sm:gap-3">
               {employeeStatusData.map((entry) => (
                 <span key={entry.name} className="flex items-center gap-2 text-xs text-gray-600">
                   <span className="h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: entry.color }} />
@@ -369,13 +369,13 @@ export default function DashboardPage() {
         </div>
 
         {/* Department Headcount */}
-        <div className="rounded-xl border border-gray-100 bg-white p-5">
+        <div className="rounded-xl border border-gray-100 bg-white p-4 md:p-5">
           <h4 className="text-sm font-bold text-gray-900 mb-4">Departement Headcount</h4>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={deptHeadcountData} layout="vertical" barSize={16}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F3F4F6" />
               <XAxis type="number" tick={{ fontSize: 11, fill: "#9CA3AF" }} axisLine={false} tickLine={false} />
-              <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: "#6B7280" }} axisLine={false} tickLine={false} width={120} />
+              <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: "#6B7280" }} axisLine={false} tickLine={false} width={100} />
               <Tooltip />
               <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                 {deptHeadcountData.map((_, index) => (
@@ -387,13 +387,13 @@ export default function DashboardPage() {
         </div>
 
         {/* Department Headcount by Gender */}
-        <div className="rounded-xl border border-gray-100 bg-white p-5">
+        <div className="rounded-xl border border-gray-100 bg-white p-4 md:p-5">
           <h4 className="text-sm font-bold text-gray-900 mb-4">Departement Headcount</h4>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={deptGenderData} layout="vertical" barSize={14}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F3F4F6" />
               <XAxis type="number" tick={{ fontSize: 11, fill: "#9CA3AF" }} axisLine={false} tickLine={false} />
-              <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: "#6B7280" }} axisLine={false} tickLine={false} width={120} />
+              <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: "#6B7280" }} axisLine={false} tickLine={false} width={100} />
               <Tooltip />
               <Legend
                 iconType="circle"
