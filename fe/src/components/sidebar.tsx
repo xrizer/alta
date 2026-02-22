@@ -18,8 +18,8 @@ export default function Sidebar() {
         <Image
           src="/logo.png"
           alt="Alta"
-          width={collapsed ? 28 : 100}
-          height={28}
+          width={collapsed ? 32 : 140}
+          height={36}
           className="object-contain"
         />
         <button
