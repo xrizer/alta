@@ -28,28 +28,32 @@ export default function Header({ onMenuClick }: HeaderProps) {
             <Menu size={20} />
           </button>
 
-          {/* Nav tabs - scrollable on mobile */}
-          <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
-            {visibleTabs.map((tab) => {
-              const active = isTabActive(pathname, tab);
-              return (
-                <Link
-                  key={tab.name}
-                  href={tab.href}
-                  className={`relative whitespace-nowrap px-3 py-4 text-sm font-medium transition-colors md:px-4 ${
-                    active
-                      ? "text-orange-500"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
-                >
-                  {tab.name}
-                  {active && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500" />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
+          {/* Nav tabs - scrollable on mobile with fade hint */}
+          <div className="relative min-w-0 flex-1">
+            <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+              {visibleTabs.map((tab) => {
+                const active = isTabActive(pathname, tab);
+                return (
+                  <Link
+                    key={tab.name}
+                    href={tab.href}
+                    className={`relative whitespace-nowrap px-3 py-4 text-sm font-medium transition-colors md:px-4 ${
+                      active
+                        ? "text-orange-500"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    {tab.name}
+                    {active && (
+                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500" />
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+            {/* Fade hint on the right edge for mobile */}
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white to-transparent md:hidden" />
+          </div>
         </div>
 
         <div className="flex items-center gap-2 md:gap-3">
