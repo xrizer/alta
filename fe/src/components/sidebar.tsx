@@ -65,7 +65,7 @@ export default function Sidebar() {
         }`}
       >
         {collapsed ? (
-          <div className="flex items-center gap-0.5">
+          <div className="relative flex items-center justify-center w-full">
             <div className="flex-shrink-0 overflow-hidden w-3.5 h-3.5">
               <Image
                 src="/logo.png"
@@ -78,7 +78,7 @@ export default function Sidebar() {
             </div>
             <button
               onClick={() => setCollapsed(false)}
-              className="text-gray-400 hover:text-gray-600"
+              className="absolute -right-1 text-gray-400 hover:text-gray-600"
             >
               <ChevronRight size={14} />
             </button>
