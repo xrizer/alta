@@ -327,38 +327,45 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Employee Status (Donut Chart) */}
+        {/* Employee Status (Pie Chart) */}
         <div className="rounded-xl border border-gray-100 bg-white p-5">
-          <h4 className="text-sm font-bold text-gray-900 mb-4">Employee Status</h4>
-          <ResponsiveContainer width="100%" height={260}>
-            <PieChart>
-              <Pie
-                data={employeeStatusData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={95}
-                paddingAngle={3}
-                dataKey="value"
-                label={({ name, value, percent }) =>
-                  `${name} ${value} ${((percent ?? 0) * 100).toFixed(1)}%`
-                }
-                labelLine={true}
-              >
-                {employeeStatusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend
-                iconType="circle"
-                iconSize={8}
-                formatter={(value) => (
-                  <span className="text-xs text-gray-600">{value}</span>
-                )}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          <h4 className="text-sm font-bold text-gray-900 text-center mb-2">Employee Status</h4>
+          <div className="flex items-center justify-center">
+            <ResponsiveContainer width="60%" height={220}>
+              <PieChart>
+                <Pie
+                  data={employeeStatusData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  dataKey="value"
+                  label={({ name, value, percent, x, y, textAnchor }) => (
+                    <text x={x} y={y} textAnchor={textAnchor} fill="#6B7280" fontSize={11}>
+                      {`${name}`}
+                      <tspan x={x} dy={14} fill={employeeStatusData.find(d => d.name === name)?.color} fontWeight="bold" fontSize={12}>
+                        {`${value}`}
+                      </tspan>
+                      <tspan fill="#9CA3AF" fontSize={11}>{` ${((percent ?? 0) * 100).toFixed(1)}%`}</tspan>
+                    </text>
+                  )}
+                  labelLine={{ stroke: "#D1D5DB", strokeWidth: 1 }}
+                >
+                  {employeeStatusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex flex-col gap-3 ml-2">
+              {employeeStatusData.map((entry) => (
+                <span key={entry.name} className="flex items-center gap-2 text-xs text-gray-600">
+                  <span className="h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: entry.color }} />
+                  {entry.name}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Department Headcount */}
