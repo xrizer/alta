@@ -3,44 +3,20 @@
 import { useAuth } from "@/contexts/auth-context";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { User } from "react-feather";
-
-const tabs = [
-  { name: "Dashboard", href: "/dashboard" },
-  { name: "Organization", href: "/dashboard/companies" },
-  { name: "People", href: "/dashboard/users" },
-  { name: "Attendance", href: "/dashboard/attendance" },
-  { name: "Payroll", href: "/dashboard/payroll" },
-  { name: "Administration", href: "/dashboard/menu-access" },
-];
-
-function isTabActive(pathname: string, tab: { name: string; href: string }) {
-  if (tab.name === "Dashboard") return pathname === "/dashboard";
-  if (tab.name === "Organization") {
-    return ["/dashboard/companies", "/dashboard/departments", "/dashboard/positions", "/dashboard/shifts", "/dashboard/organization-structure"].some(
-      (p) => pathname.startsWith(p)
-    );
-  }
-  if (tab.name === "People") {
-    return ["/dashboard/users", "/dashboard/employees"].some((p) => pathname.startsWith(p));
-  }
-  if (tab.name === "Attendance") {
-    return ["/dashboard/attendance", "/dashboard/leaves"].some((p) => pathname.startsWith(p));
-  }
-  if (tab.name === "Payroll") return pathname.startsWith("/dashboard/payroll");
-  if (tab.name === "Administration") return pathname.startsWith("/dashboard/menu-access");
-  return false;
-}
+import { User, Bell } from "react-feather";
+import { getVisibleTabs, isTabActive } from "@/lib/menu-config";
 
 export default function Header() {
-  const { user, logout } = useAuth();
+  const { user, logout, allowedMenuKeys } = useAuth();
   const pathname = usePathname();
+
+  const visibleTabs = getVisibleTabs(allowedMenuKeys);
 
   return (
     <header className="border-b border-gray-200 bg-white">
       <div className="flex h-14 items-center justify-between px-6">
         <nav className="flex items-center gap-1">
-          {tabs.map((tab) => {
+          {visibleTabs.map((tab) => {
             const active = isTabActive(pathname, tab);
             return (
               <Link
@@ -61,9 +37,12 @@ export default function Header() {
           })}
         </nav>
         <div className="flex items-center gap-3">
+          <button className="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100">
+            <Bell size={18} />
+          </button>
           <div className="text-right">
             <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-            <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+            <p className="text-xs capitalize text-gray-500">{user?.role}</p>
           </div>
           <button
             onClick={logout}
