@@ -65,14 +65,14 @@ export default function Sidebar() {
         }`}
       >
         {collapsed ? (
-          <div className="flex items-center gap-1">
-            <div className="flex-shrink-0 overflow-hidden w-7 h-7">
+          <div className="flex items-center gap-0.5">
+            <div className="flex-shrink-0 overflow-hidden w-5 h-5">
               <Image
                 src="/logo.png"
                 alt="Alta"
                 width={140}
                 height={36}
-                className="h-7 max-w-none object-cover object-left"
+                className="h-5 max-w-none object-cover object-left"
                 style={{ width: "auto" }}
               />
             </div>
@@ -80,7 +80,7 @@ export default function Sidebar() {
               onClick={() => setCollapsed(false)}
               className="text-gray-400 hover:text-gray-600"
             >
-              <ChevronRight size={16} />
+              <ChevronRight size={14} />
             </button>
           </div>
         ) : (
