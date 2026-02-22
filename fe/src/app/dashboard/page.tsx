@@ -23,80 +23,208 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import { useState } from "react";
-
-// --- Mock Data ---
-
-const attendanceTrendData = [
-  { day: "Mon", attendance: 72 },
-  { day: "Tue", attendance: 78 },
-  { day: "Wed", attendance: 65 },
-  { day: "Thu", attendance: 80 },
-  { day: "Fri", attendance: 75 },
-  { day: "Sat", attendance: 68 },
-];
-
-const employeeStatusData = [
-  { name: "Permanent", value: 52, color: "#7C3AED" },
-  { name: "Contract", value: 18, color: "#FF6800" },
-  { name: "Internship", value: 10, color: "#06B6D4" },
-];
-
-const deptHeadcountData = [
-  { name: "Engineering", count: 32 },
-  { name: "Product & Design", count: 10 },
-  { name: "Data & DevOps", count: 8 },
-  { name: "Sales & Marketing", count: 14 },
-  { name: "Customer Support", count: 8 },
-  { name: "HR & Finance", count: 8 },
-];
-
-const deptGenderData = [
-  { name: "Engineering", male: 78, female: 12 },
-  { name: "Product & Design", male: 50, female: 52 },
-  { name: "Data & DevOps", male: 85, female: 43 },
-  { name: "Sales & Marketing", male: 11, female: 50 },
-  { name: "Customer Support", male: 87, female: 34 },
-  { name: "HR & Finance", male: 30, female: 26 },
-];
-
-const notifications = [
-  {
-    id: 1,
-    type: "warning",
-    title: "Leave Request Pending",
-    description: "Andi Pratama submitted a 3-day leave request",
-    time: "3 Hours Ago",
-  },
-  {
-    id: 2,
-    type: "error",
-    title: "Permission Request",
-    description: "Siti Aisyah requested sick leave for today",
-    time: "Today, 08:15 AM",
-  },
-  {
-    id: 3,
-    type: "warning",
-    title: "New Reimbursement Request",
-    description: "Dayat submitted a reimbursement of Rp300.000",
-    time: "Yesterday",
-  },
-  {
-    id: 4,
-    type: "warning",
-    title: "New Reimbursement Request",
-    description: "Dayat submitted a reimbursement of Rp300.000",
-    time: "Yesterday",
-  },
-];
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Employee, Attendance, Leave } from "@/lib/types";
+import { getEmployees } from "@/services/employee-service";
+import { getAttendances } from "@/services/attendance-service";
+import { getLeaves } from "@/services/leave-service";
 
 const DEPT_COLORS = ["#3B82F6", "#F59E0B", "#EF4444", "#8B5CF6", "#374151", "#DC2626"];
 
+// --- Helpers ---
+
+function formatLocalDate(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function getMonday(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function formatRelativeTime(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+
+  if (diffMin < 1) return "Just now";
+  if (diffMin < 60) return `${diffMin} min ago`;
+  if (diffHour < 24) return `${diffHour} hour${diffHour > 1 ? "s" : ""} ago`;
+  if (diffDay === 1) return "Yesterday";
+  if (diffDay < 7) return `${diffDay} days ago`;
+  return date.toLocaleDateString("en-US", { day: "2-digit", month: "short" });
+}
+
+const DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
 export default function DashboardPage() {
   const { user } = useAuth();
-  const [trendPeriod, setTrendPeriod] = useState("Last Week");
+  const [trendPeriod, setTrendPeriod] = useState<"This Week" | "Last Week">("This Week");
 
+  // Raw API data
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [allAttendances, setAllAttendances] = useState<Attendance[]>([]);
+  const [pendingLeaves, setPendingLeaves] = useState<Leave[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch data
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const today = new Date();
+      const fourteenDaysAgo = new Date(today);
+      fourteenDaysAgo.setDate(today.getDate() - 14);
+
+      const [empResult, attResult, leaveResult] = await Promise.allSettled([
+        getEmployees(),
+        getAttendances({
+          start_date: formatLocalDate(fourteenDaysAgo),
+          end_date: formatLocalDate(today),
+          limit: 5000,
+        }),
+        getLeaves({ status: "pending" }),
+      ]);
+
+      if (empResult.status === "fulfilled" && empResult.value.data) {
+        setEmployees(empResult.value.data);
+      }
+      if (attResult.status === "fulfilled" && attResult.value.data) {
+        setAllAttendances(attResult.value.data.data || []);
+      }
+      if (leaveResult.status === "fulfilled" && leaveResult.value.data) {
+        setPendingLeaves(leaveResult.value.data);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // --- Derived data ---
+
+  // 1. Employee status counts
+  const employeeStats = useMemo(() => {
+    let permanent = 0, contract = 0, internship = 0;
+    for (const emp of employees) {
+      if (emp.employee_status === "tetap") permanent++;
+      else if (emp.employee_status === "kontrak") contract++;
+      else if (emp.employee_status === "probation") internship++;
+    }
+    return { total: employees.length, permanent, contract, internship };
+  }, [employees]);
+
+  // 2. Today attendance
+  const todayAttendance = useMemo(() => {
+    const todayStr = formatLocalDate(new Date());
+    const todayRecords = allAttendances.filter((a) => a.date === todayStr);
+    let present = 0, late = 0, onLeave = 0, absent = 0;
+    for (const a of todayRecords) {
+      const s = a.status;
+      if (s === "terlambat" || s === "late_in") late++;
+      else if (s === "cuti" || s === "izin" || s === "sakit") onLeave++;
+      else if (s === "alpha") absent++;
+      else present++;
+    }
+    return { total: todayRecords.length, present, late, onLeave, absent };
+  }, [allAttendances]);
+
+  // 3. Pending approval breakdown
+  const pendingStats = useMemo(() => {
+    let leave = 0, permission = 0;
+    for (const l of pendingLeaves) {
+      const t = l.leave_type;
+      if (t === "izin" || t === "dinas_luar") permission++;
+      else leave++;
+    }
+    return { total: pendingLeaves.length, leave, permission, reimbursement: 0 };
+  }, [pendingLeaves]);
+
+  // 4. Notifications from pending leaves
+  const notifications = useMemo(() => {
+    const sorted = [...pendingLeaves].sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+    return sorted.slice(0, 4).map((l) => {
+      const empName = l.employee?.user?.name || "Employee";
+      const isLeave = l.leave_type !== "izin" && l.leave_type !== "dinas_luar";
+      return {
+        id: l.id,
+        type: isLeave ? "warning" : "error",
+        title: isLeave ? "Leave Request Pending" : "Permission Request",
+        description: isLeave
+          ? `${empName} submitted a ${l.total_days}-day leave request`
+          : `${empName} requested ${l.leave_type === "dinas_luar" ? "business trip" : "permission"} for ${l.total_days} day${l.total_days > 1 ? "s" : ""}`,
+        time: formatRelativeTime(l.created_at),
+      };
+    });
+  }, [pendingLeaves]);
+
+  // 5. Attendance trend (weekly)
+  const attendanceTrendData = useMemo(() => {
+    const today = new Date();
+    const thisMonday = getMonday(today);
+    const lastMonday = new Date(thisMonday);
+    lastMonday.setDate(lastMonday.getDate() - 7);
+
+    const startMonday = trendPeriod === "This Week" ? thisMonday : lastMonday;
+
+    return DAY_NAMES.map((name, i) => {
+      const dayDate = new Date(startMonday);
+      dayDate.setDate(startMonday.getDate() + i);
+      const dayStr = formatLocalDate(dayDate);
+      const dayRecords = allAttendances.filter((a) => a.date === dayStr);
+      return { day: name, attendance: dayRecords.length };
+    });
+  }, [allAttendances, trendPeriod]);
+
+  // 6. Employee status pie chart
+  const employeeStatusData = useMemo(() => [
+    { name: "Permanent", value: employeeStats.permanent, color: "#7C3AED" },
+    { name: "Contract", value: employeeStats.contract, color: "#FF6800" },
+    { name: "Internship", value: employeeStats.internship, color: "#06B6D4" },
+  ], [employeeStats]);
+
+  // 7. Department headcount
+  const deptHeadcountData = useMemo(() => {
+    const deptMap: Record<string, number> = {};
+    for (const emp of employees) {
+      const dept = emp.department?.name || "Unknown";
+      deptMap[dept] = (deptMap[dept] || 0) + 1;
+    }
+    return Object.entries(deptMap)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [employees]);
+
+  // 8. Department headcount by gender
+  const deptGenderData = useMemo(() => {
+    const deptMap: Record<string, { male: number; female: number }> = {};
+    for (const emp of employees) {
+      const dept = emp.department?.name || "Unknown";
+      if (!deptMap[dept]) deptMap[dept] = { male: 0, female: 0 };
+      const g = (emp.gender || "").toLowerCase();
+      if (g === "male" || g === "laki-laki" || g === "l") deptMap[dept].male++;
+      else if (g === "female" || g === "perempuan" || g === "p") deptMap[dept].female++;
+    }
+    return Object.entries(deptMap)
+      .map(([name, { male, female }]) => ({ name, male, female }))
+      .sort((a, b) => b.male + b.female - (a.male + a.female));
+  }, [employees]);
+
+  // --- Date / Time display ---
   const now = new Date();
   const dayName = now.toLocaleDateString("en-US", { weekday: "long" });
   const dateStr = now.toLocaleDateString("en-US", {
@@ -109,6 +237,56 @@ export default function DashboardPage() {
     minute: "2-digit",
     hour12: false,
   });
+
+  // --- Loading skeleton ---
+  if (isLoading) {
+    return (
+      <div className="space-y-5 animate-pulse">
+        <div className="h-7 w-36 rounded bg-gray-200" />
+        {/* Greeting skeleton */}
+        <div className="rounded-xl border border-gray-100 bg-white px-4 py-4 space-y-4 md:px-6 md:py-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-orange-500 md:text-xl">
+                Halo, {user?.name || "Alta"}!
+              </h3>
+              <p className="mt-0.5 text-sm text-gray-500">
+                Here&apos;s your HR overview for today
+              </p>
+            </div>
+            <div className="text-left sm:text-right">
+              <p className="text-sm font-semibold text-gray-900">
+                {dayName}, {dateStr}
+              </p>
+              <p className="text-xl font-bold text-gray-900 md:text-2xl">{timeStr}</p>
+            </div>
+          </div>
+          <div className="border-t border-gray-100" />
+          <div className="h-10 rounded bg-gray-200" />
+        </div>
+        {/* Overview skeleton */}
+        <div className="h-6 w-28 rounded bg-gray-200" />
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+          <div className="lg:col-span-2 space-y-3">
+            <div className="h-24 rounded-xl bg-gray-200" />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="h-52 rounded-xl bg-gray-200" />
+              <div className="h-52 rounded-xl bg-gray-200" />
+            </div>
+          </div>
+          <div className="h-72 rounded-xl bg-gray-200" />
+        </div>
+        {/* Analytics skeleton */}
+        <div className="h-6 w-28 rounded bg-gray-200" />
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+          <div className="h-72 rounded-xl bg-gray-200" />
+          <div className="h-72 rounded-xl bg-gray-200" />
+          <div className="h-72 rounded-xl bg-gray-200" />
+          <div className="h-72 rounded-xl bg-gray-200" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -164,21 +342,21 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Total Employees</p>
-                  <p className="text-2xl font-bold text-gray-900">80</p>
+                  <p className="text-2xl font-bold text-gray-900">{employeeStats.total}</p>
                 </div>
               </div>
               <div className="flex gap-6 border-t border-gray-200 pt-3 sm:gap-8 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
                 <div>
                   <p className="text-xs text-gray-400">Permanent</p>
-                  <p className="text-lg font-bold text-gray-900">60</p>
+                  <p className="text-lg font-bold text-gray-900">{employeeStats.permanent}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-400">Contract</p>
-                  <p className="text-lg font-bold text-gray-900">13</p>
+                  <p className="text-lg font-bold text-gray-900">{employeeStats.contract}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-400">Internship</p>
-                  <p className="text-lg font-bold text-gray-900">7</p>
+                  <p className="text-lg font-bold text-gray-900">{employeeStats.internship}</p>
                 </div>
               </div>
             </div>
@@ -197,26 +375,27 @@ export default function DashboardPage() {
                     <p className="text-xs text-gray-500">Today Attendance</p>
                   </div>
                   <p className="text-2xl font-bold text-gray-900">
-                    75<span className="text-base font-normal text-gray-400">/80</span>
+                    {todayAttendance.total}
+                    <span className="text-base font-normal text-gray-400">/{employeeStats.total}</span>
                   </p>
                 </div>
               </div>
               <div className="overflow-hidden rounded-lg border border-gray-100">
                 <div className="flex items-center justify-between bg-orange-50 px-4 py-2">
                   <span className="text-sm text-orange-500">Late</span>
-                  <span className="text-base font-bold text-orange-500">10</span>
+                  <span className="text-base font-bold text-orange-500">{todayAttendance.late}</span>
                 </div>
               </div>
               <div className="overflow-hidden rounded-lg border border-gray-100">
                 <div className="flex items-center justify-between bg-green-50 px-4 py-2">
                   <span className="text-sm text-green-600">On Leave</span>
-                  <span className="text-base font-bold text-green-600">5</span>
+                  <span className="text-base font-bold text-green-600">{todayAttendance.onLeave}</span>
                 </div>
               </div>
               <div className="overflow-hidden rounded-lg border border-gray-100">
                 <div className="flex items-center justify-between bg-red-50 px-4 py-2">
                   <span className="text-sm text-red-500">Absent</span>
-                  <span className="text-base font-bold text-red-500">5</span>
+                  <span className="text-base font-bold text-red-500">{todayAttendance.absent}</span>
                 </div>
               </div>
             </div>
@@ -231,20 +410,20 @@ export default function DashboardPage() {
                     </div>
                     <p className="text-xs text-gray-500">Pending Approval</p>
                   </div>
-                  <p className="text-2xl font-bold text-gray-900">8</p>
+                  <p className="text-2xl font-bold text-gray-900">{pendingStats.total}</p>
                 </div>
               </div>
               <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
                 <span className="text-sm text-gray-600">Leave</span>
-                <span className="text-base font-bold text-gray-900">2</span>
+                <span className="text-base font-bold text-gray-900">{pendingStats.leave}</span>
               </div>
               <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
                 <span className="text-sm text-gray-600">Permission</span>
-                <span className="text-base font-bold text-gray-900">2</span>
+                <span className="text-base font-bold text-gray-900">{pendingStats.permission}</span>
               </div>
               <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
                 <span className="text-sm text-gray-600">Reimbursement</span>
-                <span className="text-base font-bold text-gray-900">4</span>
+                <span className="text-base font-bold text-gray-900">{pendingStats.reimbursement}</span>
               </div>
             </div>
           </div>
@@ -259,24 +438,28 @@ export default function DashboardPage() {
             </button>
           </div>
           <div className="space-y-5">
-            {notifications.map((n) => (
-              <div key={n.id} className="flex gap-3">
-                <div className="mt-1.5">
-                  <span
-                    className={`block h-2.5 w-2.5 rounded-full ${
-                      n.type === "error" ? "bg-red-500" : "bg-yellow-400"
-                    }`}
-                  />
+            {notifications.length === 0 ? (
+              <p className="text-sm text-gray-400 text-center py-4">No pending notifications</p>
+            ) : (
+              notifications.map((n) => (
+                <div key={n.id} className="flex gap-3">
+                  <div className="mt-1.5">
+                    <span
+                      className={`block h-2.5 w-2.5 rounded-full ${
+                        n.type === "error" ? "bg-red-500" : "bg-yellow-400"
+                      }`}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900">{n.title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{n.description}</p>
+                    <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                      <Clock size={11} /> {n.time}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900">{n.title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{n.description}</p>
-                  <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                    <Clock size={11} /> {n.time}
-                  </p>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -302,7 +485,7 @@ export default function DashboardPage() {
             <LineChart data={attendanceTrendData}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
               <XAxis dataKey="day" tick={{ fontSize: 12, fill: "#9CA3AF" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12, fill: "#9CA3AF" }} axisLine={false} tickLine={false} domain={[0, 100]} />
+              <YAxis tick={{ fontSize: 12, fill: "#9CA3AF" }} axisLine={false} tickLine={false} />
               <Tooltip />
               <Line
                 type="monotone"
@@ -316,13 +499,7 @@ export default function DashboardPage() {
           </ResponsiveContainer>
           <div className="flex flex-wrap items-center gap-4 mt-2">
             <span className="flex items-center gap-1.5 text-xs text-gray-500">
-              <span className="h-2 w-2 rounded-full bg-indigo-500" /> Permanent
-            </span>
-            <span className="flex items-center gap-1.5 text-xs text-gray-500">
-              <span className="h-2 w-2 rounded-full bg-orange-500" /> Contract
-            </span>
-            <span className="flex items-center gap-1.5 text-xs text-gray-500">
-              <span className="h-2 w-2 rounded-full bg-cyan-500" /> Internship
+              <span className="h-2 w-2 rounded-full bg-indigo-500" /> Attendance
             </span>
           </div>
         </div>
@@ -370,12 +547,12 @@ export default function DashboardPage() {
 
         {/* Department Headcount */}
         <div className="rounded-xl border border-gray-100 bg-white p-4 md:p-5">
-          <h4 className="text-sm font-bold text-gray-900 mb-4">Departement Headcount</h4>
-          <ResponsiveContainer width="100%" height={240}>
+          <h4 className="text-sm font-bold text-gray-900 mb-4">Department Headcount</h4>
+          <ResponsiveContainer width="100%" height={Math.max(240, deptHeadcountData.length * 40)}>
             <BarChart data={deptHeadcountData} layout="vertical" barSize={16}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F3F4F6" />
               <XAxis type="number" tick={{ fontSize: 11, fill: "#9CA3AF" }} axisLine={false} tickLine={false} />
-              <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: "#6B7280" }} axisLine={false} tickLine={false} width={100} />
+              <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: "#6B7280" }} axisLine={false} tickLine={false} width={120} />
               <Tooltip />
               <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                 {deptHeadcountData.map((_, index) => (
@@ -388,12 +565,12 @@ export default function DashboardPage() {
 
         {/* Department Headcount by Gender */}
         <div className="rounded-xl border border-gray-100 bg-white p-4 md:p-5">
-          <h4 className="text-sm font-bold text-gray-900 mb-4">Departement Headcount</h4>
-          <ResponsiveContainer width="100%" height={240}>
+          <h4 className="text-sm font-bold text-gray-900 mb-4">Department Headcount by Gender</h4>
+          <ResponsiveContainer width="100%" height={Math.max(240, deptGenderData.length * 40)}>
             <BarChart data={deptGenderData} layout="vertical" barSize={14}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F3F4F6" />
               <XAxis type="number" tick={{ fontSize: 11, fill: "#9CA3AF" }} axisLine={false} tickLine={false} />
-              <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: "#6B7280" }} axisLine={false} tickLine={false} width={100} />
+              <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fill: "#6B7280" }} axisLine={false} tickLine={false} width={120} />
               <Tooltip />
               <Legend
                 iconType="circle"
