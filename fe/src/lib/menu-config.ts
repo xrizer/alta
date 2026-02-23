@@ -1,7 +1,7 @@
 // Menu configuration matching backend valid menu keys:
 // dashboard, companies, departments, positions, shifts,
 // organization_structure, users, employees, attendance,
-// leaves, payroll, menu_access_policy
+// leaves, payroll, payslips, menu_access_policy
 
 export interface SubMenuItem {
   name: string;
@@ -70,8 +70,11 @@ export const navTabs: NavTab[] = [
   {
     name: "Payroll",
     href: "/dashboard/payroll",
-    menuKeys: ["payroll"],
-    subItems: [],
+    menuKeys: ["payroll", "payslips"],
+    subItems: [
+      { name: "Payroll", key: "payroll", href: "/dashboard/payroll" },
+      { name: "Payslips", key: "payslips", href: "/dashboard/payslips" },
+    ],
   },
   {
     name: "Administration",

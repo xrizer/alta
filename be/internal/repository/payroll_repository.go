@@ -12,6 +12,7 @@ type PayrollRepository interface {
 	FindByEmployeeID(employeeID string) ([]model.Payroll, error)
 	FindByPeriod(month, year int) ([]model.Payroll, error)
 	FindByEmployeeIDAndPeriod(employeeID string, month, year int) (*model.Payroll, error)
+	FindPaidByEmployeeID(employeeID string) ([]model.Payroll, error)
 	FindAll() ([]model.Payroll, error)
 	Update(payroll *model.Payroll) error
 	Delete(id string) error
@@ -63,6 +64,14 @@ func (r *payrollRepository) FindByEmployeeIDAndPeriod(employeeID string, month, 
 		return nil, err
 	}
 	return &payroll, nil
+}
+
+func (r *payrollRepository) FindPaidByEmployeeID(employeeID string) ([]model.Payroll, error) {
+	var payrolls []model.Payroll
+	if err := r.preload(r.db).Where("employee_id = ? AND status = ?", employeeID, model.PayrollPaid).Order("period_year DESC, period_month DESC").Find(&payrolls).Error; err != nil {
+		return nil, err
+	}
+	return payrolls, nil
 }
 
 func (r *payrollRepository) FindAll() ([]model.Payroll, error) {

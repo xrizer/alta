@@ -20,6 +20,7 @@ const (
 	MenuAttendance           = "attendance"
 	MenuLeaves               = "leaves"
 	MenuPayroll              = "payroll"
+	MenuPayslips             = "payslips"
 	MenuMenuAccessPolicy     = "menu_access_policy"
 )
 
@@ -35,6 +36,7 @@ var ValidMenuKeys = map[string]bool{
 	MenuAttendance:           true,
 	MenuLeaves:               true,
 	MenuPayroll:              true,
+	MenuPayslips:             true,
 	MenuMenuAccessPolicy:     true,
 }
 

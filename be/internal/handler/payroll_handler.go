@@ -12,10 +12,11 @@ import (
 
 type PayrollHandler struct {
 	payrollService service.PayrollService
+	empService     service.EmployeeService
 }
 
-func NewPayrollHandler(payrollService service.PayrollService) *PayrollHandler {
-	return &PayrollHandler{payrollService: payrollService}
+func NewPayrollHandler(payrollService service.PayrollService, empService service.EmployeeService) *PayrollHandler {
+	return &PayrollHandler{payrollService: payrollService, empService: empService}
 }
 
 // GetAll godoc
@@ -65,6 +66,29 @@ func (h *PayrollHandler) GetAll(c *fiber.Ctx) error {
 		return response.Error(c, fiber.StatusInternalServerError, "Failed to fetch payrolls")
 	}
 	return response.Success(c, fiber.StatusOK, "Payrolls retrieved", payrolls)
+}
+
+// GetMyPayslips godoc
+// @Summary Get my payslips
+// @Description Retrieve paid payroll records for the authenticated user
+// @Tags Payrolls
+// @Security Bearer
+// @Produce json
+// @Success 200 {object} response.Response{data=[]dto.PayrollResponse} "Payslips retrieved"
+// @Failure 404 {object} response.Response "Employee profile not found"
+// @Failure 500 {object} response.Response "Failed to fetch payslips"
+// @Router /payrolls/me [get]
+func (h *PayrollHandler) GetMyPayslips(c *fiber.Ctx) error {
+	userID := c.Locals("userID").(string)
+	emp, err := h.empService.GetByUserID(userID)
+	if err != nil {
+		return response.Error(c, fiber.StatusNotFound, "Employee profile not found")
+	}
+	payslips, err := h.payrollService.GetPaidByEmployeeID(emp.ID)
+	if err != nil {
+		return response.Error(c, fiber.StatusInternalServerError, "Failed to fetch payslips")
+	}
+	return response.Success(c, fiber.StatusOK, "Payslips retrieved", payslips)
 }
 
 // GetByID godoc
