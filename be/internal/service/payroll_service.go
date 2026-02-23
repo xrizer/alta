@@ -16,6 +16,7 @@ type PayrollService interface {
 	GetByID(id string) (*dto.PayrollResponse, error)
 	GetByEmployeeID(employeeID string) ([]dto.PayrollResponse, error)
 	GetByPeriod(month, year int) ([]dto.PayrollResponse, error)
+	GetPaidByEmployeeID(employeeID string) ([]dto.PayrollResponse, error)
 	Generate(req dto.GeneratePayrollRequest) (*dto.PayrollResponse, error)
 	Update(id string, req dto.UpdatePayrollRequest) (*dto.PayrollResponse, error)
 	UpdateStatus(id string, req dto.PayrollStatusRequest) (*dto.PayrollResponse, error)
@@ -70,6 +71,14 @@ func (s *payrollService) GetByEmployeeID(employeeID string) ([]dto.PayrollRespon
 
 func (s *payrollService) GetByPeriod(month, year int) ([]dto.PayrollResponse, error) {
 	payrolls, err := s.payrollRepo.FindByPeriod(month, year)
+	if err != nil {
+		return nil, err
+	}
+	return dto.ToPayrollResponses(payrolls), nil
+}
+
+func (s *payrollService) GetPaidByEmployeeID(employeeID string) ([]dto.PayrollResponse, error) {
+	payrolls, err := s.payrollRepo.FindPaidByEmployeeID(employeeID)
 	if err != nil {
 		return nil, err
 	}

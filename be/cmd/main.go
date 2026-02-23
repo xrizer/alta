@@ -89,7 +89,7 @@ func main() {
 	holidayHandler := handler.NewHolidayHandler(holidayService)
 	attHandler := handler.NewAttendanceHandler(attService, empService)
 	leaveHandler := handler.NewLeaveHandler(leaveService)
-	payrollHandler := handler.NewPayrollHandler(payrollService)
+	payrollHandler := handler.NewPayrollHandler(payrollService, empService)
 	orgHandler := handler.NewOrganizationHandler(orgService)
 	menuAccessHandler := handler.NewMenuAccessHandler(menuAccessService)
 
@@ -206,6 +206,10 @@ func main() {
 	leaves.Put("/:id", leaveHandler.Update)
 	leaves.Put("/:id/approve", middleware.RoleMiddleware("admin", "hr"), leaveHandler.Approve)
 	leaves.Delete("/:id", leaveHandler.Delete)
+
+	// Payslips self-service route (all authenticated users)
+	payrollsSelf := api.Group("/payrolls", middleware.AuthMiddleware(cfg))
+	payrollsSelf.Get("/me", payrollHandler.GetMyPayslips)
 
 	// Payroll routes (admin, hr only)
 	payrolls := api.Group("/payrolls", middleware.AuthMiddleware(cfg), middleware.RoleMiddleware("admin", "hr"))

@@ -43,3 +43,8 @@ export async function deletePayroll(id: string): Promise<ApiResponse<null>> {
   const response = await api.delete(`/payrolls/${id}`);
   return response.data;
 }
+
+export async function getMyPayslips(): Promise<ApiResponse<Payroll[]>> {
+  const response = await api.get("/payrolls/me");
+  return response.data;
+}

@@ -38,6 +38,7 @@ const menuIconMap: Record<string, React.ReactNode> = {
   attendance: <Clock size={18} />,
   leaves: <Calendar size={18} />,
   payroll: <DollarSign size={18} />,
+  payslips: <FileText size={18} />,
   menu_access_policy: <Shield size={18} />,
 };
 
