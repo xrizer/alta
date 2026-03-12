@@ -135,6 +135,7 @@ func main() {
 	companies.Get("/:id", companyHandler.GetByID)
 	companies.Post("/", middleware.RoleMiddleware("admin"), companyHandler.Create)
 	companies.Put("/:id", middleware.RoleMiddleware("admin"), companyHandler.Update)
+	companies.Delete("/", middleware.RoleMiddleware("admin"), companyHandler.DeleteMultiple)
 	companies.Delete("/:id", middleware.RoleMiddleware("admin"), companyHandler.Delete)
 
 	// Department routes (admin, hr can view; admin can manage)

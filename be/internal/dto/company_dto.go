@@ -56,3 +56,15 @@ func ToCompanyResponses(companies []model.Company) []CompanyResponse {
 	}
 	return responses
 }
+
+type PaginatedCompanyResponse struct {
+	Data       []CompanyResponse `json:"data"`
+	Page       int               `json:"page"`
+	Limit      int               `json:"limit"`
+	TotalItems int64             `json:"total_items"`
+	TotalPages int               `json:"total_pages"`
+}
+
+type DeleteMultipleCompaniesRequest struct {
+	IDs []string `json:"ids" validate:"required"`
+}
