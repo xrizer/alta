@@ -19,7 +19,7 @@ export default function ShiftsPage() {
     try {
       const [shiftsRes, companiesRes] = await Promise.all([
         shiftService.getShifts(),
-        companyService.getCompanies(),
+        companyService.getCompaniesAll(),
       ]);
       if (shiftsRes.success && shiftsRes.data) setShifts(shiftsRes.data);
       if (companiesRes.success && companiesRes.data) setCompanies(companiesRes.data);

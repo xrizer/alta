@@ -52,6 +52,12 @@ export async function deleteCompany(id: string): Promise<ApiResponse<null>> {
   return response.data;
 }
 
+// Convenience wrapper for dropdowns/selects that need all companies as a flat array
+export async function getCompaniesAll(): Promise<ApiResponse<Company[]>> {
+  const res = await getCompanies({ limit: 1000 });
+  return { success: res.success, message: res.message, data: res.data?.data };
+}
+
 export async function deleteMultipleCompanies(
   ids: string[]
 ): Promise<ApiResponse<null>> {

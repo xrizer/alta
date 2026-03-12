@@ -23,7 +23,7 @@ export default function CreatePositionPage() {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const res = await companyService.getCompanies();
+        const res = await companyService.getCompaniesAll();
         if (res.success && res.data) setCompanies(res.data.filter((c) => c.is_active));
       } catch {
         setError("Failed to fetch companies");
