@@ -1,45 +1,51 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import Image from "next/image";
-import { usePathname } from "next/navigation";
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import {
   Home,
   ChevronLeft,
   ChevronRight,
-  Users,
   FileText,
   Clock,
   Calendar,
   DollarSign,
-  Shield,
-  Briefcase,
-  GitBranch,
   X,
-} from "react-feather";
-import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/auth-context";
+} from 'react-feather';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/auth-context';
 import {
   getActiveTab,
   getVisibleSubItems,
   isSubItemActive,
   type SubMenuItem,
-} from "@/lib/menu-config";
+} from '@/lib/menu-config';
+import {
+  Copy,
+  House,
+  Settings,
+  Share2,
+  Target,
+  User,
+  Users2,
+  Wrench,
+} from 'lucide-react';
 
 // Map backend menu keys to react-feather icons
 const menuIconMap: Record<string, React.ReactNode> = {
-  companies: <Users size={18} />,
-  departments: <Users size={18} />,
-  positions: <FileText size={18} />,
-  shifts: <FileText size={18} />,
-  organization_structure: <GitBranch size={18} />,
-  users: <Users size={18} />,
-  employees: <Briefcase size={18} />,
+  companies: <Copy size={18} />,
+  departments: <House size={18} />,
+  positions: <Target size={18} />,
+  shifts: <Settings size={18} />,
+  organization_structure: <Share2 size={18} />,
+  users: <User size={18} />,
+  employees: <Users2 size={18} />,
   attendance: <Clock size={18} />,
   leaves: <Calendar size={18} />,
   payroll: <DollarSign size={18} />,
   payslips: <FileText size={18} />,
-  menu_access_policy: <Shield size={18} />,
+  menu_access_policy: <Wrench size={18} />,
 };
 
 interface SidebarProps {
@@ -62,7 +68,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
     ? getVisibleSubItems(activeTab.subItems, allowedMenuKeys)
     : [];
 
-  const isDashboardActive = pathname === "/dashboard";
+  const isDashboardActive = pathname === '/dashboard';
 
   const sidebarContent = (
     <>
@@ -70,10 +76,9 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       <div
         className={`flex h-16 items-center border-b border-gray-100 ${
           collapsed && !mobileOpen
-            ? "justify-center gap-0 px-2"
-            : "justify-between px-4"
-        }`}
-      >
+            ? 'justify-center gap-0 px-2'
+            : 'justify-between px-4'
+        }`}>
         {collapsed && !mobileOpen ? (
           <div className="relative flex w-full items-center justify-center">
             <div className="h-3.5 w-3.5 flex-shrink-0 overflow-hidden">
@@ -83,13 +88,12 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                 width={140}
                 height={36}
                 className="h-3.5 max-w-none object-cover object-left"
-                style={{ width: "auto" }}
+                style={{ width: 'auto' }}
               />
             </div>
             <button
               onClick={() => setCollapsed(false)}
-              className="absolute -right-1 text-gray-400 hover:text-gray-600"
-            >
+              className="absolute -right-1 text-gray-400 hover:text-gray-600">
               <ChevronRight size={14} />
             </button>
           </div>
@@ -105,15 +109,13 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
             {mobileOpen ? (
               <button
                 onClick={onMobileClose}
-                className="text-gray-400 hover:text-gray-600 md:hidden"
-              >
+                className="text-gray-400 hover:text-gray-600 md:hidden">
                 <X size={20} />
               </button>
             ) : (
               <button
                 onClick={() => setCollapsed(true)}
-                className="hidden text-gray-400 hover:text-gray-600 md:block"
-              >
+                className="hidden text-gray-400 hover:text-gray-600 md:block">
                 <ChevronLeft size={18} />
               </button>
             )}
@@ -135,11 +137,10 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                   href={sub.href}
                   className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                     active
-                      ? "bg-orange-50 text-orange-600"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  } ${isCollapsedDesktop ? "justify-center" : ""}`}
-                  title={isCollapsedDesktop ? sub.name : undefined}
-                >
+                      ? 'bg-orange-50 text-orange-600'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  } ${isCollapsedDesktop ? 'justify-center' : ''}`}
+                  title={isCollapsedDesktop ? sub.name : undefined}>
                   {icon}
                   {!isCollapsedDesktop && <span>{sub.name}</span>}
                 </Link>
@@ -151,11 +152,10 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
             href="/dashboard"
             className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
               isDashboardActive
-                ? "bg-orange-50 text-orange-600"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            } ${collapsed && !mobileOpen ? "justify-center" : ""}`}
-            title={collapsed && !mobileOpen ? "Overview" : undefined}
-          >
+                ? 'bg-orange-50 text-orange-600'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            } ${collapsed && !mobileOpen ? 'justify-center' : ''}`}
+            title={collapsed && !mobileOpen ? 'Overview' : undefined}>
             <Home size={18} />
             {!(collapsed && !mobileOpen) && <span>Overview</span>}
           </Link>
@@ -169,9 +169,8 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       {/* Desktop sidebar */}
       <aside
         className={`hidden md:flex h-screen flex-col border-r border-gray-200 bg-white transition-all duration-300 ${
-          collapsed ? "w-16" : "w-60"
-        }`}
-      >
+          collapsed ? 'w-16' : 'w-60'
+        }`}>
         {sidebarContent}
       </aside>
 
