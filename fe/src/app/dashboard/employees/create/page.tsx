@@ -51,7 +51,7 @@ export default function CreateEmployeePage() {
         const [usersRes, companiesRes, departmentsRes, positionsRes, shiftsRes] =
           await Promise.all([
             userService.getUsers(),
-            companyService.getCompanies(),
+            companyService.getCompaniesAll(),
             departmentService.getDepartments(),
             positionService.getPositions(),
             shiftService.getShifts(),

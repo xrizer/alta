@@ -62,6 +62,14 @@ export interface Company {
   updated_at: string;
 }
 
+export interface PaginatedCompanyResponse {
+  data: Company[];
+  page: number;
+  limit: number;
+  total_items: number;
+  total_pages: number;
+}
+
 export interface CreateCompanyRequest {
   name: string;
   address?: string;

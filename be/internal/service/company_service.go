@@ -10,10 +10,12 @@ import (
 
 type CompanyService interface {
 	GetAll() ([]dto.CompanyResponse, error)
+	GetAllPaginated(page, limit int, search, sortBy, sortOrder string) (*dto.PaginatedCompanyResponse, error)
 	GetByID(id string) (*dto.CompanyResponse, error)
 	Create(req dto.CreateCompanyRequest) (*dto.CompanyResponse, error)
 	Update(id string, req dto.UpdateCompanyRequest) (*dto.CompanyResponse, error)
 	Delete(id string) error
+	DeleteMultiple(ids []string) error
 }
 
 type companyService struct {
@@ -30,6 +32,26 @@ func (s *companyService) GetAll() ([]dto.CompanyResponse, error) {
 		return nil, err
 	}
 	return dto.ToCompanyResponses(companies), nil
+}
+
+func (s *companyService) GetAllPaginated(page, limit int, search, sortBy, sortOrder string) (*dto.PaginatedCompanyResponse, error) {
+	companies, total, err := s.companyRepo.FindAllPaginated(page, limit, search, sortBy, sortOrder)
+	if err != nil {
+		return nil, err
+	}
+
+	totalPages := int(total) / limit
+	if int(total)%limit > 0 {
+		totalPages++
+	}
+
+	return &dto.PaginatedCompanyResponse{
+		Data:       dto.ToCompanyResponses(companies),
+		Page:       page,
+		Limit:      limit,
+		TotalItems: total,
+		TotalPages: totalPages,
+	}, nil
 }
 
 func (s *companyService) GetByID(id string) (*dto.CompanyResponse, error) {
@@ -102,4 +124,11 @@ func (s *companyService) Delete(id string) error {
 		return errors.New("company not found")
 	}
 	return s.companyRepo.Delete(id)
+}
+
+func (s *companyService) DeleteMultiple(ids []string) error {
+	if len(ids) == 0 {
+		return errors.New("no IDs provided")
+	}
+	return s.companyRepo.DeleteMultiple(ids)
 }
