@@ -9,6 +9,40 @@ import * as companyService from "@/services/company-service";
 type SortField = "name" | "email" | "phone" | "npwp" | "is_active" | "created_at";
 type SortOrder = "asc" | "desc";
 
+function getPageNumbers(current: number, total: number, maxVisible = 3): number[] {
+  if (total <= maxVisible) return Array.from({ length: total }, (_, i) => i + 1);
+  let start = Math.max(1, current - Math.floor(maxVisible / 2));
+  let end = start + maxVisible - 1;
+  if (end > total) {
+    end = total;
+    start = Math.max(1, end - maxVisible + 1);
+  }
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+}
+
+const EditIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+  </svg>
+);
+
+const TrashIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+    <path d="M10 11v6M14 11v6" />
+    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+  </svg>
+);
+
+const SearchIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
+
 export default function CompaniesPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
@@ -19,7 +53,7 @@ export default function CompaniesPage() {
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(5);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -61,7 +95,6 @@ export default function CompaniesPage() {
     fetchCompanies();
   }, [fetchCompanies]);
 
-  // Reset to page 1 when search/sort/perPage changes
   useEffect(() => {
     setCurrentPage(1);
     setSelectedIds(new Set());
@@ -70,9 +103,7 @@ export default function CompaniesPage() {
   const handleSearchInput = (val: string) => {
     setSearchInput(val);
     if (searchTimer.current) clearTimeout(searchTimer.current);
-    searchTimer.current = setTimeout(() => {
-      setSearch(val);
-    }, 400);
+    searchTimer.current = setTimeout(() => setSearch(val), 400);
   };
 
   const handleSort = (field: SortField) => {
@@ -85,23 +116,27 @@ export default function CompaniesPage() {
   };
 
   const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortBy !== field) return <span className="text-gray-300 ml-1">↕</span>;
-    return <span className="text-blue-500 ml-1">{sortOrder === "asc" ? "↑" : "↓"}</span>;
+    if (sortBy !== field)
+      return (
+        <span className="ml-1 text-gray-300 text-xs">
+          ↑↓
+        </span>
+      );
+    return (
+      <span className="ml-1 text-orange-500 text-xs">
+        {sortOrder === "asc" ? "↑" : "↓"}
+      </span>
+    );
   };
 
   const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedIds(new Set(companies.map((c) => c.id)));
-    } else {
-      setSelectedIds(new Set());
-    }
+    setSelectedIds(checked ? new Set(companies.map((c) => c.id)) : new Set());
   };
 
   const handleSelectOne = (id: string, checked: boolean) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (checked) next.add(id);
-      else next.delete(id);
+      checked ? next.add(id) : next.delete(id);
       return next;
     });
   };
@@ -145,19 +180,22 @@ export default function CompaniesPage() {
   const endItem = Math.min(safePage * perPage, totalItems);
   const allSelected = companies.length > 0 && companies.every((c) => selectedIds.has(c.id));
   const someSelected = selectedIds.size > 0 && !allSelected;
+  const pageNumbers = getPageNumbers(safePage, totalPages);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Companies</h2>
-          <p className="mt-1 text-sm text-gray-600">Manage company data</p>
+          <p className="mt-1 text-sm text-gray-500">Manage company data</p>
         </div>
         {isAdmin && (
           <Link
             href="/dashboard/companies/create"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 transition-colors"
           >
+            <span className="text-base leading-none">+</span>
             Add Company
           </Link>
         )}
@@ -167,29 +205,35 @@ export default function CompaniesPage() {
         <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-        {/* Toolbar */}
-        <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3">
+      {/* Search + Delete Selected — top right */}
+      <div className="flex items-center justify-end gap-3">
+        {isAdmin && selectedIds.size > 0 && (
+          <button
+            onClick={handleDeleteSelected}
+            disabled={isDeleting}
+            className="rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white hover:bg-red-600 disabled:opacity-50 transition-colors whitespace-nowrap"
+          >
+            {isDeleting ? "Deleting..." : `Delete Selected (${selectedIds.size})`}
+          </button>
+        )}
+        <div className="relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <SearchIcon />
+          </span>
           <input
             type="text"
-            placeholder="Search by name, email, phone, NPWP..."
+            placeholder="Search"
             value={searchInput}
             onChange={(e) => handleSearchInput(e.target.value)}
-            className="w-full max-w-sm rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+            className="w-64 rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
           />
-          {isAdmin && selectedIds.size > 0 && (
-            <button
-              onClick={handleDeleteSelected}
-              disabled={isDeleting}
-              className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50 whitespace-nowrap"
-            >
-              {isDeleting ? "Deleting..." : `Delete Selected (${selectedIds.size})`}
-            </button>
-          )}
         </div>
+      </div>
 
+      {/* Table */}
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-white">
             <tr>
               {isAdmin && (
                 <th className="px-4 py-3 w-10">
@@ -198,57 +242,43 @@ export default function CompaniesPage() {
                     checked={allSelected}
                     ref={(el) => { if (el) el.indeterminate = someSelected; }}
                     onChange={(e) => handleSelectAll(e.target.checked)}
-                    className="rounded border-gray-300"
+                    className="rounded border-gray-300 accent-orange-500"
                   />
                 </th>
               )}
-              <th
-                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none hover:text-gray-700"
-                onClick={() => handleSort("name")}
-              >
-                Name <SortIcon field="name" />
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none hover:text-gray-700"
-                onClick={() => handleSort("email")}
-              >
-                Email <SortIcon field="email" />
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none hover:text-gray-700"
-                onClick={() => handleSort("phone")}
-              >
-                Phone <SortIcon field="phone" />
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none hover:text-gray-700"
-                onClick={() => handleSort("npwp")}
-              >
-                NPWP <SortIcon field="npwp" />
-              </th>
-              <th
-                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none hover:text-gray-700"
-                onClick={() => handleSort("is_active")}
-              >
-                Status <SortIcon field="is_active" />
-              </th>
-              {isAdmin && (
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Actions
+              {(
+                [
+                  { label: "Name", field: "name" as SortField },
+                  { label: "Email", field: "email" as SortField },
+                  { label: "Phone", field: "phone" as SortField },
+                  { label: "NPWP", field: "npwp" as SortField },
+                  { label: "Status", field: "is_active" as SortField },
+                ] as const
+              ).map(({ label, field }) => (
+                <th
+                  key={field}
+                  onClick={() => handleSort(field)}
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer select-none hover:text-gray-900"
+                >
+                  {label}
+                  <SortIcon field={field} />
                 </th>
-              )}
+              ))}
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                Actions
+              </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-100">
             {isLoading ? (
               <tr>
-                <td colSpan={isAdmin ? 7 : 5} className="px-6 py-8 text-center text-sm text-gray-500">
+                <td colSpan={isAdmin ? 7 : 6} className="px-6 py-10 text-center text-sm text-gray-400">
                   Loading companies...
                 </td>
               </tr>
             ) : companies.length === 0 ? (
               <tr>
-                <td colSpan={isAdmin ? 7 : 5} className="px-6 py-8 text-center text-sm text-gray-500">
+                <td colSpan={isAdmin ? 7 : 6} className="px-6 py-10 text-center text-sm text-gray-400">
                   No companies found
                 </td>
               </tr>
@@ -256,7 +286,7 @@ export default function CompaniesPage() {
               companies.map((company) => (
                 <tr
                   key={company.id}
-                  className={`hover:bg-gray-50 ${selectedIds.has(company.id) ? "bg-blue-50" : ""}`}
+                  className={`hover:bg-gray-50 transition-colors ${selectedIds.has(company.id) ? "bg-orange-50" : ""}`}
                 >
                   {isAdmin && (
                     <td className="px-4 py-4 w-10">
@@ -264,7 +294,7 @@ export default function CompaniesPage() {
                         type="checkbox"
                         checked={selectedIds.has(company.id)}
                         onChange={(e) => handleSelectOne(company.id, e.target.checked)}
-                        className="rounded border-gray-300"
+                        className="rounded border-gray-300 accent-orange-500"
                       />
                     </td>
                   )}
@@ -282,88 +312,84 @@ export default function CompaniesPage() {
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <span
-                      className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                      className={`inline-flex rounded-full px-3 py-0.5 text-xs font-semibold ${
                         company.is_active
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
                       }`}
                     >
                       {company.is_active ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  {isAdmin && (
-                    <td className="whitespace-nowrap px-6 py-4 text-sm">
+                  <td className="whitespace-nowrap px-6 py-4">
+                    <div className="flex items-center gap-3">
                       <Link
                         href={`/dashboard/companies/${company.id}/edit`}
-                        className="text-blue-600 hover:text-blue-900 mr-4"
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
                       >
+                        <EditIcon />
                         Edit
                       </Link>
-                      <button
-                        onClick={() => handleDelete(company.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  )}
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleDelete(company.id)}
+                          className="inline-flex items-center gap-1.5 text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
+                        >
+                          <TrashIcon />
+                          Delete
+                        </button>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between border-t border-gray-200 px-6 py-3">
+        {/* Pagination Footer */}
+        <div className="flex items-center justify-between border-t border-gray-100 px-6 py-3">
+          {/* Left: showing info */}
+          <p className="text-sm text-gray-500">
+            Showing {startItem} to {endItem} of {totalItems} results
+          </p>
+
+          {/* Center: page numbers */}
+          <div className="flex items-center gap-1">
+            {pageNumbers.map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`min-w-[32px] h-8 rounded px-2 text-sm font-medium transition-colors ${
+                  page === safePage
+                    ? "bg-orange-500 text-white"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              onClick={() => setCurrentPage(Math.min(safePage + 1, totalPages))}
+              disabled={safePage >= totalPages}
+              className="flex h-8 w-8 items-center justify-center rounded text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              &gt;
+            </button>
+          </div>
+
+          {/* Right: page per row */}
           <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600">Rows per page:</label>
+            <span className="text-sm text-gray-500">Page per Row</span>
             <select
               value={perPage}
               onChange={(e) => setPerPage(Number(e.target.value))}
-              className="rounded border border-gray-300 px-2 py-1 text-sm text-gray-900"
+              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 focus:outline-none focus:border-orange-400"
             >
               {[5, 10, 25, 50, 100].map((n) => (
                 <option key={n} value={n}>{n}</option>
               ))}
             </select>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">
-              {startItem}–{endItem} of {totalItems}
-            </span>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setCurrentPage(1)}
-                disabled={safePage <= 1}
-                className="rounded border border-gray-300 px-2 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                &laquo;
-              </button>
-              <button
-                onClick={() => setCurrentPage(safePage - 1)}
-                disabled={safePage <= 1}
-                className="rounded border border-gray-300 px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Prev
-              </button>
-              <span className="px-2 text-sm text-gray-700">
-                Page {safePage} of {totalPages}
-              </span>
-              <button
-                onClick={() => setCurrentPage(safePage + 1)}
-                disabled={safePage >= totalPages}
-                className="rounded border border-gray-300 px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
-              <button
-                onClick={() => setCurrentPage(totalPages)}
-                disabled={safePage >= totalPages}
-                className="rounded border border-gray-300 px-2 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                &raquo;
-              </button>
-            </div>
           </div>
         </div>
       </div>
