@@ -36,38 +36,38 @@ export default function CreateCompanyPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Create Company</h2>
-        <p className="mt-1 text-sm text-gray-600">Add a new company</p>
+        <h2 className="text-2xl font-bold text-gray-900">Add Companies</h2>
+        <p className="mt-1 text-sm text-gray-500">Add a new company</p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-6 rounded-xl border border-gray-200 bg-white p-6">
         {error && <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Name *</label>
-            <input name="name" required value={form.name} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <input name="name" required placeholder="PT Alta Indonesia" value={form.name} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input name="email" type="email" value={form.email} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            <input name="email" type="email" placeholder="info@alta.co.id" value={form.email} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Phone</label>
-            <input name="phone" value={form.phone} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            <input name="phone" placeholder="021-5551234" value={form.phone} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">NPWP</label>
-            <input name="npwp" value={form.npwp} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            <input name="npwp" placeholder="01.234.567.8-012.000" value={form.npwp} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
           </div>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Address</label>
-          <textarea name="address" rows={3} value={form.address} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+          <textarea name="address" rows={3} placeholder="Jln. Kuhlman no 42, Suite 484, 18825, Makale, Sumatera Utara, Indonesia" value={form.address} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder:text-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
         </div>
         <div className="flex justify-end gap-3">
-          <button type="button" onClick={() => router.back()} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
-          <button type="submit" disabled={isSubmitting} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">{isSubmitting ? "Creating..." : "Create Company"}</button>
+          <button type="button" onClick={() => router.back()} className="rounded-lg border border-orange-500 px-5 py-2 text-sm font-semibold text-orange-500 hover:bg-orange-50">Cancel</button>
+          <button type="submit" disabled={isSubmitting} className="rounded-lg bg-orange-500 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50">{isSubmitting ? "Creating..." : "Create Company"}</button>
         </div>
       </form>
     </div>
