@@ -97,7 +97,7 @@ export default function OrganizationStructurePage() {
   useEffect(() => {
     async function loadCompanies() {
       try {
-        const res = await companyService.getCompanies();
+        const res = await companyService.getCompaniesAll();
         if (res.success && res.data) {
           setCompanies(res.data);
           if (res.data.length === 1) {

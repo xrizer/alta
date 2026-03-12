@@ -21,7 +21,7 @@ export default function CreateShiftPage() {
   useEffect(() => {
     const fetchCompanies = async () => {
       try {
-        const res = await companyService.getCompanies();
+        const res = await companyService.getCompaniesAll();
         if (res.success && res.data) setCompanies(res.data);
       } catch {
         setError("Failed to fetch companies");
