@@ -21,7 +21,9 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import {
   getActiveTab,
+  getVisibleTabs,
   getVisibleSubItems,
+  isTabActive,
   isSubItemActive,
   type SubMenuItem,
 } from "@/lib/menu-config";
@@ -42,6 +44,15 @@ const menuIconMap: Record<string, React.ReactNode> = {
   menu_access_policy: <Shield size={18} />,
 };
 
+const tabIconMap: Record<string, React.ReactNode> = {
+  Dashboard: <Home size={18} />,
+  Organization: <Briefcase size={18} />,
+  People: <Users size={18} />,
+  Attendance: <Clock size={18} />,
+  Payroll: <DollarSign size={18} />,
+  Administration: <Shield size={18} />,
+};
+
 interface SidebarProps {
   mobileOpen?: boolean;
   onMobileClose?: () => void;
@@ -58,109 +69,167 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activeTab = getActiveTab(pathname);
+  const visibleTabs = getVisibleTabs(allowedMenuKeys);
   const subItems = activeTab
     ? getVisibleSubItems(activeTab.subItems, allowedMenuKeys)
     : [];
 
   const isDashboardActive = pathname === "/dashboard";
 
-  const sidebarContent = (
-    <>
-      {/* Logo */}
-      <div
-        className={`flex h-16 items-center border-b border-gray-100 ${
-          collapsed && !mobileOpen
-            ? "justify-center gap-0 px-2"
-            : "justify-between px-4"
-        }`}
-      >
-        {collapsed && !mobileOpen ? (
-          <div className="relative flex w-full items-center justify-center">
-            <div className="h-3.5 w-3.5 flex-shrink-0 overflow-hidden">
-              <Image
-                src="/logo.png"
-                alt="Alta"
-                width={140}
-                height={36}
-                className="h-3.5 max-w-none object-cover object-left"
-                style={{ width: "auto" }}
-              />
-            </div>
-            <button
-              onClick={() => setCollapsed(false)}
-              className="absolute -right-1 text-gray-400 hover:text-gray-600"
-            >
-              <ChevronRight size={14} />
-            </button>
-          </div>
-        ) : (
-          <>
+  // Logo section (shared between mobile and desktop)
+  const logoSection = (
+    <div
+      className={`flex h-16 items-center border-b border-gray-100 ${
+        collapsed && !mobileOpen
+          ? "justify-center gap-0 px-2"
+          : "justify-between px-4"
+      }`}
+    >
+      {collapsed && !mobileOpen ? (
+        <div className="relative flex w-full items-center justify-center">
+          <div className="h-3.5 w-3.5 flex-shrink-0 overflow-hidden">
             <Image
               src="/logo.png"
               alt="Alta"
               width={140}
               height={36}
-              className="object-contain"
+              className="h-3.5 max-w-none object-cover object-left"
+              style={{ width: "auto" }}
             />
-            {mobileOpen ? (
-              <button
-                onClick={onMobileClose}
-                className="text-gray-400 hover:text-gray-600 md:hidden"
-              >
-                <X size={20} />
-              </button>
-            ) : (
-              <button
-                onClick={() => setCollapsed(true)}
-                className="hidden text-gray-400 hover:text-gray-600 md:block"
-              >
-                <ChevronLeft size={18} />
-              </button>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
-        {subItems.length > 0 ? (
-          <div className="flex flex-col gap-1">
-            {subItems.map((sub: SubMenuItem) => {
-              const active = isSubItemActive(pathname, sub);
-              const icon = menuIconMap[sub.key] || <FileText size={18} />;
-              const isCollapsedDesktop = collapsed && !mobileOpen;
-              return (
-                <Link
-                  key={sub.key}
-                  href={sub.href}
-                  className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    active
-                      ? "bg-orange-50 text-orange-600"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  } ${isCollapsedDesktop ? "justify-center" : ""}`}
-                  title={isCollapsedDesktop ? sub.name : undefined}
-                >
-                  {icon}
-                  {!isCollapsedDesktop && <span>{sub.name}</span>}
-                </Link>
-              );
-            })}
           </div>
-        ) : (
-          <Link
-            href="/dashboard"
-            className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-              isDashboardActive
-                ? "bg-orange-50 text-orange-600"
-                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            } ${collapsed && !mobileOpen ? "justify-center" : ""}`}
-            title={collapsed && !mobileOpen ? "Overview" : undefined}
+          <button
+            onClick={() => setCollapsed(false)}
+            className="absolute -right-1 text-gray-400 hover:text-gray-600"
           >
-            <Home size={18} />
-            {!(collapsed && !mobileOpen) && <span>Overview</span>}
-          </Link>
-        )}
-      </nav>
+            <ChevronRight size={14} />
+          </button>
+        </div>
+      ) : (
+        <>
+          <Image
+            src="/logo.png"
+            alt="Alta"
+            width={140}
+            height={36}
+            className="object-contain"
+          />
+          {mobileOpen ? (
+            <button
+              onClick={onMobileClose}
+              className="text-gray-400 hover:text-gray-600 md:hidden"
+            >
+              <X size={20} />
+            </button>
+          ) : (
+            <button
+              onClick={() => setCollapsed(true)}
+              className="hidden text-gray-400 hover:text-gray-600 md:block"
+            >
+              <ChevronLeft size={18} />
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  );
+
+  // Desktop nav: show sub-items of the active tab only
+  const desktopNavContent = (
+    <nav className="flex-1 overflow-y-auto px-3 py-4">
+      {subItems.length > 0 ? (
+        <div className="flex flex-col gap-1">
+          {subItems.map((sub: SubMenuItem) => {
+            const active = isSubItemActive(pathname, sub);
+            const icon = menuIconMap[sub.key] || <FileText size={18} />;
+            const isCollapsedDesktop = collapsed && !mobileOpen;
+            return (
+              <Link
+                key={sub.key}
+                href={sub.href}
+                className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  active
+                    ? "bg-orange-50 text-orange-600"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                } ${isCollapsedDesktop ? "justify-center" : ""}`}
+                title={isCollapsedDesktop ? sub.name : undefined}
+              >
+                {icon}
+                {!isCollapsedDesktop && <span>{sub.name}</span>}
+              </Link>
+            );
+          })}
+        </div>
+      ) : (
+        <Link
+          href="/dashboard"
+          className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+            isDashboardActive
+              ? "bg-orange-50 text-orange-600"
+              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+          } ${collapsed && !mobileOpen ? "justify-center" : ""}`}
+          title={collapsed && !mobileOpen ? "Overview" : undefined}
+        >
+          <Home size={18} />
+          {!(collapsed && !mobileOpen) && <span>Overview</span>}
+        </Link>
+      )}
+    </nav>
+  );
+
+  // Mobile nav: show all top-level tabs + their sub-items
+  const mobileNavContent = (
+    <nav className="flex-1 overflow-y-auto px-3 py-4">
+      <div className="flex flex-col gap-1">
+        {visibleTabs.map((tab) => {
+          const tabActive = isTabActive(pathname, tab);
+          const visibleSubs = getVisibleSubItems(tab.subItems, allowedMenuKeys);
+          const tabIcon = tabIconMap[tab.name] || <FileText size={18} />;
+          return (
+            <div key={tab.name}>
+              <Link
+                href={tab.href}
+                className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+                  tabActive
+                    ? "text-orange-600"
+                    : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                }`}
+              >
+                {tabIcon}
+                <span>{tab.name}</span>
+              </Link>
+              {visibleSubs.length > 0 && (
+                <div className="ml-6 mt-0.5 mb-1 flex flex-col gap-0.5">
+                  {visibleSubs.map((sub) => {
+                    const subActive = isSubItemActive(pathname, sub);
+                    const icon = menuIconMap[sub.key] || <FileText size={16} />;
+                    return (
+                      <Link
+                        key={sub.key}
+                        href={sub.href}
+                        className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                          subActive
+                            ? "bg-orange-50 text-orange-600"
+                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                        }`}
+                      >
+                        {icon}
+                        <span>{sub.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </nav>
+  );
+
+  const sidebarContent = (
+    <>
+      {logoSection}
+      {mobileOpen ? mobileNavContent : desktopNavContent}
     </>
   );
 
