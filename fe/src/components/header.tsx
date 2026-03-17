@@ -28,8 +28,8 @@ export default function Header({ onMenuClick }: HeaderProps) {
             <Menu size={20} />
           </button>
 
-          {/* Nav tabs - scrollable on mobile with fade hint */}
-          <div className="relative min-w-0 flex-1">
+          {/* Nav tabs - hidden on mobile (use sidebar hamburger menu instead) */}
+          <div className="relative min-w-0 flex-1 hidden md:block">
             <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
               {visibleTabs.map((tab) => {
                 const active = isTabActive(pathname, tab);
@@ -51,8 +51,6 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 );
               })}
             </nav>
-            {/* Fade hint on the right edge for mobile */}
-            <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white to-transparent md:hidden" />
           </div>
         </div>
 
