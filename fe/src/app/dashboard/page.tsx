@@ -24,6 +24,7 @@ import {
   Bar,
 } from "recharts";
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Employee, Attendance, Leave } from "@/lib/types";
 import { getEmployees } from "@/services/employee-service";
 import { getAttendances } from "@/services/attendance-service";
@@ -69,6 +70,7 @@ const DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const [trendPeriod, setTrendPeriod] = useState<"This Week" | "Last Week">("This Week");
 
   // Raw API data
@@ -315,13 +317,13 @@ export default function DashboardPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-sm font-bold text-gray-700">Quick Actions</span>
           <div className="flex flex-wrap items-center gap-2 md:gap-3">
-            <button className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors md:px-5">
+            <button onClick={() => router.push("/dashboard/attendance")} className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors md:px-5">
               Review Attendance
             </button>
-            <button className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors md:px-5">
+            <button onClick={() => router.push("/dashboard/leaves")} className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors md:px-5">
               Review Approval
             </button>
-            <button className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors md:px-5">
+            <button onClick={() => router.push("/dashboard/payroll")} className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors md:px-5">
               Process Payroll
             </button>
           </div>
