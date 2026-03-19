@@ -86,22 +86,23 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       }`}
     >
       {collapsed && !mobileOpen ? (
-        <div className="flex w-full items-center justify-between px-2">
-          <div className="h-7 w-7 flex-shrink-0 overflow-hidden">
-            <Image
+        <div className="flex w-full items-center justify-between px-1">
+          <div
+            className="flex-shrink-0 overflow-hidden"
+            style={{ height: "18px", width: "36px" }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src="/logo.png"
               alt="Alta"
-              width={140}
-              height={36}
-              className="h-7 max-w-none object-cover object-left"
-              style={{ width: "auto" }}
+              style={{ height: "18px", width: "auto" }}
             />
           </div>
           <button
             onClick={() => setCollapsed(false)}
             className="text-gray-400 hover:text-gray-600"
           >
-            <ChevronRight size={16} />
+            <ChevronRight size={14} />
           </button>
         </div>
       ) : (
