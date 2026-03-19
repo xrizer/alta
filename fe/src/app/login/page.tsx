@@ -58,7 +58,7 @@ export default function LoginPage() {
             alt="HRIS Illustration"
             width={500}
             height={380}
-            className="object-contain"
+            className="mx-auto object-contain"
             priority
           />
         </div>
