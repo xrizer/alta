@@ -69,7 +69,7 @@ export default function LoginPage() {
         <div className="w-full max-w-sm">
           <div className="rounded-2xl border border-gray-100 p-10 shadow-lg">
             {/* Logo */}
-            <div className="mb-6 flex justify-center">
+            <div className="mb-6 flex items-center justify-center">
               <Image
                 src="/logo-full.png"
                 alt="Alta"
