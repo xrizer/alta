@@ -43,13 +43,13 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen">
       {/* Left panel */}
-      <div className="hidden w-1/2 flex-col items-start justify-center bg-orange-500 px-16 py-12 lg:flex">
-        <h1 className="text-4xl font-bold leading-tight text-white">
+      <div className="hidden w-1/2 flex-col items-center justify-center bg-orange-500 px-16 py-12 lg:flex">
+        <h1 className="text-center text-4xl font-bold leading-tight text-white">
           Welcome to Alta,
           <br />
           Your Friendly HRIS
         </h1>
-        <p className="mt-4 text-base text-orange-100">
+        <p className="mt-4 text-center text-base text-orange-100">
           Manage your HR management easily
         </p>
         <div className="mt-10 w-full">
