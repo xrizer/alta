@@ -79,7 +79,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   // Logo section (shared between mobile and desktop)
   const logoSection = (
     <div
-      className={`flex h-16 items-center border-b border-gray-100 ${
+      className={`flex h-16 items-center border-b border-gray-100 dark:border-gray-700 ${
         collapsed && !mobileOpen
           ? "justify-center gap-0 px-2"
           : "justify-between px-4"
@@ -100,7 +100,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           </div>
           <button
             onClick={() => setCollapsed(false)}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
           >
             <ChevronRight size={14} />
           </button>
@@ -117,14 +117,14 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           {mobileOpen ? (
             <button
               onClick={onMobileClose}
-              className="text-gray-400 hover:text-gray-600 md:hidden"
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 md:hidden"
             >
               <X size={20} />
             </button>
           ) : (
             <button
               onClick={() => setCollapsed(true)}
-              className="hidden text-gray-400 hover:text-gray-600 md:block"
+              className="hidden text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 md:block"
             >
               <ChevronLeft size={18} />
             </button>
@@ -149,8 +149,8 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                 href={sub.href}
                 className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   active
-                    ? "bg-orange-50 text-orange-600"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    ? "bg-orange-50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
                 } ${isCollapsedDesktop ? "justify-center" : ""}`}
                 title={isCollapsedDesktop ? sub.name : undefined}
               >
@@ -165,8 +165,8 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           href="/dashboard"
           className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
             isDashboardActive
-              ? "bg-orange-50 text-orange-600"
-              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              ? "bg-orange-50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400"
+              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
           } ${collapsed && !mobileOpen ? "justify-center" : ""}`}
           title={collapsed && !mobileOpen ? "Overview" : undefined}
         >
@@ -191,8 +191,8 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                 href={tab.href}
                 className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
                   tabActive
-                    ? "text-orange-600"
-                    : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                    ? "text-orange-600 dark:text-orange-400"
+                    : "text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100"
                 }`}
               >
                 {tabIcon}
@@ -209,8 +209,8 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                         href={sub.href}
                         className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                           subActive
-                            ? "bg-orange-50 text-orange-600"
-                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                            ? "bg-orange-50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400"
+                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
                         }`}
                       >
                         {icon}
@@ -238,7 +238,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
     <>
       {/* Desktop sidebar */}
       <aside
-        className={`hidden md:flex h-screen flex-col border-r border-gray-200 bg-white transition-all duration-300 ${
+        className={`hidden md:flex h-screen flex-col border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 transition-all duration-300 ${
           collapsed ? "w-16" : "w-60"
         }`}
       >
@@ -252,7 +252,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
             className="fixed inset-0 z-40 bg-black/50 md:hidden"
             onClick={onMobileClose}
           />
-          <aside className="fixed inset-y-0 left-0 z-50 flex w-60 flex-col bg-white shadow-xl md:hidden">
+          <aside className="fixed inset-y-0 left-0 z-50 flex w-60 flex-col bg-white shadow-xl dark:bg-gray-900 md:hidden">
             {sidebarContent}
           </aside>
         </>
