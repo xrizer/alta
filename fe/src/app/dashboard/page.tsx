@@ -243,48 +243,48 @@ export default function DashboardPage() {
   // --- Loading skeleton ---
   if (isLoading) {
     return (
-      <div className="space-y-5 animate-pulse">
-        <div className="h-7 w-36 rounded bg-gray-200" />
+      <div className="space-y-5 animate-pulse dark:text-gray-100">
+        <div className="h-7 w-36 rounded bg-gray-200 dark:bg-gray-700" />
         {/* Greeting skeleton */}
-        <div className="rounded-xl border border-gray-100 bg-white px-4 py-4 space-y-4 md:px-6 md:py-5">
+        <div className="rounded-xl border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800 px-4 py-4 space-y-4 md:px-6 md:py-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h3 className="text-lg font-bold text-orange-500 md:text-xl">
                 Halo, {user?.name || "Alta"}!
               </h3>
-              <p className="mt-0.5 text-sm text-gray-500">
+              <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
                 Here&apos;s your HR overview for today
               </p>
             </div>
             <div className="text-left sm:text-right">
-              <p className="text-sm font-semibold text-gray-900">
+              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                 {dayName}, {dateStr}
               </p>
-              <p className="text-xl font-bold text-gray-900 md:text-2xl">{timeStr}</p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white md:text-2xl">{timeStr}</p>
             </div>
           </div>
-          <div className="border-t border-gray-100" />
-          <div className="h-10 rounded bg-gray-200" />
+          <div className="border-t border-gray-100 dark:border-gray-700" />
+          <div className="h-10 rounded bg-gray-200 dark:bg-gray-700" />
         </div>
         {/* Overview skeleton */}
-        <div className="h-6 w-28 rounded bg-gray-200" />
+        <div className="h-6 w-28 rounded bg-gray-200 dark:bg-gray-700" />
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-3">
-            <div className="h-24 rounded-xl bg-gray-200" />
+            <div className="h-24 rounded-xl bg-gray-200 dark:bg-gray-700" />
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="h-52 rounded-xl bg-gray-200" />
-              <div className="h-52 rounded-xl bg-gray-200" />
+              <div className="h-52 rounded-xl bg-gray-200 dark:bg-gray-700" />
+              <div className="h-52 rounded-xl bg-gray-200 dark:bg-gray-700" />
             </div>
           </div>
-          <div className="h-72 rounded-xl bg-gray-200" />
+          <div className="h-72 rounded-xl bg-gray-200 dark:bg-gray-700" />
         </div>
         {/* Analytics skeleton */}
-        <div className="h-6 w-28 rounded bg-gray-200" />
+        <div className="h-6 w-28 rounded bg-gray-200 dark:bg-gray-700" />
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-          <div className="h-72 rounded-xl bg-gray-200" />
-          <div className="h-72 rounded-xl bg-gray-200" />
-          <div className="h-72 rounded-xl bg-gray-200" />
-          <div className="h-72 rounded-xl bg-gray-200" />
+          <div className="h-72 rounded-xl bg-gray-200 dark:bg-gray-700" />
+          <div className="h-72 rounded-xl bg-gray-200 dark:bg-gray-700" />
+          <div className="h-72 rounded-xl bg-gray-200 dark:bg-gray-700" />
+          <div className="h-72 rounded-xl bg-gray-200 dark:bg-gray-700" />
         </div>
       </div>
     );
@@ -293,37 +293,37 @@ export default function DashboardPage() {
   return (
     <div className="space-y-5">
       {/* Page Title */}
-      <h2 className="text-xl font-bold text-gray-900">Dashboard</h2>
+      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
 
       {/* Greeting + Date + Quick Actions */}
-      <div className="rounded-xl border border-gray-100 bg-white px-4 py-4 space-y-4 md:px-6 md:py-5">
+      <div className="rounded-xl border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800 px-4 py-4 space-y-4 md:px-6 md:py-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-lg font-bold text-orange-500 md:text-xl">
               Halo, {user?.name || "Alta"}!
             </h3>
-            <p className="mt-0.5 text-sm text-gray-500">
+            <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
               Here&apos;s your HR overview for today
             </p>
           </div>
           <div className="text-left sm:text-right">
-            <p className="text-sm font-semibold text-gray-900">
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               {dayName}, {dateStr}
             </p>
-            <p className="text-xl font-bold text-gray-900 md:text-2xl">{timeStr}</p>
+            <p className="text-xl font-bold text-gray-900 dark:text-white md:text-2xl">{timeStr}</p>
           </div>
         </div>
-        <div className="border-t border-gray-100" />
+        <div className="border-t border-gray-100 dark:border-gray-700" />
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <span className="text-sm font-bold text-gray-700">Quick Actions</span>
+          <span className="text-sm font-bold text-gray-700 dark:text-gray-300">Quick Actions</span>
           <div className="flex flex-wrap items-center gap-2 md:gap-3">
             <button onClick={() => router.push("/dashboard/attendance")} className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors md:px-5">
               Review Attendance
             </button>
-            <button onClick={() => router.push("/dashboard/leaves")} className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors md:px-5">
+            <button onClick={() => router.push("/dashboard/leaves")} className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950/30 transition-colors md:px-5">
               Review Approval
             </button>
-            <button onClick={() => router.push("/dashboard/payroll")} className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 transition-colors md:px-5">
+            <button onClick={() => router.push("/dashboard/payroll")} className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950/30 transition-colors md:px-5">
               Process Payroll
             </button>
           </div>
@@ -331,34 +331,34 @@ export default function DashboardPage() {
       </div>
 
       {/* Overview + Notifications */}
-      <h3 className="text-lg font-bold text-gray-900">Overview</h3>
+      <h3 className="text-lg font-bold text-gray-900 dark:text-white">Overview</h3>
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         {/* Overview Cards */}
         <div className="lg:col-span-2 space-y-3">
           {/* Total Employees */}
-          <div className="rounded-xl border border-gray-100 bg-white px-4 py-4 md:px-5">
+          <div className="rounded-xl border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800 px-4 py-4 md:px-5">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50">
                   <Users size={20} className="text-orange-500" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500">Total Employees</p>
-                  <p className="text-2xl font-bold text-gray-900">{employeeStats.total}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Total Employees</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{employeeStats.total}</p>
                 </div>
               </div>
-              <div className="flex gap-6 border-t border-gray-200 pt-3 sm:gap-8 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
+              <div className="flex gap-6 border-t border-gray-200 dark:border-gray-700 pt-3 sm:gap-8 sm:border-l sm:border-t-0 dark:border-gray-700 sm:pl-6 sm:pt-0">
                 <div>
-                  <p className="text-xs text-gray-400">Permanent</p>
-                  <p className="text-lg font-bold text-gray-900">{employeeStats.permanent}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">Permanent</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">{employeeStats.permanent}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400">Contract</p>
-                  <p className="text-lg font-bold text-gray-900">{employeeStats.contract}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">Contract</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">{employeeStats.contract}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400">Internship</p>
-                  <p className="text-lg font-bold text-gray-900">{employeeStats.internship}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">Internship</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">{employeeStats.internship}</p>
                 </div>
               </div>
             </div>
@@ -368,15 +368,15 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {/* Left: Today Attendance + colored status strips */}
             <div className="space-y-2">
-              <div className="rounded-xl border border-gray-100 bg-white px-4 py-4 md:px-5">
+              <div className="rounded-xl border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800 px-4 py-4 md:px-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50">
                       <CheckCircle size={20} className="text-green-500" />
                     </div>
-                    <p className="text-xs text-gray-500">Today Attendance</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Today Attendance</p>
                   </div>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
                     {todayAttendance.total}
                     <span className="text-base font-normal text-gray-400">/{employeeStats.total}</span>
                   </p>
@@ -404,37 +404,37 @@ export default function DashboardPage() {
 
             {/* Right: Pending Approval + plain status rows */}
             <div className="space-y-2">
-              <div className="rounded-xl border border-gray-100 bg-white px-4 py-4 md:px-5">
+              <div className="rounded-xl border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800 px-4 py-4 md:px-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-50">
                       <Clock size={20} className="text-orange-500" />
                     </div>
-                    <p className="text-xs text-gray-500">Pending Approval</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Pending Approval</p>
                   </div>
-                  <p className="text-2xl font-bold text-gray-900">{pendingStats.total}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{pendingStats.total}</p>
                 </div>
               </div>
-              <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
-                <span className="text-sm text-gray-600">Leave</span>
-                <span className="text-base font-bold text-gray-900">{pendingStats.leave}</span>
+              <div className="rounded-lg border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800 px-4 py-2 flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-300">Leave</span>
+                <span className="text-base font-bold text-gray-900 dark:text-white">{pendingStats.leave}</span>
               </div>
-              <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
-                <span className="text-sm text-gray-600">Permission</span>
-                <span className="text-base font-bold text-gray-900">{pendingStats.permission}</span>
+              <div className="rounded-lg border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800 px-4 py-2 flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-300">Permission</span>
+                <span className="text-base font-bold text-gray-900 dark:text-white">{pendingStats.permission}</span>
               </div>
-              <div className="rounded-lg border border-gray-100 bg-white px-4 py-2 flex items-center justify-between">
-                <span className="text-sm text-gray-600">Reimbursement</span>
-                <span className="text-base font-bold text-gray-900">{pendingStats.reimbursement}</span>
+              <div className="rounded-lg border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800 px-4 py-2 flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-300">Reimbursement</span>
+                <span className="text-base font-bold text-gray-900 dark:text-white">{pendingStats.reimbursement}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Notifications */}
-        <div className="rounded-xl border border-gray-100 bg-white p-4 md:p-5">
+        <div className="rounded-xl border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800 p-4 md:p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Notifications</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Notifications</h3>
             <button className="flex items-center gap-1 text-xs font-medium text-blue-500 hover:text-blue-600">
               View All <ChevronRight size={14} />
             </button>
@@ -453,9 +453,9 @@ export default function DashboardPage() {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900">{n.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{n.description}</p>
-                    <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{n.title}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{n.description}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 flex items-center gap-1">
                       <Clock size={11} /> {n.time}
                     </p>
                   </div>
@@ -467,13 +467,13 @@ export default function DashboardPage() {
       </div>
 
       {/* Analytics */}
-      <h3 className="text-lg font-bold text-gray-900">Analytics</h3>
+      <h3 className="text-lg font-bold text-gray-900 dark:text-white">Analytics</h3>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         {/* Attendance Trend */}
-        <div className="rounded-xl border border-gray-100 bg-white p-4 md:p-5">
+        <div className="rounded-xl border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800 p-4 md:p-5">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="text-sm font-bold text-gray-900">Attendance Trend</h4>
+            <h4 className="text-sm font-bold text-gray-900 dark:text-white">Attendance Trend</h4>
             <button
               onClick={() =>
                 setTrendPeriod(trendPeriod === "Last Week" ? "This Week" : "Last Week")
@@ -500,15 +500,15 @@ export default function DashboardPage() {
             </LineChart>
           </ResponsiveContainer>
           <div className="flex flex-wrap items-center gap-4 mt-2">
-            <span className="flex items-center gap-1.5 text-xs text-gray-500">
+            <span className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
               <span className="h-2 w-2 rounded-full bg-indigo-500" /> Attendance
             </span>
           </div>
         </div>
 
         {/* Employee Status (Pie Chart) */}
-        <div className="rounded-xl border border-gray-100 bg-white p-4 md:p-5">
-          <h4 className="text-sm font-bold text-gray-900 text-center mb-2">Employee Status</h4>
+        <div className="rounded-xl border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800 p-4 md:p-5">
+          <h4 className="text-sm font-bold text-gray-900 dark:text-white text-center mb-2">Employee Status</h4>
           <div className="flex flex-col items-center sm:flex-row sm:justify-center">
             <ResponsiveContainer width="100%" height={280} className="sm:max-w-[60%]">
               <PieChart>
@@ -548,8 +548,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Department Headcount */}
-        <div className="rounded-xl border border-gray-100 bg-white p-4 md:p-5">
-          <h4 className="text-sm font-bold text-gray-900 mb-4">Department Headcount</h4>
+        <div className="rounded-xl border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800 p-4 md:p-5">
+          <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Department Headcount</h4>
           <ResponsiveContainer width="100%" height={Math.max(240, deptHeadcountData.length * 40)}>
             <BarChart data={deptHeadcountData} layout="vertical" barSize={16}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F3F4F6" />
@@ -566,8 +566,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Department Headcount by Gender */}
-        <div className="rounded-xl border border-gray-100 bg-white p-4 md:p-5">
-          <h4 className="text-sm font-bold text-gray-900 mb-4">Department Headcount by Gender</h4>
+        <div className="rounded-xl border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-800 p-4 md:p-5">
+          <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Department Headcount by Gender</h4>
           <ResponsiveContainer width="100%" height={Math.max(240, deptGenderData.length * 40)}>
             <BarChart data={deptGenderData} layout="vertical" barSize={14}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F3F4F6" />
@@ -578,7 +578,7 @@ export default function DashboardPage() {
                 iconType="circle"
                 iconSize={8}
                 formatter={(value) => (
-                  <span className="text-xs text-gray-600 capitalize">{value}</span>
+                  <span className="text-xs text-gray-600 dark:text-gray-300 capitalize">{value}</span>
                 )}
               />
               <Bar dataKey="male" stackId="a" fill="#3B82F6" radius={[0, 0, 0, 0]} />
