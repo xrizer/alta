@@ -510,13 +510,13 @@ export default function DashboardPage() {
         <div className="rounded-xl border border-gray-100 bg-white p-4 md:p-5">
           <h4 className="text-sm font-bold text-gray-900 text-center mb-2">Employee Status</h4>
           <div className="flex flex-col items-center sm:flex-row sm:justify-center">
-            <ResponsiveContainer width="100%" height={220} className="sm:max-w-[60%]">
+            <ResponsiveContainer width="100%" height={280} className="sm:max-w-[60%]">
               <PieChart>
                 <Pie
                   data={employeeStatusData}
                   cx="50%"
-                  cy="50%"
-                  outerRadius={80}
+                  cy="45%"
+                  outerRadius={75}
                   dataKey="value"
                   label={({ name, value, percent, x, y, textAnchor }) => (
                     <text x={x} y={y} textAnchor={textAnchor} fill="#6B7280" fontSize={11}>
