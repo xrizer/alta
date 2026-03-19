@@ -74,7 +74,7 @@ export default function LoginPage() {
             {/* Logo */}
             <div className="mb-6 flex justify-center">
               <Image
-                src="/logo.png"
+                src="/logo-full.png"
                 alt="Alta"
                 width={195}
                 height={21}
