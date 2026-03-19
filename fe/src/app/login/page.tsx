@@ -57,7 +57,7 @@ export default function LoginPage() {
 
         <div className="flex items-end justify-center">
           <Image
-            src="/login-illustration.png"
+            src="/login-ilustration.png"
             alt="HRIS Illustration"
             width={480}
             height={360}
