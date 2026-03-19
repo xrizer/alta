@@ -89,13 +89,13 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         <div className="flex w-full items-center justify-between px-1">
           <div
             className="flex-shrink-0 overflow-hidden"
-            style={{ height: "18px", width: "36px" }}
+            style={{ height: "12px", width: "24px" }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo.png"
               alt="Alta"
-              style={{ height: "18px", width: "auto" }}
+              style={{ height: "12px", width: "auto" }}
             />
           </div>
           <button
