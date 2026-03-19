@@ -73,9 +73,9 @@ export default function LoginPage() {
               <Image
                 src="/logo-full.png"
                 alt="Alta"
-                width={195}
-                height={21}
-                className="object-contain"
+                width={120}
+                height={32}
+                className="h-8 w-auto object-contain"
                 priority
               />
             </div>
