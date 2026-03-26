@@ -110,8 +110,8 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           <Image
             src="/logo-full.png"
             alt="Alta"
-            width={100}
-            height={33}
+            width={80}
+            height={26}
             className="object-contain"
           />
           {mobileOpen ? (
