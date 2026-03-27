@@ -1,19 +1,26 @@
 'use client';
 
 import Link from 'next/link';
-import { Plus, Search } from 'lucide-react';
+import { Plus } from 'lucide-react';
+import { type Companies } from './Companies.column';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/auth-context';
 import useCompanies from './useCompanies';
 import { DataTable } from '@/components/ui/data-table';
 import { CompaniesColumn } from './Companies.column';
-import { Input } from '@/components/ui/input';
 
 export default function Companies() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
 
-  const { companies, isLoading } = useCompanies();
+  const {
+    companies,
+    isLoading,
+    mutateDeleteCompanies,
+    selectedIds,
+    setRowSelection,
+    rowSelection,
+  } = useCompanies();
 
   if (isLoading) {
     return (
@@ -41,18 +48,20 @@ export default function Companies() {
         )}
       </div>
 
-      <div className="flex justify-end">
-        <Input
-          icon={<Search width={18} color="#BFBFBF" />}
-          placeholder="Search"
-        />
-      </div>
-
       <DataTable
         columns={CompaniesColumn}
-        data={companies}
+        data={companies?.data || []}
         filterKey="clientName"
-        // totalPages={data.pagination.totalPage}
+        totalPages={companies?.total_pages}
+        totalItems={companies?.total_items}
+        limit={companies?.limit}
+        page={companies?.page}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        getRowId={(row) => (row as Companies).id}
+        selectedIds={selectedIds}
+        onDeleteSelected={() => mutateDeleteCompanies()}
+        onClearSelection={() => setRowSelection({})}
       />
     </div>
   );

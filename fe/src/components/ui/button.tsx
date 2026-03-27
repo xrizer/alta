@@ -20,7 +20,7 @@ const buttonVariants = cva(
           'border-2 border-disable text-primary-text bg-transparent hover:bg-disable/10',
 
         // GRAY
-        gray: 'bg-disable text-disable-foreground cursor-not-allowed',
+        gray: 'bg-disable text-disable-foreground ',
         'gray-outline':
           'border-2 border-disable text-disable bg-input hover:bg-disable/10',
 
@@ -40,7 +40,7 @@ const buttonVariants = cva(
         default: 'h-9 px-4 text-sm',
         sm: 'h-9 px-4 text-sm',
         lg: 'h-12 px-8 text-lg',
-        icon: 'h-11 w-11',
+        icon: 'md:h-11 md:w-11 text-sm',
         sizeless: 'h-0 w-0',
       },
     },

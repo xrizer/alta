@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import * as DepartmentsService from '@/services/department-service';
+import * as departmentsService from '@/services/department-service';
 import * as companyService from '@/services/company-service';
 import * as yup from 'yup';
 import { Company } from '@/lib/types';
@@ -25,12 +25,13 @@ const useCreateDepartments = () => {
   const getCompanies = async () => {
     const res = await companyService.getCompanies();
     if (!res.success) throw new Error(res.message);
-    return res.data as Company[];
+    return res.data?.data as Company[];
   };
 
   const { data: companies } = useQuery({
     queryKey: ['companies'],
     queryFn: getCompanies,
+    initialData: [],
   });
 
   const {
@@ -47,7 +48,7 @@ const useCreateDepartments = () => {
   });
 
   const createDepartments = async (payload: CreateDepartmentsPayload) => {
-    const res = await DepartmentsService.createDepartment(payload);
+    const res = await departmentsService.createDepartment(payload);
     if (!res.success) {
       throw new Error(res.message);
     }

@@ -1,15 +1,30 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import * as companyService from '@/services/company-service';
-import { Company } from '@/lib/types';
+import useChangeUrl from '@/hooks/useChangeUrl';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { RowSelectionState } from '@tanstack/react-table';
+import { useState } from 'react';
+import { useContext } from 'react';
+import { ToasterContext } from '@/contexts/ToasterContext';
 
 const useCompanies = () => {
-  const [selectedId, setSelectedId] = useState<string>('');
+  const queryClient = useQueryClient();
+  const { setToaster } = useContext(ToasterContext);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
+  const { currentLimit, currentPage, currentSearch } = useChangeUrl();
+
+  const selectedIds = Object.keys(rowSelection).filter(
+    (id) => rowSelection[id],
+  );
 
   const getCompanies = async () => {
-    const res = await companyService.getCompanies();
-    if (!res.success) throw new Error(res.message);
-    return res.data as Company[];
+    const res = await companyService.getCompanies({
+      page: Number(currentPage),
+      limit: Number(currentLimit),
+      search: currentSearch || undefined,
+    });
+
+    return res.data;
   };
 
   const {
@@ -17,20 +32,45 @@ const useCompanies = () => {
     isLoading,
     isRefetching,
     refetch,
-    error,
   } = useQuery({
-    queryKey: ['companies'],
+    queryKey: ['companies', currentPage, currentLimit, currentSearch],
     queryFn: getCompanies,
+    enabled: !!currentPage && !!currentLimit,
+  });
+
+  const handleMultipleDelete = async () => {
+    if (selectedIds.length === 0) return;
+    const res = await companyService.deleteMultipleCompanies(selectedIds);
+    return res;
+  };
+
+  const { mutate: mutateDeleteCompanies } = useMutation({
+    mutationFn: handleMultipleDelete,
+    onError: (error) => {
+      setToaster({
+        type: 'error',
+        message: error.message,
+      });
+    },
+    onSuccess: () => {
+      setToaster({
+        type: 'success',
+        message: 'Delete companies success',
+      });
+      setRowSelection({}); // ← reset checkbox
+      queryClient.invalidateQueries({ queryKey: ['companies'] }); // ← ganti refetch() dengan ini
+    },
   });
 
   return {
+    mutateDeleteCompanies,
+    setRowSelection,
+    selectedIds,
     companies,
+    rowSelection,
     isLoading,
     isRefetching,
-    error,
     refetch,
-    selectedId,
-    setSelectedId,
   };
 };
 

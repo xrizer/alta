@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import * as companyService from '@/services/company-service';
+import * as departmentService from '@/services/department-service';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ToasterContext } from '@/contexts/ToasterContext';
 
@@ -8,7 +8,7 @@ const useDeleteDepartmentsModal = () => {
   const { setToaster } = useContext(ToasterContext);
 
   const deleteBanner = async (id: string) => {
-    const res = await companyService.deleteCompany(id);
+    const res = await departmentService.deleteDepartment(id);
 
     return res;
   };
@@ -22,11 +22,11 @@ const useDeleteDepartmentsModal = () => {
     onSuccess: () => {
       setToaster({
         type: 'success',
-        message: 'Success delete company',
+        message: 'Success delete department',
       });
 
       queryClient.invalidateQueries({
-        queryKey: ['companies'],
+        queryKey: ['departments'],
       });
     },
     onError: (error) => {

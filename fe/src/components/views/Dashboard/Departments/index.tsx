@@ -1,13 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { Plus, Search } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/auth-context';
 import useDepartments from './useDepartments';
 import { DataTable } from '@/components/ui/data-table';
 import { DepartmensColumn } from './Departments.column';
-import { Input } from '@/components/ui/input';
 
 export default function Departments() {
   const { user } = useAuth();
@@ -39,13 +38,6 @@ export default function Departments() {
             </Button>
           </Link>
         )}
-      </div>
-
-      <div className="flex justify-end">
-        <Input
-          icon={<Search width={18} color="#BFBFBF" />}
-          placeholder="Search"
-        />
       </div>
 
       <DataTable

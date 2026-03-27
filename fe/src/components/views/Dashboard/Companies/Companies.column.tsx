@@ -3,10 +3,10 @@ import Typography from '@/components/ui/typography';
 import { ColumnDef } from '@tanstack/react-table';
 import { SquarePen, Trash } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog } from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import DeleteClientsModal from './DeleteCompaniesModal';
 import {
+  Dialog,
   DialogContent,
   DialogTitle,
   DialogTrigger,
@@ -16,16 +16,20 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 export type Companies = {
   id: string;
   name: string;
-  phone: string;
-  npwp: string;
   address: string;
+  phone: string;
   email: string;
+  npwp: string;
+  logo: string;
   is_active: boolean;
+  created_at: string;
+  updated_at: string;
 };
 
 export const CompaniesColumn: ColumnDef<Companies>[] = [
   {
     id: 'select',
+
     header: ({ table }) => (
       <Checkbox
         checked={

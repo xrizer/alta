@@ -60,12 +60,10 @@ const useChangeUrl = () => {
         );
     };
 
-    const handleChangeLimit = (e: ChangeEvent<HTMLSelectElement>) => {
-        const selectedLimit = e.target.value;
-
+    const handleChangeLimit = (limit: string) => {
         router.push(
             `${pathname}?${createQueryString({
-                limit: selectedLimit,
+                limit,
                 page: PAGE_DEFAULT,
             })}`
         );

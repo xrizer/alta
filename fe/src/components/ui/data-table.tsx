@@ -12,6 +12,8 @@ import {
   ColumnFiltersState,
   SortingState,
   VisibilityState,
+  RowSelectionState,
+  OnChangeFn,
 } from '@tanstack/react-table';
 import {
   Select,
@@ -38,6 +40,17 @@ import { LIMIT_LISTS } from '@/constants/list.constant';
 import { cn } from '@/lib/utils';
 import { TablePagination } from './pagination-table';
 import useChangeUrl from '@/hooks/useChangeUrl';
+import { Input } from './input';
+import { Search, Trash, X } from 'lucide-react';
+import { Button } from './button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -45,6 +58,15 @@ interface DataTableProps<TData, TValue> {
   filterKey?: string;
   hiddenHintFooter?: boolean;
   totalPages?: number;
+  totalItems?: number;
+  limit?: number;
+  page?: number;
+  rowSelection?: RowSelectionState;
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>;
+  getRowId?: (row: TData) => string;
+  selectedIds?: string[];
+  onDeleteSelected?: () => void;
+  onClearSelection?: () => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -52,16 +74,35 @@ export function DataTable<TData, TValue>({
   data,
   hiddenHintFooter,
   totalPages,
+  totalItems,
+  limit,
+  page,
+  rowSelection = {},
+  onRowSelectionChange,
+  getRowId,
+  selectedIds = [],
+  onDeleteSelected,
+  onClearSelection,
 }: // filterKey,
 DataTableProps<TData, TValue>) {
-  const { handleChangePage, currentPage } = useChangeUrl();
+  const {
+    handleChangePage,
+    handleChangeLimit,
+    handleSearch,
+    currentSearch,
+    currentPage,
+    currentLimit,
+  } = useChangeUrl();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
   );
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+  // const [rowSelection, setRowSelection] = React.useState({});
+
+  const start = totalItems ? (page! - 1) * limit! + 1 : 0;
+  const end = totalItems ? Math.min(page! * limit!, totalItems) : 0;
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -74,7 +115,9 @@ DataTableProps<TData, TValue>) {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
+    // onRowSelectionChange: setRowSelection,
+    getRowId,
+    onRowSelectionChange,
     state: {
       sorting,
       columnFilters,
@@ -84,7 +127,7 @@ DataTableProps<TData, TValue>) {
   });
 
   return (
-    <div className="w-full">
+    <div className="w-full space-y-4">
       {/* Filter
       {filterKey && (
         <div className="flex items-center py-4">
@@ -100,6 +143,63 @@ DataTableProps<TData, TValue>) {
           />
         </div>
       )} */}
+
+      {/* Search */}
+      <div className="flex justify-end">
+        <Input
+          icon={<Search width={18} color="#BFBFBF" />}
+          placeholder="Search"
+          defaultValue={currentSearch}
+          onChange={handleSearch}
+        />
+      </div>
+
+      {/* multiple delete box*/}
+      {selectedIds.length > 0 && (
+        <div className="flex items-center justify-between flex-row 3 px-3 py-1 md:py-0 bg-gray-100 rounded-lg border border-gray-400">
+          <Typography>{selectedIds.length} item dipilih</Typography>
+          <div className="flex gap-3">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant={'icon'}
+                  size="icon"
+                  className="flex gap-2 items-center text-error">
+                  <Trash width={20} />
+                  <span className="hidden md:block">Hapus</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <VisuallyHidden>
+                  <DialogTitle>Dialog</DialogTitle>
+                </VisuallyHidden>
+                <div className="flex justify-center flex-col items-center gap-6">
+                  <Typography variant="h3">
+                    Anda yakin ingin menghapus data?
+                  </Typography>
+                  <Typography
+                    variant="bodyRegular"
+                    className="text-secondary-text">
+                    Setelah dihapus, data tidak bisa dipulihkan kembali.
+                  </Typography>
+                  <div className="space-x-5">
+                    <DialogClose asChild>
+                      <Button variant={'primary-outline'}>Batal</Button>
+                    </DialogClose>
+                    <Button variant={'primary'} onClick={onDeleteSelected}>
+                      Hapus
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+            <Button variant="icon" size="icon" onClick={onClearSelection}>
+              <X width={20} className="block md:hidden" />
+              <span className="hidden md:block">Batal</span>
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Table */}
       <div className="overflow-hidden rounded-xl border  ">
@@ -157,7 +257,8 @@ DataTableProps<TData, TValue>) {
                   )}>
                   {!hiddenHintFooter && (
                     <Typography variant="caption">
-                      Showing 1 to 5 of 5 results
+                      Showing {start} to {end} of {totalItems} results
+                      {/* Showing 1 to 5 of 5 results */}
                     </Typography>
                   )}
 
@@ -172,10 +273,13 @@ DataTableProps<TData, TValue>) {
 
                   <div className="flex flex-row items-center gap-3 border border-input pl-4 shadow-xs py-0 rounded-md">
                     <Typography variant="caption">Page per Row</Typography>
-                    <Select>
+                    <Select
+                      value={currentLimit.toString()}
+                      onValueChange={(value) => handleChangeLimit(value)}>
                       <SelectTrigger className="w-[68px] rounded-l-none! border-y-0! border-r-0">
                         <SelectValue placeholder="10" />
                       </SelectTrigger>
+
                       <SelectContent>
                         <SelectGroup>
                           {LIMIT_LISTS.map((limit) => (

@@ -8,6 +8,8 @@
 /* DESIGN TOKENS (RAW COLORS) */
 /* -------------------------------- */
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --radius: 0.625rem;
 

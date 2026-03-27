@@ -26,6 +26,8 @@ const CreateDepartments = () => {
     router,
   } = useCreateDepartment();
 
+  console.log(companies);
+
   return (
     <div className="space-y-4">
       <div className="space-y-1">
@@ -93,7 +95,7 @@ const CreateDepartments = () => {
               <Textarea
                 {...field}
                 placeholder="PT Alta Indonesia"
-                label="Adress"
+                label="Description"
                 autoComplete="off"
                 isInvalid={errors.description !== undefined}
                 errorMessage={errors.description?.message}
