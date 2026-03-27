@@ -16,7 +16,7 @@ alta/
 ## Tech Stack
 - **Backend**: Go 1.23, Fiber v2, GORM, PostgreSQL 16, JWT (access + refresh tokens), bcrypt
 - **Frontend**: Next.js 16, TypeScript, Tailwind CSS, Axios, React Context
-- **Deployment**: Docker Compose, Nginx reverse proxy on GCP VM (136.112.30.58)
+- **Deployment**: Docker Compose, Nginx reverse proxy on GCP VM (35.225.170.132), domain: altahris.com
 
 ## API Pattern
 - All API endpoints are under `/api/`
