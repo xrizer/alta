@@ -47,17 +47,17 @@ export default function CreateUserPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Create User</h2>
-        <p className="mt-1 text-sm text-gray-600">
+        <p className="mt-1 text-sm text-gray-500">
           Add a new user to the system
         </p>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-6 rounded-xl border border-gray-200 bg-white p-6"
+        className="space-y-5 rounded-xl border border-gray-200 bg-white p-6"
       >
         {error && (
           <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">
@@ -65,9 +65,9 @@ export default function CreateUserPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-semibold text-gray-900">
               Name
             </label>
             <input
@@ -76,12 +76,12 @@ export default function CreateUserPage() {
               required
               value={form.name}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-semibold text-gray-900">
               Email
             </label>
             <input
@@ -90,12 +90,12 @@ export default function CreateUserPage() {
               required
               value={form.email}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-semibold text-gray-900">
               Password
             </label>
             <input
@@ -105,19 +105,19 @@ export default function CreateUserPage() {
               minLength={6}
               value={form.password}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-semibold text-gray-900">
               Role
             </label>
             <select
               name="role"
               value={form.role}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             >
               <option value="employee">Employee</option>
               <option value="hr">HR</option>
@@ -126,7 +126,7 @@ export default function CreateUserPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-semibold text-gray-900">
               Phone
             </label>
             <input
@@ -134,13 +134,13 @@ export default function CreateUserPage() {
               type="text"
               value={form.phone}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-semibold text-gray-900">
             Address
           </label>
           <textarea
@@ -148,7 +148,7 @@ export default function CreateUserPage() {
             rows={3}
             value={form.address}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
           />
         </div>
 
@@ -156,14 +156,14 @@ export default function CreateUserPage() {
           <button
             type="button"
             onClick={() => router.back()}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? "Creating..." : "Create User"}
           </button>

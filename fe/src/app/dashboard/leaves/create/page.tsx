@@ -63,17 +63,17 @@ export default function CreateLeavePage() {
   if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-gray-500">Loading...</div></div>;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Request Leave</h2>
-        <p className="mt-1 text-sm text-gray-600">Submit a new leave request</p>
+        <p className="mt-1 text-sm text-gray-500">Submit a new leave request</p>
       </div>
-      <form onSubmit={handleSubmit} className="space-y-6 rounded-xl border border-gray-200 bg-white p-6">
+      <form onSubmit={handleSubmit} className="space-y-5 rounded-xl border border-gray-200 bg-white p-6">
         {error && <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Leave Type *</label>
-            <select name="leave_type" value={form.leave_type} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+            <label className="block text-sm font-semibold text-gray-900">Leave Type *</label>
+            <select name="leave_type" value={form.leave_type} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500">
               <option value="cuti_tahunan">Cuti Tahunan</option>
               <option value="cuti_sakit">Cuti Sakit</option>
               <option value="cuti_melahirkan">Cuti Melahirkan</option>
@@ -83,25 +83,25 @@ export default function CreateLeavePage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Total Days *</label>
-            <input name="total_days" type="number" min={1} required value={form.total_days} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            <label className="block text-sm font-semibold text-gray-900">Total Days *</label>
+            <input name="total_days" type="number" min={1} required value={form.total_days} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Start Date *</label>
-            <input name="start_date" type="date" required value={form.start_date} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            <label className="block text-sm font-semibold text-gray-900">Start Date *</label>
+            <input name="start_date" type="date" required value={form.start_date} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">End Date *</label>
-            <input name="end_date" type="date" required value={form.end_date} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            <label className="block text-sm font-semibold text-gray-900">End Date *</label>
+            <input name="end_date" type="date" required value={form.end_date} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Reason *</label>
-          <textarea name="reason" rows={3} required value={form.reason} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+          <label className="block text-sm font-semibold text-gray-900">Reason *</label>
+          <textarea name="reason" rows={3} required value={form.reason} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
         </div>
         <div className="flex justify-end gap-3">
-          <button type="button" onClick={() => router.back()} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
-          <button type="submit" disabled={isSubmitting || !myEmployee} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">{isSubmitting ? "Submitting..." : "Submit Request"}</button>
+          <button type="button" onClick={() => router.back()} className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50">Cancel</button>
+          <button type="submit" disabled={isSubmitting || !myEmployee} className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50">{isSubmitting ? "Submitting..." : "Submit Request"}</button>
         </div>
       </form>
     </div>
