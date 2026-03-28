@@ -94,25 +94,25 @@ export default function EditPositionPage() {
     );
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Edit Position</h2>
-        <p className="mt-1 text-sm text-gray-600">Update position information</p>
+        <p className="mt-1 text-sm text-gray-500">Update position information</p>
       </div>
-      <form onSubmit={handleSubmit} className="space-y-6 rounded-xl border border-gray-200 bg-white p-6">
+      <form onSubmit={handleSubmit} className="space-y-5 rounded-xl border border-gray-200 bg-white p-6">
         {error && <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Company</label>
-            <input value={companyName} disabled className="mt-1 block w-full rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            <label className="block text-sm font-semibold text-gray-900">Company</label>
+            <input value={companyName} disabled className="mt-1 block w-full rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-gray-500 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Department</label>
+            <label className="block text-sm font-semibold text-gray-900">Department</label>
             <select
               name="department_id"
               value={form.department_id}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             >
               <option value="">Select department</option>
               {departments.map((d) => (
@@ -121,21 +121,21 @@ export default function EditPositionPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
-            <input name="name" value={form.name} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            <label className="block text-sm font-semibold text-gray-900">Name</label>
+            <input name="name" value={form.name} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Base Salary</label>
-            <input name="base_salary" type="number" min="0" value={form.base_salary} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            <label className="block text-sm font-semibold text-gray-900">Base Salary</label>
+            <input name="base_salary" type="number" min="0" value={form.base_salary} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <input type="checkbox" name="is_active" id="is_active" checked={form.is_active} onChange={handleChange} className="h-4 w-4 rounded border-gray-300 text-blue-600" />
-          <label htmlFor="is_active" className="text-sm font-medium text-gray-700">Active</label>
+          <input type="checkbox" name="is_active" id="is_active" checked={form.is_active} onChange={handleChange} className="h-4 w-4 rounded border-gray-300 text-orange-500 accent-orange-500" />
+          <label htmlFor="is_active" className="text-sm font-semibold text-gray-900">Active</label>
         </div>
         <div className="flex justify-end gap-3">
-          <button type="button" onClick={() => router.back()} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
-          <button type="submit" disabled={isSubmitting} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">{isSubmitting ? "Updating..." : "Update Position"}</button>
+          <button type="button" onClick={() => router.back()} className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50">Cancel</button>
+          <button type="submit" disabled={isSubmitting} className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50">{isSubmitting ? "Updating..." : "Update Position"}</button>
         </div>
       </form>
     </div>
