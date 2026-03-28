@@ -326,7 +326,7 @@ export default function AttendancePage() {
             >
               Download Template
             </button>
-            <label className={`cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 ${isImporting ? "opacity-50 pointer-events-none" : ""}`}>
+            <label className={`cursor-pointer rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 ${isImporting ? "opacity-50 pointer-events-none" : ""}`}>
               {isImporting ? "Importing..." : "Import XLSX"}
               <input
                 ref={fileInputRef}

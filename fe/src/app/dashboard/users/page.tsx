@@ -65,7 +65,7 @@ export default function UsersPage() {
         {currentUser?.role === "admin" && (
           <Link
             href="/dashboard/users/create"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+            className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600"
           >
             Add User
           </Link>
