@@ -111,7 +111,7 @@ export default function PayrollPage() {
           <p className="mt-1 text-sm text-gray-600">Generate and manage monthly payroll</p>
         </div>
         {isAdmin && (
-          <button onClick={() => setShowGenerate(true)} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+          <button onClick={() => setShowGenerate(true)} className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600">
             Generate Payroll
           </button>
         )}
@@ -151,7 +151,7 @@ export default function PayrollPage() {
           </div>
           <div className="flex gap-3">
             <button onClick={() => setShowGenerate(false)} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
-            <button onClick={handleGenerate} disabled={isGenerating || !genEmployee} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">{isGenerating ? "Generating..." : "Generate"}</button>
+            <button onClick={handleGenerate} disabled={isGenerating || !genEmployee} className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50">{isGenerating ? "Generating..." : "Generate"}</button>
           </div>
         </div>
       )}

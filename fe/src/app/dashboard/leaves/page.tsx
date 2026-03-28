@@ -91,7 +91,7 @@ export default function LeavesPage() {
           <p className="mt-1 text-sm text-gray-600">Manage leave requests</p>
         </div>
         {(myEmployee || !isAdminOrHr) && (
-          <Link href="/dashboard/leaves/create" className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+          <Link href="/dashboard/leaves/create" className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600">
             Request Leave
           </Link>
         )}
