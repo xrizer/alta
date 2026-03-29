@@ -564,6 +564,32 @@ definitions:
       total_pages:
         type: integer
     type: object
+  dto.NotificationResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      is_read:
+        type: boolean
+      message:
+        type: string
+      read_at:
+        type: string
+      ref_id:
+        type: string
+      ref_type:
+        type: string
+      title:
+        type: string
+      type:
+        $ref: '#/definitions/model.NotificationType'
+    type: object
+  dto.UnreadCountResponse:
+    properties:
+      count:
+        type: integer
+    type: object
   dto.PayrollResponse:
     properties:
       basic_salary:
@@ -940,6 +966,18 @@ definitions:
     - LeaveCutiBesar
     - LeaveIzin
     - LeaveDinasLuar
+  model.NotificationType:
+    enum:
+    - info
+    - success
+    - warning
+    - error
+    type: string
+    x-enum-varnames:
+    - NotificationTypeInfo
+    - NotificationTypeSuccess
+    - NotificationTypeWarning
+    - NotificationTypeError
   model.PayrollStatus:
     enum:
     - draft
@@ -952,11 +990,13 @@ definitions:
     - PayrollPaid
   model.Role:
     enum:
+    - superadmin
     - admin
     - hr
     - employee
     type: string
     x-enum-varnames:
+    - RoleSuperAdmin
     - RoleAdmin
     - RoleHR
     - RoleEmployee
@@ -2474,6 +2514,88 @@ paths:
       summary: Get my menu access
       tags:
       - Menu Access
+  /notifications:
+    get:
+      description: Returns the latest notifications for the authenticated user
+      parameters:
+      - description: Max number to return (default 20)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Notifications retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.NotificationResponse'
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: Get notifications for the current user
+      tags:
+      - Notifications
+  /notifications/read-all:
+    put:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: All notifications marked as read
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Mark all notifications as read
+      tags:
+      - Notifications
+  /notifications/unread-count:
+    get:
+      description: Returns the number of unread notifications for the authenticated
+        user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Unread count retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UnreadCountResponse'
+              type: object
+      security:
+      - Bearer: []
+      summary: Get unread notification count
+      tags:
+      - Notifications
+  /notifications/{id}/read:
+    put:
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Notification marked as read
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Mark a notification as read
+      tags:
+      - Notifications
   /organization/structure:
     get:
       description: Retrieve the hierarchical organization structure for a company
