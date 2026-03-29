@@ -46,6 +46,11 @@ const ALL_MENU_SECTIONS = [
 
 // Default menu keys per role
 const ROLE_DEFAULTS: Record<string, string[]> = {
+  superadmin: [
+    "dashboard", "companies", "departments", "positions", "shifts",
+    "organization_structure", "users", "employees", "attendance", "leaves",
+    "payroll", "menu_access_policy",
+  ],
   admin: [
     "dashboard", "companies", "departments", "positions", "shifts",
     "organization_structure", "users", "employees", "attendance", "leaves",
@@ -240,7 +245,9 @@ export default function MenuAccessPage() {
                       <td className="whitespace-nowrap px-6 py-4 text-sm">
                         <span
                           className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                            user.role === "admin"
+                            user.role === "superadmin"
+                              ? "bg-red-100 text-red-700"
+                              : user.role === "admin"
                               ? "bg-purple-100 text-purple-700"
                               : user.role === "hr"
                               ? "bg-blue-100 text-blue-700"

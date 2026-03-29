@@ -50,7 +50,7 @@ func (h *UserHandler) GetByID(c *fiber.Ctx) error {
 	userRole := c.Locals("role").(string)
 	userID := c.Locals("userID").(string)
 
-	if userRole == "employee" && userID != id {
+	if userRole != "superadmin" && userRole != "admin" && userRole != "hr" && userID != id {
 		return response.Error(c, fiber.StatusForbidden, "Access denied")
 	}
 
@@ -100,8 +100,8 @@ func (h *UserHandler) Create(c *fiber.Ctx) error {
 		return response.Error(c, fiber.StatusBadRequest, "Name, email, password, and role are required")
 	}
 
-	if req.Role != "admin" && req.Role != "hr" && req.Role != "employee" {
-		return response.Error(c, fiber.StatusBadRequest, "Invalid role. Must be admin, hr, or employee")
+	if req.Role != "superadmin" && req.Role != "admin" && req.Role != "hr" && req.Role != "employee" {
+		return response.Error(c, fiber.StatusBadRequest, "Invalid role. Must be superadmin, admin, hr, or employee")
 	}
 
 	if len(req.Password) < 6 {
@@ -135,8 +135,8 @@ func (h *UserHandler) Update(c *fiber.Ctx) error {
 		return response.Error(c, fiber.StatusBadRequest, "Invalid request body")
 	}
 
-	if req.Role != "" && req.Role != "admin" && req.Role != "hr" && req.Role != "employee" {
-		return response.Error(c, fiber.StatusBadRequest, "Invalid role. Must be admin, hr, or employee")
+	if req.Role != "" && req.Role != "superadmin" && req.Role != "admin" && req.Role != "hr" && req.Role != "employee" {
+		return response.Error(c, fiber.StatusBadRequest, "Invalid role. Must be superadmin, admin, hr, or employee")
 	}
 
 	if req.Password != "" && len(req.Password) < 6 {

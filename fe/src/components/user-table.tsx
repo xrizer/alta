@@ -11,7 +11,7 @@ interface UserTableProps {
 
 export default function UserTable({ users, onDelete }: UserTableProps) {
   const { user: currentUser } = useAuth();
-  const isAdmin = currentUser?.role === "admin";
+  const isAdmin = currentUser?.role === "admin" || currentUser?.role === "superadmin";
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
@@ -52,11 +52,13 @@ export default function UserTable({ users, onDelete }: UserTableProps) {
               <td className="whitespace-nowrap px-6 py-4 text-sm">
                 <span
                   className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                    user.role === "admin"
-                      ? "bg-purple-100 text-purple-800"
-                      : user.role === "hr"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-gray-100 text-gray-800"
+                    user.role === "superadmin"
+                      ? "bg-red-100 text-red-800"
+                      : user.role === "admin"
+                        ? "bg-purple-100 text-purple-800"
+                        : user.role === "hr"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-gray-100 text-gray-800"
                   }`}
                 >
                   {user.role}
