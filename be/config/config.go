@@ -3,6 +3,7 @@ package config
 import (
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -26,6 +27,8 @@ type Config struct {
 
 	AdminEmail    string
 	AdminPassword string
+
+	KafkaBrokers []string
 }
 
 func Load() *Config {
@@ -61,6 +64,8 @@ func Load() *Config {
 
 		AdminEmail:    getEnv("ADMIN_EMAIL", "admin@hris.com"),
 		AdminPassword: getEnv("ADMIN_PASSWORD", "admin123"),
+
+		KafkaBrokers: splitBrokers(getEnv("KAFKA_BROKERS", "localhost:9092")),
 	}
 }
 
@@ -69,4 +74,15 @@ func getEnv(key, fallback string) string {
 		return value
 	}
 	return fallback
+}
+
+func splitBrokers(brokers string) []string {
+	var result []string
+	for _, b := range strings.Split(brokers, ",") {
+		b = strings.TrimSpace(b)
+		if b != "" {
+			result = append(result, b)
+		}
+	}
+	return result
 }
