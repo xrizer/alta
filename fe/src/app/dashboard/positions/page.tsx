@@ -1,10 +1,24 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { Position } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as positionService from "@/services/position-service";
+
+type SortField = "name" | "company" | "department" | "base_salary" | "is_active";
+type SortOrder = "asc" | "desc";
+
+function getPageNumbers(current: number, total: number, maxVisible = 3): number[] {
+  if (total <= maxVisible) return Array.from({ length: total }, (_, i) => i + 1);
+  let start = Math.max(1, current - Math.floor(maxVisible / 2));
+  let end = start + maxVisible - 1;
+  if (end > total) {
+    end = total;
+    start = Math.max(1, end - maxVisible + 1);
+  }
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+}
 
 const EditIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -22,20 +36,37 @@ const TrashIcon = () => (
   </svg>
 );
 
+const SearchIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
+    <circle cx="11" cy="11" r="8" />
+    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+  </svg>
+);
+
 const formatSalary = (value: number) =>
   new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(value);
 
 export default function PositionsPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
-  const [positions, setPositions] = useState<Position[]>([]);
+  const [allPositions, setAllPositions] = useState<Position[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(5);
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [sortBy, setSortBy] = useState<SortField>("name");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const fetchPositions = useCallback(async () => {
+    setIsLoading(true);
+    setError("");
     try {
       const res = await positionService.getPositions();
-      if (res.success && res.data) setPositions(res.data);
+      if (res.success && res.data) setAllPositions(res.data);
     } catch {
       setError("Failed to fetch positions");
     } finally {
@@ -43,40 +74,93 @@ export default function PositionsPage() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchPositions();
-  }, [fetchPositions]);
+  useEffect(() => { fetchPositions(); }, [fetchPositions]);
+  useEffect(() => { setCurrentPage(1); }, [search, sortBy, sortOrder, perPage]);
+
+  const handleSearchInput = (val: string) => {
+    setSearchInput(val);
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => setSearch(val), 400);
+  };
+
+  const handleSort = (field: SortField) => {
+    if (sortBy === field) setSortOrder((o) => (o === "asc" ? "desc" : "asc"));
+    else { setSortBy(field); setSortOrder("asc"); }
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortBy !== field) return <span className="ml-1 text-gray-300 text-xs">↑↓</span>;
+    return <span className="ml-1 text-orange-500 text-xs">{sortOrder === "asc" ? "↑" : "↓"}</span>;
+  };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this position?")) return;
     try {
       const res = await positionService.deletePosition(id);
-      if (res.success) setPositions(positions.filter((p) => p.id !== id));
+      if (res.success) setAllPositions((prev) => prev.filter((p) => p.id !== id));
       else setError(res.message);
     } catch {
       setError("Failed to delete position");
     }
   };
 
-  if (isLoading)
+  const filtered = allPositions.filter((pos) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading positions...</div>
-      </div>
+      pos.name?.toLowerCase().includes(q) ||
+      pos.company?.name?.toLowerCase().includes(q) ||
+      pos.department?.name?.toLowerCase().includes(q)
     );
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === "name") {
+      return sortOrder === "asc" ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+    }
+    if (sortBy === "company") {
+      const av = a.company?.name || ""; const bv = b.company?.name || "";
+      return sortOrder === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+    }
+    if (sortBy === "department") {
+      const av = a.department?.name || ""; const bv = b.department?.name || "";
+      return sortOrder === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+    }
+    if (sortBy === "base_salary") {
+      return sortOrder === "asc" ? a.base_salary - b.base_salary : b.base_salary - a.base_salary;
+    }
+    if (sortBy === "is_active") {
+      return sortOrder === "asc"
+        ? Number(a.is_active) - Number(b.is_active)
+        : Number(b.is_active) - Number(a.is_active);
+    }
+    return 0;
+  });
+
+  const totalItems = sorted.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
+  const safePage = Math.min(Math.max(currentPage, 1), totalPages);
+  const startItem = totalItems === 0 ? 0 : (safePage - 1) * perPage + 1;
+  const endItem = Math.min(safePage * perPage, totalItems);
+  const positions = sorted.slice((safePage - 1) * perPage, safePage * perPage);
+  const pageNumbers = getPageNumbers(safePage, totalPages);
+
+  const colSpan = isAdmin ? 6 : 5;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Positions</h2>
-          <p className="mt-1 text-sm text-gray-600">Manage position data</p>
+          <p className="mt-1 text-sm text-gray-500">Manage position data</p>
         </div>
         {isAdmin && (
           <Link
             href="/dashboard/positions/create"
-            className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 transition-colors"
           >
+            <span className="text-base leading-none">+</span>
             Add Position
           </Link>
         )}
@@ -86,59 +170,143 @@ export default function PositionsPage() {
         <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      {/* Search */}
+      <div className="flex items-center justify-end gap-3">
+        <div className="relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <SearchIcon />
+          </span>
+          <input
+            type="text"
+            placeholder="Search"
+            value={searchInput}
+            onChange={(e) => handleSearchInput(e.target.value)}
+            className="w-64 rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+          />
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+          <thead className="bg-white">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Company</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Department</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Base Salary</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
-              {isAdmin && <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>}
+              {(
+                [
+                  { label: "Name", field: "name" as SortField },
+                  { label: "Company", field: "company" as SortField },
+                  { label: "Department", field: "department" as SortField },
+                  { label: "Base Salary", field: "base_salary" as SortField },
+                  { label: "Status", field: "is_active" as SortField },
+                ] as const
+              ).map(({ label, field }) => (
+                <th
+                  key={field}
+                  onClick={() => handleSort(field)}
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer select-none hover:text-gray-900"
+                >
+                  {label}
+                  <SortIcon field={field} />
+                </th>
+              ))}
+              {isAdmin && (
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
+              )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
-            {positions.map((position) => (
-              <tr key={position.id} className="hover:bg-gray-50">
-                <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{position.name}</td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{position.company?.name || "-"}</td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{position.department?.name || "-"}</td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatSalary(position.base_salary)}</td>
-                <td className="whitespace-nowrap px-6 py-4">
-                  <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${position.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                    {position.is_active ? "Active" : "Inactive"}
-                  </span>
-                </td>
-                {isAdmin && (
-                  <td className="whitespace-nowrap px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <Link
-                        href={`/dashboard/positions/${position.id}/edit`}
-                        className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
-                      >
-                        <EditIcon />
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(position.id)}
-                        className="inline-flex items-center gap-1.5 text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
-                      >
-                        <TrashIcon />
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                )}
-              </tr>
-            ))}
-            {positions.length === 0 && (
+          <tbody className="divide-y divide-gray-100">
+            {isLoading ? (
               <tr>
-                <td colSpan={isAdmin ? 6 : 5} className="px-6 py-8 text-center text-sm text-gray-500">No positions found</td>
+                <td colSpan={colSpan} className="px-6 py-10 text-center text-sm text-gray-400">
+                  Loading positions...
+                </td>
               </tr>
+            ) : positions.length === 0 ? (
+              <tr>
+                <td colSpan={colSpan} className="px-6 py-10 text-center text-sm text-gray-400">
+                  No positions found
+                </td>
+              </tr>
+            ) : (
+              positions.map((position) => (
+                <tr key={position.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{position.name}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{position.company?.name || "-"}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{position.department?.name || "-"}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatSalary(position.base_salary)}</td>
+                  <td className="whitespace-nowrap px-6 py-4">
+                    <span
+                      className={`inline-flex rounded-full px-3 py-0.5 text-xs font-semibold ${
+                        position.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {position.is_active ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+                  {isAdmin && (
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <Link
+                          href={`/dashboard/positions/${position.id}/edit`}
+                          className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                        >
+                          <EditIcon />
+                          Edit
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(position.id)}
+                          className="inline-flex items-center gap-1.5 text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
+                        >
+                          <TrashIcon />
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  )}
+                </tr>
+              ))
             )}
           </tbody>
         </table>
+
+        {/* Pagination Footer */}
+        <div className="flex items-center justify-between border-t border-gray-100 px-6 py-3">
+          <p className="text-sm text-gray-500">
+            Showing {startItem} to {endItem} of {totalItems} results
+          </p>
+          <div className="flex items-center gap-1">
+            {pageNumbers.map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`min-w-[32px] h-8 rounded px-2 text-sm font-medium transition-colors ${
+                  page === safePage ? "bg-orange-500 text-white" : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              onClick={() => setCurrentPage(Math.min(safePage + 1, totalPages))}
+              disabled={safePage >= totalPages}
+              className="flex h-8 w-8 items-center justify-center rounded text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              &gt;
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500">Page per Row</span>
+            <select
+              value={perPage}
+              onChange={(e) => setPerPage(Number(e.target.value))}
+              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 focus:outline-none focus:border-orange-400"
+            >
+              {[5, 10, 25, 50, 100].map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
     </div>
   );
