@@ -25,6 +25,9 @@ type Config struct {
 	AppPort      string
 	CORSOrigins  string
 
+	SuperAdminEmail    string
+	SuperAdminPassword string
+
 	AdminEmail    string
 	AdminPassword string
 
@@ -61,6 +64,9 @@ func Load() *Config {
 
 		AppPort:     getEnv("APP_PORT", "8080"),
 		CORSOrigins: getEnv("CORS_ORIGINS", "http://localhost:3000"),
+
+		SuperAdminEmail:    getEnv("SUPERADMIN_EMAIL", "superadmin@hris.com"),
+		SuperAdminPassword: getEnv("SUPERADMIN_PASSWORD", "superadmin123"),
 
 		AdminEmail:    getEnv("ADMIN_EMAIL", "admin@hris.com"),
 		AdminPassword: getEnv("ADMIN_PASSWORD", "admin123"),

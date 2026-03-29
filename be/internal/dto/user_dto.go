@@ -6,7 +6,7 @@ type CreateUserRequest struct {
 	Name     string     `json:"name" validate:"required"`
 	Email    string     `json:"email" validate:"required,email"`
 	Password string     `json:"password" validate:"required,min=6"`
-	Role     model.Role `json:"role" validate:"required,oneof=admin hr employee"`
+	Role     model.Role `json:"role" validate:"required,oneof=superadmin admin hr employee"`
 	Phone    string     `json:"phone"`
 	Address  string     `json:"address"`
 }

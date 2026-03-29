@@ -46,6 +46,7 @@ func main() {
 	cfg := config.Load()
 	db := config.ConnectDatabase(cfg)
 
+	seedSuperAdmin(db, cfg)
 	seedAdmin(db, cfg)
 
 	// Kafka producer (fire-and-forget; logs errors if broker unavailable)
@@ -258,6 +259,35 @@ func main() {
 
 	log.Printf("Server starting on port %s", cfg.AppPort)
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", cfg.AppPort)))
+}
+
+func seedSuperAdmin(db *gorm.DB, cfg *config.Config) {
+	var count int64
+	db.Model(&model.User{}).Where("role = ?", "superadmin").Count(&count)
+	if count > 0 {
+		return
+	}
+
+	hashedPassword, err := hash.HashPassword(cfg.SuperAdminPassword)
+	if err != nil {
+		log.Printf("Failed to hash superadmin password: %v", err)
+		return
+	}
+
+	superAdmin := &model.User{
+		Name:     "Super Administrator",
+		Email:    cfg.SuperAdminEmail,
+		Password: hashedPassword,
+		Role:     model.RoleSuperAdmin,
+		IsActive: true,
+	}
+
+	if err := db.Create(superAdmin).Error; err != nil {
+		log.Printf("Failed to seed superadmin user: %v", err)
+		return
+	}
+
+	log.Printf("Superadmin user seeded: %s", cfg.SuperAdminEmail)
 }
 
 func seedAdmin(db *gorm.DB, cfg *config.Config) {
