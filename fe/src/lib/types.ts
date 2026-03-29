@@ -379,3 +379,21 @@ export interface Payroll {
   created_at: string;
   updated_at: string;
 }
+
+export type NotificationType = "info" | "success" | "warning" | "error";
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  ref_id?: string;
+  ref_type?: string;
+  is_read: boolean;
+  read_at?: string;
+  created_at: string;
+}
+
+export interface UnreadCountResponse {
+  count: number;
+}

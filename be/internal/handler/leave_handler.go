@@ -3,17 +3,20 @@ package handler
 import (
 	"hris-backend/internal/dto"
 	"hris-backend/internal/service"
+	"hris-backend/pkg/kafka"
 	"hris-backend/pkg/response"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type LeaveHandler struct {
 	leaveService service.LeaveService
+	producer     *kafka.Producer
 }
 
-func NewLeaveHandler(leaveService service.LeaveService) *LeaveHandler {
-	return &LeaveHandler{leaveService: leaveService}
+func NewLeaveHandler(leaveService service.LeaveService, producer *kafka.Producer) *LeaveHandler {
+	return &LeaveHandler{leaveService: leaveService, producer: producer}
 }
 
 // GetAll godoc
@@ -102,6 +105,26 @@ func (h *LeaveHandler) Create(c *fiber.Ctx) error {
 	if err != nil {
 		return response.Error(c, fiber.StatusBadRequest, err.Error())
 	}
+
+	// Publish Kafka event for admin/HR notification
+	if h.producer != nil {
+		empName := ""
+		if leave.Employee != nil && leave.Employee.User != nil {
+			empName = leave.Employee.User.Name
+		}
+		payload := kafka.LeaveSubmittedPayload{
+			LeaveID:      leave.ID,
+			EmployeeName: empName,
+			LeaveType:    string(leave.LeaveType),
+			TotalDays:    leave.TotalDays,
+		}
+		if msg, err := kafka.MarshalEvent(kafka.EventLeaveSubmitted, payload); err == nil {
+			h.producer.PublishAsync(msg)
+		} else {
+			log.Printf("[kafka] leave create: marshal event: %v", err)
+		}
+	}
+
 	return response.Success(c, fiber.StatusCreated, "Leave request created", leave)
 }
 
@@ -161,6 +184,31 @@ func (h *LeaveHandler) Approve(c *fiber.Ctx) error {
 	if err != nil {
 		return response.Error(c, fiber.StatusBadRequest, err.Error())
 	}
+
+	// Publish Kafka event to notify the employee
+	if h.producer != nil {
+		empUserID := ""
+		empName := ""
+		if leave.Employee != nil {
+			empUserID = leave.Employee.UserID
+			if leave.Employee.User != nil {
+				empName = leave.Employee.User.Name
+			}
+		}
+		payload := kafka.LeaveStatusChangedPayload{
+			LeaveID:         leave.ID,
+			EmployeeUserID:  empUserID,
+			EmployeeName:    empName,
+			NewStatus:       string(leave.Status),
+			RejectionReason: leave.RejectionReason,
+		}
+		if msg, err := kafka.MarshalEvent(kafka.EventLeaveStatusChanged, payload); err == nil {
+			h.producer.PublishAsync(msg)
+		} else {
+			log.Printf("[kafka] leave approve: marshal event: %v", err)
+		}
+	}
+
 	return response.Success(c, fiber.StatusOK, "Leave request updated", leave)
 }
 

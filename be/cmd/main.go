@@ -11,6 +11,7 @@ import (
 	"hris-backend/internal/repository"
 	"hris-backend/internal/service"
 	"hris-backend/pkg/hash"
+	"hris-backend/pkg/kafka"
 
 	_ "hris-backend/docs" // swagger docs
 
@@ -48,6 +49,12 @@ func main() {
 	seedSuperAdmin(db, cfg)
 	seedAdmin(db, cfg)
 
+	// Kafka producer (fire-and-forget; logs errors if broker unavailable)
+	kafkaProducer := kafka.NewProducer(cfg.KafkaBrokers, kafka.TopicNotifications)
+
+	// Notification repository (needed by both the Kafka consumer and the HTTP handler)
+	notifRepo := repository.NewNotificationRepository(db)
+
 	// Repositories
 	userRepo := repository.NewUserRepository(db)
 	companyRepo := repository.NewCompanyRepository(db)
@@ -77,6 +84,7 @@ func main() {
 	orgService := service.NewOrganizationService(companyRepo)
 	menuAccessRepo := repository.NewMenuAccessRepository(db)
 	menuAccessService := service.NewMenuAccessService(menuAccessRepo, userRepo)
+	notifService := service.NewNotificationService(notifRepo)
 
 	// Handlers
 	authHandler := handler.NewAuthHandler(authService)
@@ -89,10 +97,16 @@ func main() {
 	empSalaryHandler := handler.NewEmployeeSalaryHandler(empSalaryService)
 	holidayHandler := handler.NewHolidayHandler(holidayService)
 	attHandler := handler.NewAttendanceHandler(attService, empService)
-	leaveHandler := handler.NewLeaveHandler(leaveService)
+	leaveHandler := handler.NewLeaveHandler(leaveService, kafkaProducer)
 	payrollHandler := handler.NewPayrollHandler(payrollService, empService)
 	orgHandler := handler.NewOrganizationHandler(orgService)
 	menuAccessHandler := handler.NewMenuAccessHandler(menuAccessService)
+	notifHandler := handler.NewNotificationHandler(notifService)
+
+	// Start Kafka consumer — processes events and writes notifications to DB
+	processor := kafka.NewEventProcessor(notifRepo, userRepo)
+	consumer := kafka.NewConsumer(cfg.KafkaBrokers, kafka.TopicNotifications, "hris-notification-group", processor.Handle)
+	consumer.Start()
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
@@ -232,6 +246,13 @@ func main() {
 	menuAccess.Get("/", middleware.RoleMiddleware("admin"), menuAccessHandler.GetAll)
 	menuAccess.Post("/", middleware.RoleMiddleware("admin"), menuAccessHandler.Set)
 	menuAccess.Delete("/:user_id", middleware.RoleMiddleware("admin"), menuAccessHandler.Delete)
+
+	// Notification routes (all authenticated)
+	notifications := api.Group("/notifications", middleware.AuthMiddleware(cfg))
+	notifications.Get("/", notifHandler.GetMyNotifications)
+	notifications.Get("/unread-count", notifHandler.GetUnreadCount)
+	notifications.Put("/read-all", notifHandler.MarkAllAsRead)
+	notifications.Put("/:id/read", notifHandler.MarkAsRead)
 
 	// Swagger documentation
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)

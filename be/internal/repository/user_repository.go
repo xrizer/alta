@@ -11,6 +11,7 @@ type UserRepository interface {
 	FindByID(id string) (*model.User, error)
 	FindByEmail(email string) (*model.User, error)
 	FindAll() ([]model.User, error)
+	FindByRoles(roles []string) ([]model.User, error)
 	Update(user *model.User) error
 	Delete(id string) error
 }
@@ -53,6 +54,14 @@ func (r *userRepository) FindAll() ([]model.User, error) {
 
 func (r *userRepository) Update(user *model.User) error {
 	return r.db.Save(user).Error
+}
+
+func (r *userRepository) FindByRoles(roles []string) ([]model.User, error) {
+	var users []model.User
+	if err := r.db.Where("role IN ? AND is_active = true", roles).Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
 }
 
 func (r *userRepository) Delete(id string) error {
