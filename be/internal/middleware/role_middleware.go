@@ -13,6 +13,11 @@ func RoleMiddleware(allowedRoles ...string) fiber.Handler {
 			return response.Error(c, fiber.StatusForbidden, "Access denied")
 		}
 
+		// Superadmin bypasses all role restrictions
+		if role == "superadmin" {
+			return c.Next()
+		}
+
 		for _, allowed := range allowedRoles {
 			if role == allowed {
 				return c.Next()

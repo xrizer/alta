@@ -26,6 +26,9 @@ type Config struct {
 
 	AdminEmail    string
 	AdminPassword string
+
+	SuperAdminEmail    string
+	SuperAdminPassword string
 }
 
 func Load() *Config {
@@ -61,6 +64,9 @@ func Load() *Config {
 
 		AdminEmail:    getEnv("ADMIN_EMAIL", "admin@hris.com"),
 		AdminPassword: getEnv("ADMIN_PASSWORD", "admin123"),
+
+		SuperAdminEmail:    getEnv("SUPERADMIN_EMAIL", "superadmin@hris.com"),
+		SuperAdminPassword: getEnv("SUPERADMIN_PASSWORD", "superadmin123"),
 	}
 }
 
