@@ -382,20 +382,20 @@ export default function DashboardPage() {
                   </p>
                 </div>
               </div>
-              <div className="overflow-hidden rounded-lg border border-gray-100">
-                <div className="flex items-center justify-between bg-orange-50 px-4 py-2">
+              <div className="overflow-hidden rounded-lg border border-gray-100 dark:border-orange-900/30">
+                <div className="flex items-center justify-between bg-orange-50 dark:bg-orange-950/30 px-4 py-2">
                   <span className="text-sm text-orange-500">Late</span>
                   <span className="text-base font-bold text-orange-500">{todayAttendance.late}</span>
                 </div>
               </div>
-              <div className="overflow-hidden rounded-lg border border-gray-100">
-                <div className="flex items-center justify-between bg-green-50 px-4 py-2">
+              <div className="overflow-hidden rounded-lg border border-gray-100 dark:border-green-900/30">
+                <div className="flex items-center justify-between bg-green-50 dark:bg-green-950/30 px-4 py-2">
                   <span className="text-sm text-green-600">On Leave</span>
                   <span className="text-base font-bold text-green-600">{todayAttendance.onLeave}</span>
                 </div>
               </div>
-              <div className="overflow-hidden rounded-lg border border-gray-100">
-                <div className="flex items-center justify-between bg-red-50 px-4 py-2">
+              <div className="overflow-hidden rounded-lg border border-gray-100 dark:border-red-900/30">
+                <div className="flex items-center justify-between bg-red-50 dark:bg-red-950/30 px-4 py-2">
                   <span className="text-sm text-red-500">Absent</span>
                   <span className="text-base font-bold text-red-500">{todayAttendance.absent}</span>
                 </div>
@@ -538,7 +538,7 @@ export default function DashboardPage() {
             </ResponsiveContainer>
             <div className="flex flex-row gap-4 mt-3 sm:mt-0 sm:ml-2 sm:flex-col sm:gap-3">
               {employeeStatusData.map((entry) => (
-                <span key={entry.name} className="flex items-center gap-2 text-xs text-gray-600">
+                <span key={entry.name} className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
                   <span className="h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: entry.color }} />
                   {entry.name}
                 </span>
