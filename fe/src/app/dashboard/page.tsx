@@ -73,6 +73,13 @@ export default function DashboardPage() {
   const router = useRouter();
   const [trendPeriod, setTrendPeriod] = useState<"This Week" | "Last Week">("This Week");
 
+  // Real-time clock
+  const [currentTime, setCurrentTime] = useState(new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   // Raw API data
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [allAttendances, setAllAttendances] = useState<Attendance[]>([]);
@@ -227,14 +234,13 @@ export default function DashboardPage() {
   }, [employees]);
 
   // --- Date / Time display ---
-  const now = new Date();
-  const dayName = now.toLocaleDateString("en-US", { weekday: "long" });
-  const dateStr = now.toLocaleDateString("en-US", {
+  const dayName = currentTime.toLocaleDateString("en-US", { weekday: "long" });
+  const dateStr = currentTime.toLocaleDateString("en-US", {
     day: "2-digit",
     month: "long",
     year: "numeric",
   });
-  const timeStr = now.toLocaleTimeString("en-US", {
+  const timeStr = currentTime.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
