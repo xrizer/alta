@@ -8,6 +8,8 @@ import * as departmentsService from '@/services/department-service';
 import * as companyService from '@/services/company-service';
 import * as yup from 'yup';
 import { Company } from '@/lib/types';
+import { useContext } from 'react';
+import { ToasterContext } from '@/contexts/ToasterContext';
 
 export const createDepartmentsSchema = yup.object({
   name: yup.string().required('Name is required'),
@@ -21,6 +23,7 @@ export type CreateDepartmentsPayload = yup.InferType<
 
 const useCreateDepartments = () => {
   const router = useRouter();
+  const { setToaster } = useContext(ToasterContext);
 
   const getCompanies = async () => {
     const res = await companyService.getCompanies();
@@ -64,7 +67,11 @@ const useCreateDepartments = () => {
   } = useMutation({
     mutationFn: createDepartments,
     onSuccess: () => {
-      router.push('/dashboard/companies');
+      setToaster({
+        type: 'success',
+        message: 'Success create department',
+      });
+      router.push('/dashboard/departments');
     },
   });
 

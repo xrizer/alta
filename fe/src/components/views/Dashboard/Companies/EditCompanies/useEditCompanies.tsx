@@ -5,9 +5,10 @@ import { useRouter, useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation, useQuery } from '@tanstack/react-query';
-
+import { useContext } from 'react';
 import * as companyService from '@/services/company-service';
 import * as yup from 'yup';
+import { ToasterContext } from '@/contexts/ToasterContext';
 
 export const editCompanySchema = yup.object({
   name: yup.string().required('Name is required'),
@@ -24,7 +25,7 @@ const useEditCompanies = () => {
   const router = useRouter();
   const params = useParams();
   const companyId = params.id as string;
-
+  const { setToaster } = useContext(ToasterContext);
   const {
     control,
     handleSubmit: handleSubmitForm,
@@ -83,6 +84,10 @@ const useEditCompanies = () => {
   } = useMutation({
     mutationFn: updateCompany,
     onSuccess: () => {
+      setToaster({
+        type: 'success',
+        message: 'Success editi company',
+      });
       router.push('/dashboard/companies');
     },
   });

@@ -1,11 +1,12 @@
 'use client';
 
+import { useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation } from '@tanstack/react-query';
+import { ToasterContext } from '@/contexts/ToasterContext';
 import * as companyService from '@/services/company-service';
-
 import * as yup from 'yup';
 
 export const createCompanySchema = yup.object({
@@ -20,6 +21,7 @@ export type CreateCompanyPayload = yup.InferType<typeof createCompanySchema>;
 
 const useCreateCompanies = () => {
   const router = useRouter();
+  const { setToaster } = useContext(ToasterContext);
 
   const {
     control,
@@ -54,6 +56,11 @@ const useCreateCompanies = () => {
   } = useMutation({
     mutationFn: createCompany,
     onSuccess: () => {
+      setToaster({
+        type: 'success',
+        message: 'Success create company',
+      });
+
       router.push('/dashboard/companies');
     },
   });

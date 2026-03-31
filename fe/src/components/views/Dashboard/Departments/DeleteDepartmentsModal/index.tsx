@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { DialogClose } from '@/components/ui/dialog';
 import Typography from '@/components/ui/typography';
-import useDeleteCompaniesModal from './useDeleteCompaniesModal';
+import useDeleteDepartmentsModal from './useDeleteDepartmentsModal';
 // import useDeleteClientsModal from './useDeleteClientsModal';
 
 interface PropsTypes {
@@ -10,7 +10,7 @@ interface PropsTypes {
 
 const DeleteDepartemensModal = (props: PropsTypes) => {
   const { id } = props;
-  const { mutateDeleteCompanies } = useDeleteCompaniesModal();
+  const { mutateDeleteDepartment } = useDeleteDepartmentsModal();
 
   return (
     <div className="">
@@ -26,7 +26,7 @@ const DeleteDepartemensModal = (props: PropsTypes) => {
           <Button
             variant={'primary'}
             onClick={() => {
-              mutateDeleteCompanies(id);
+              mutateDeleteDepartment(id);
             }}>
             Hapus
           </Button>

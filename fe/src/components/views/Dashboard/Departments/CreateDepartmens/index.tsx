@@ -116,7 +116,7 @@ const CreateDepartments = () => {
           <Button type="submit" disabled={isPendingMutateCreateDepartments}>
             {isPendingMutateCreateDepartments
               ? 'Creating...'
-              : 'Create Company'}
+              : 'Create Department'}
           </Button>
         </div>
       </form>
