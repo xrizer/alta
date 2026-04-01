@@ -51,14 +51,14 @@ export default function CreateDepartmentPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Create Department</h2>
-        <p className="mt-1 text-sm text-gray-500">Add a new department</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create Department</h2>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Add a new department</p>
       </div>
-      <form onSubmit={handleSubmit} className="space-y-5 rounded-xl border border-gray-200 bg-white p-6">
+      <form onSubmit={handleSubmit} className="space-y-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
         {error && <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>}
         <div>
-          <label className="block text-sm font-semibold text-gray-900">Company *</label>
-          <select name="company_id" required value={form.company_id} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500">
+          <label className="block text-sm font-semibold text-gray-900 dark:text-white">Company *</label>
+          <select name="company_id" required value={form.company_id} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500">
             <option value="">Select a company</option>
             {companies.map((company) => (
               <option key={company.id} value={company.id}>{company.name}</option>
@@ -66,12 +66,12 @@ export default function CreateDepartmentPage() {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-900">Name *</label>
-          <input name="name" required value={form.name} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
+          <label className="block text-sm font-semibold text-gray-900 dark:text-white">Name *</label>
+          <input name="name" required value={form.name} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-900">Description</label>
-          <textarea name="description" rows={3} value={form.description} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
+          <label className="block text-sm font-semibold text-gray-900 dark:text-white">Description</label>
+          <textarea name="description" rows={3} value={form.description} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
         </div>
         <div className="flex justify-end gap-3">
           <button type="button" onClick={() => router.back()} className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50">Cancel</button>

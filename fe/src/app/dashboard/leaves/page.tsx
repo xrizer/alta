@@ -67,9 +67,9 @@ export default function LeavesPage() {
   };
 
   const statusColors: Record<string, string> = {
-    pending: "bg-yellow-100 text-yellow-800",
-    approved: "bg-green-100 text-green-800",
-    rejected: "bg-red-100 text-red-800",
+    pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+    approved: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+    rejected: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
   };
 
   const leaveTypeLabels: Record<string, string> = {
@@ -87,8 +87,8 @@ export default function LeavesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Leaves</h2>
-          <p className="mt-1 text-sm text-gray-600">Manage leave requests</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Leaves</h2>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">Manage leave requests</p>
         </div>
         {(myEmployee || !isAdminOrHr) && (
           <Link href="/dashboard/leaves/create" className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600">
@@ -97,34 +97,34 @@ export default function LeavesPage() {
         )}
       </div>
 
-      {error && <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>}
-      {success && <div className="rounded-md bg-green-50 p-4 text-sm text-green-700">{success}</div>}
+      {error && <div className="rounded-md bg-red-50 dark:bg-red-900/30 p-4 text-sm text-red-700 dark:text-red-400">{error}</div>}
+      {success && <div className="rounded-md bg-green-50 dark:bg-green-900/30 p-4 text-sm text-green-700 dark:text-green-400">{success}</div>}
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
-              {isAdminOrHr && <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Employee</th>}
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Start</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">End</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Days</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Reason</th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
-              {isAdminOrHr && <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>}
+              {isAdminOrHr && <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Employee</th>}
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Type</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Start</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">End</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Days</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Reason</th>
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Status</th>
+              {isAdminOrHr && <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Actions</th>}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {leaves.map((leave) => (
-              <tr key={leave.id} className="hover:bg-gray-50">
-                {isAdminOrHr && <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{leave.employee?.user?.name || "-"}</td>}
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{leaveTypeLabels[leave.leave_type] || leave.leave_type}</td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{leave.start_date}</td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{leave.end_date}</td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{leave.total_days}</td>
-                <td className="max-w-xs truncate px-6 py-4 text-sm text-gray-500">{leave.reason}</td>
+              <tr key={leave.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                {isAdminOrHr && <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-white">{leave.employee?.user?.name || "-"}</td>}
+                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-white">{leaveTypeLabels[leave.leave_type] || leave.leave_type}</td>
+                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{leave.start_date}</td>
+                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{leave.end_date}</td>
+                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{leave.total_days}</td>
+                <td className="max-w-xs truncate px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{leave.reason}</td>
                 <td className="whitespace-nowrap px-6 py-4">
-                  <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${statusColors[leave.status] || "bg-gray-100 text-gray-800"}`}>
+                  <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${statusColors[leave.status] || "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"}`}>
                     {leave.status}
                   </span>
                 </td>
@@ -137,14 +137,14 @@ export default function LeavesPage() {
                       </div>
                     )}
                     {leave.status === "rejected" && leave.rejection_reason && (
-                      <span className="text-xs text-gray-400" title={leave.rejection_reason}>Reason: {leave.rejection_reason}</span>
+                      <span className="text-xs text-gray-400 dark:text-gray-500" title={leave.rejection_reason}>Reason: {leave.rejection_reason}</span>
                     )}
                   </td>
                 )}
               </tr>
             ))}
             {leaves.length === 0 && (
-              <tr><td colSpan={isAdminOrHr ? 8 : 6} className="px-6 py-8 text-center text-sm text-gray-500">No leave requests found</td></tr>
+              <tr><td colSpan={isAdminOrHr ? 8 : 6} className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No leave requests found</td></tr>
             )}
           </tbody>
         </table>
