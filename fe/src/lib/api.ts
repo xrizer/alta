@@ -1,4 +1,5 @@
 import axios from "axios";
+import { reportError } from "@/lib/dynatrace";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -88,6 +89,18 @@ api.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
+    }
+
+    // Log all non-401 errors (401s are handled by the refresh logic above)
+    const status: number = error.response?.status ?? 0;
+    if (status !== 401) {
+      reportError({
+        message:
+          error.response?.data?.message ?? error.message ?? "unknown error",
+        status_code: status,
+        path: error.config?.url ?? "",
+        method: (error.config?.method ?? "").toUpperCase(),
+      });
     }
 
     return Promise.reject(error);
