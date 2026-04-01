@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import Pagination from "@/components/pagination";
 import { Payroll, Employee } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as payrollService from "@/services/payroll-service";
@@ -17,6 +18,8 @@ export default function PayrollPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showDetail, setShowDetail] = useState<Payroll | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(5);
 
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
@@ -101,6 +104,12 @@ export default function PayrollPage() {
     paid: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
   };
 
+  const totalPages = Math.max(1, Math.ceil(payrolls.length / perPage));
+  const safePage = Math.min(currentPage, totalPages);
+  const displayData = useMemo(() => payrolls.slice((safePage - 1) * perPage, safePage * perPage), [payrolls, safePage, perPage]);
+
+  useEffect(() => { setCurrentPage(1); }, [perPage, month, year]);
+
   if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-gray-500">Loading...</div></div>;
 
   return (
@@ -183,7 +192,7 @@ export default function PayrollPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {payrolls.map((p) => (
+            {displayData.map((p) => (
               <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                 <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{p.employee?.user?.name || "-"}</td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{`${p.period_month}/${p.period_year}`}</td>
@@ -206,11 +215,19 @@ export default function PayrollPage() {
                 </td>
               </tr>
             ))}
-            {payrolls.length === 0 && (
+            {displayData.length === 0 && (
               <tr><td colSpan={7} className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No payroll records found for this period</td></tr>
             )}
           </tbody>
         </table>
+        <Pagination
+          currentPage={safePage}
+          totalPages={totalPages}
+          totalItems={payrolls.length}
+          perPage={perPage}
+          onPageChange={setCurrentPage}
+          onPerPageChange={setPerPage}
+        />
       </div>
 
       {/* Detail Modal */}

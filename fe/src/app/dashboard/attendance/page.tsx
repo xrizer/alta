@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import Pagination from "@/components/pagination";
 import { Attendance, Employee } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as attendanceService from "@/services/attendance-service";
@@ -290,8 +291,6 @@ export default function AttendancePage() {
   // Pagination uses server-side values; column search/sort are client-side on the current page
   const displayData = filteredAndSorted;
   const safePage = Math.min(currentPage, Math.max(1, totalPages));
-  const startItem = totalItems === 0 ? 0 : (safePage - 1) * perPage + 1;
-  const endItem = Math.min(safePage * perPage, totalItems);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -484,59 +483,14 @@ export default function AttendancePage() {
           </table>
         </div>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 px-6 py-3">
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 dark:text-gray-400">Rows per page:</label>
-            <select
-              value={perPage}
-              onChange={(e) => setPerPage(Number(e.target.value))}
-              className="rounded border border-gray-300 dark:border-gray-600 px-2 py-1 text-sm text-gray-900 dark:text-white dark:bg-gray-700"
-            >
-              {[5, 10, 25, 50, 100].map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-              {startItem}–{endItem} of {totalItems}
-            </span>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setCurrentPage(1)}
-                disabled={safePage <= 1}
-                className="rounded border border-gray-300 dark:border-gray-600 px-2 py-1 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                &laquo;
-              </button>
-              <button
-                onClick={() => setCurrentPage(safePage - 1)}
-                disabled={safePage <= 1}
-                className="rounded border border-gray-300 dark:border-gray-600 px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Prev
-              </button>
-              <span className="px-2 text-sm text-gray-700 dark:text-gray-300">
-                Page {safePage} of {totalPages}
-              </span>
-              <button
-                onClick={() => setCurrentPage(safePage + 1)}
-                disabled={safePage >= totalPages}
-                className="rounded border border-gray-300 dark:border-gray-600 px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
-              <button
-                onClick={() => setCurrentPage(totalPages)}
-                disabled={safePage >= totalPages}
-                className="rounded border border-gray-300 dark:border-gray-600 px-2 py-1 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                &raquo;
-              </button>
-            </div>
-          </div>
-        </div>
+        <Pagination
+          currentPage={safePage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          perPage={perPage}
+          onPageChange={setCurrentPage}
+          onPerPageChange={setPerPage}
+        />
       </div>
     </div>
   );

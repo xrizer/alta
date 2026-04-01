@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
+import Pagination from "@/components/pagination";
 import { Leave, Employee } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as leaveService from "@/services/leave-service";
@@ -15,6 +16,8 @@ export default function LeavesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(5);
 
   const fetchData = useCallback(async () => {
     try {
@@ -81,6 +84,12 @@ export default function LeavesPage() {
     dinas_luar: "Dinas Luar",
   };
 
+  const totalPages = Math.max(1, Math.ceil(leaves.length / perPage));
+  const safePage = Math.min(currentPage, totalPages);
+  const displayData = useMemo(() => leaves.slice((safePage - 1) * perPage, safePage * perPage), [leaves, safePage, perPage]);
+
+  useEffect(() => { setCurrentPage(1); }, [perPage]);
+
   if (isLoading) return <div className="flex items-center justify-center py-12"><div className="text-gray-500">Loading...</div></div>;
 
   return (
@@ -115,7 +124,7 @@ export default function LeavesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {leaves.map((leave) => (
+            {displayData.map((leave) => (
               <tr key={leave.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                 {isAdminOrHr && <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-white">{leave.employee?.user?.name || "-"}</td>}
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-white">{leaveTypeLabels[leave.leave_type] || leave.leave_type}</td>
@@ -143,11 +152,19 @@ export default function LeavesPage() {
                 )}
               </tr>
             ))}
-            {leaves.length === 0 && (
+            {displayData.length === 0 && (
               <tr><td colSpan={isAdminOrHr ? 8 : 6} className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No leave requests found</td></tr>
             )}
           </tbody>
         </table>
+        <Pagination
+          currentPage={safePage}
+          totalPages={totalPages}
+          totalItems={leaves.length}
+          perPage={perPage}
+          onPageChange={setCurrentPage}
+          onPerPageChange={setPerPage}
+        />
       </div>
     </div>
   );
