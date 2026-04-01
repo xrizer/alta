@@ -187,8 +187,8 @@ export default function CompaniesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Companies</h2>
-          <p className="mt-1 text-sm text-gray-500">Manage company data</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Companies</h2>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage company data</p>
         </div>
         {isAdmin && (
           <Link
@@ -225,15 +225,15 @@ export default function CompaniesPage() {
             placeholder="Search"
             value={searchInput}
             onChange={(e) => handleSearchInput(e.target.value)}
-            className="w-64 rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+            className="w-64 rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
           />
         </div>
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-white">
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-white dark:bg-gray-800">
             <tr>
               {isAdmin && (
                 <th className="px-4 py-3 w-10">
@@ -242,7 +242,7 @@ export default function CompaniesPage() {
                     checked={allSelected}
                     ref={(el) => { if (el) el.indeterminate = someSelected; }}
                     onChange={(e) => handleSelectAll(e.target.checked)}
-                    className="rounded border-gray-300 accent-orange-500"
+                    className="rounded border-gray-300 dark:border-gray-600 accent-orange-500"
                   />
                 </th>
               )}
@@ -258,27 +258,27 @@ export default function CompaniesPage() {
                 <th
                   key={field}
                   onClick={() => handleSort(field)}
-                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer select-none hover:text-gray-900"
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer select-none hover:text-gray-900 dark:hover:text-white"
                 >
                   {label}
                   <SortIcon field={field} />
                 </th>
               ))}
-              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+              <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
             {isLoading ? (
               <tr>
-                <td colSpan={isAdmin ? 7 : 6} className="px-6 py-10 text-center text-sm text-gray-400">
+                <td colSpan={isAdmin ? 7 : 6} className="px-6 py-10 text-center text-sm text-gray-400 dark:text-gray-500">
                   Loading companies...
                 </td>
               </tr>
             ) : companies.length === 0 ? (
               <tr>
-                <td colSpan={isAdmin ? 7 : 6} className="px-6 py-10 text-center text-sm text-gray-400">
+                <td colSpan={isAdmin ? 7 : 6} className="px-6 py-10 text-center text-sm text-gray-400 dark:text-gray-500">
                   No companies found
                 </td>
               </tr>
@@ -286,7 +286,7 @@ export default function CompaniesPage() {
               companies.map((company) => (
                 <tr
                   key={company.id}
-                  className={`hover:bg-gray-50 transition-colors ${selectedIds.has(company.id) ? "bg-orange-50" : ""}`}
+                  className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${selectedIds.has(company.id) ? "bg-orange-50" : ""}`}
                 >
                   {isAdmin && (
                     <td className="px-4 py-4 w-10">
@@ -294,28 +294,28 @@ export default function CompaniesPage() {
                         type="checkbox"
                         checked={selectedIds.has(company.id)}
                         onChange={(e) => handleSelectOne(company.id, e.target.checked)}
-                        className="rounded border-gray-300 accent-orange-500"
+                        className="rounded border-gray-300 dark:border-gray-600 accent-orange-500"
                       />
                     </td>
                   )}
-                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                     {company.name}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                     {company.email || "-"}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                     {company.phone || "-"}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                     {company.npwp || "-"}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <span
                       className={`inline-flex rounded-full px-3 py-0.5 text-xs font-semibold ${
                         company.is_active
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
+                          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                          : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
                       }`}
                     >
                       {company.is_active ? "Active" : "Inactive"}
@@ -348,9 +348,9 @@ export default function CompaniesPage() {
         </table>
 
         {/* Pagination Footer */}
-        <div className="flex items-center justify-between border-t border-gray-100 px-6 py-3">
+        <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 px-6 py-3">
           {/* Left: showing info */}
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             Showing {startItem} to {endItem} of {totalItems} results
           </p>
 
@@ -363,7 +363,7 @@ export default function CompaniesPage() {
                 className={`min-w-[32px] h-8 rounded px-2 text-sm font-medium transition-colors ${
                   page === safePage
                     ? "bg-orange-500 text-white"
-                    : "text-gray-600 hover:bg-gray-100"
+                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                 }`}
               >
                 {page}
@@ -372,7 +372,7 @@ export default function CompaniesPage() {
             <button
               onClick={() => setCurrentPage(Math.min(safePage + 1, totalPages))}
               disabled={safePage >= totalPages}
-              className="flex h-8 w-8 items-center justify-center rounded text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               &gt;
             </button>
@@ -380,11 +380,11 @@ export default function CompaniesPage() {
 
           {/* Right: page per row */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Page per Row</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Page per Row</span>
             <select
               value={perPage}
               onChange={(e) => setPerPage(Number(e.target.value))}
-              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 focus:outline-none focus:border-orange-400"
+              className="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-sm text-gray-700 dark:text-white focus:outline-none focus:border-orange-400"
             >
               {[5, 10, 25, 50, 100].map((n) => (
                 <option key={n} value={n}>{n}</option>

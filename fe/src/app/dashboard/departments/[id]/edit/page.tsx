@@ -55,26 +55,26 @@ export default function EditDepartmentPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Edit Department</h2>
-        <p className="mt-1 text-sm text-gray-500">Update department information</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Department</h2>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Update department information</p>
       </div>
-      <form onSubmit={handleSubmit} className="space-y-5 rounded-xl border border-gray-200 bg-white p-6">
+      <form onSubmit={handleSubmit} className="space-y-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
         {error && <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>}
         <div>
-          <label className="block text-sm font-semibold text-gray-900">Company</label>
-          <p className="mt-1 block w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-500">{companyName}</p>
+          <label className="block text-sm font-semibold text-gray-900 dark:text-white">Company</label>
+          <p className="mt-1 block w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-gray-500 dark:text-gray-400">{companyName}</p>
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-900">Name</label>
-          <input name="name" value={form.name} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
+          <label className="block text-sm font-semibold text-gray-900 dark:text-white">Name</label>
+          <input name="name" value={form.name} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-900">Description</label>
-          <textarea name="description" rows={3} value={form.description} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
+          <label className="block text-sm font-semibold text-gray-900 dark:text-white">Description</label>
+          <textarea name="description" rows={3} value={form.description} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
         </div>
         <div className="flex items-center gap-2">
-          <input type="checkbox" name="is_active" id="is_active" checked={form.is_active} onChange={handleChange} className="h-4 w-4 rounded border-gray-300 text-orange-500 accent-orange-500" />
-          <label htmlFor="is_active" className="text-sm font-semibold text-gray-900">Active</label>
+          <input type="checkbox" name="is_active" id="is_active" checked={form.is_active} onChange={handleChange} className="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-orange-500 accent-orange-500" />
+          <label htmlFor="is_active" className="text-sm font-semibold text-gray-900 dark:text-white">Active</label>
         </div>
         <div className="flex justify-end gap-3">
           <button type="button" onClick={() => router.back()} className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50">Cancel</button>

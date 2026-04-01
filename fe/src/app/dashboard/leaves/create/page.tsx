@@ -65,15 +65,15 @@ export default function CreateLeavePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Request Leave</h2>
-        <p className="mt-1 text-sm text-gray-500">Submit a new leave request</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Request Leave</h2>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Submit a new leave request</p>
       </div>
-      <form onSubmit={handleSubmit} className="space-y-5 rounded-xl border border-gray-200 bg-white p-6">
-        {error && <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>}
+      <form onSubmit={handleSubmit} className="space-y-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+        {error && <div className="rounded-md bg-red-50 dark:bg-red-900/30 p-4 text-sm text-red-700 dark:text-red-400">{error}</div>}
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <label className="block text-sm font-semibold text-gray-900">Leave Type *</label>
-            <select name="leave_type" value={form.leave_type} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500">
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white">Leave Type *</label>
+            <select name="leave_type" value={form.leave_type} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-700 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500">
               <option value="cuti_tahunan">Cuti Tahunan</option>
               <option value="cuti_sakit">Cuti Sakit</option>
               <option value="cuti_melahirkan">Cuti Melahirkan</option>
@@ -83,21 +83,21 @@ export default function CreateLeavePage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-900">Total Days *</label>
-            <input name="total_days" type="number" min={1} required value={form.total_days} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white">Total Days *</label>
+            <input name="total_days" type="number" min={1} required value={form.total_days} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-700 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-900">Start Date *</label>
-            <input name="start_date" type="date" required value={form.start_date} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white">Start Date *</label>
+            <input name="start_date" type="date" required value={form.start_date} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-700 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-900">End Date *</label>
-            <input name="end_date" type="date" required value={form.end_date} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white">End Date *</label>
+            <input name="end_date" type="date" required value={form.end_date} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-700 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
           </div>
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-900">Reason *</label>
-          <textarea name="reason" rows={3} required value={form.reason} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
+          <label className="block text-sm font-semibold text-gray-900 dark:text-white">Reason *</label>
+          <textarea name="reason" rows={3} required value={form.reason} onChange={handleChange} className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-700 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500" />
         </div>
         <div className="flex justify-end gap-3">
           <button type="button" onClick={() => router.back()} className="rounded-lg border border-orange-500 px-4 py-2 text-sm font-medium text-orange-500 hover:bg-orange-50">Cancel</button>

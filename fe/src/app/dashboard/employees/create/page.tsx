@@ -112,7 +112,7 @@ export default function CreateEmployeePage() {
   };
 
   const inputClass =
-    "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500";
+    "mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white dark:placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500";
 
   if (isLoadingData)
     return (
@@ -124,13 +124,13 @@ export default function CreateEmployeePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Create Employee</h2>
-        <p className="mt-1 text-sm text-gray-500">Register a new employee</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create Employee</h2>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Register a new employee</p>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-5 rounded-xl border border-gray-200 bg-white p-6"
+        className="space-y-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6"
       >
         {error && (
           <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>
@@ -138,10 +138,10 @@ export default function CreateEmployeePage() {
 
         {/* Assignment Section */}
         <div>
-          <h3 className="mb-4 text-lg font-semibold text-gray-900">Assignment</h3>
+          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Assignment</h3>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-semibold text-gray-900">User *</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">User *</label>
               <select
                 name="user_id"
                 required
@@ -158,7 +158,7 @@ export default function CreateEmployeePage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">Company *</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Company *</label>
               <select
                 name="company_id"
                 required
@@ -175,7 +175,7 @@ export default function CreateEmployeePage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">Department *</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Department *</label>
               <select
                 name="department_id"
                 required
@@ -192,7 +192,7 @@ export default function CreateEmployeePage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">Position *</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Position *</label>
               <select
                 name="position_id"
                 required
@@ -209,7 +209,7 @@ export default function CreateEmployeePage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">Shift *</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Shift *</label>
               <select
                 name="shift_id"
                 required
@@ -230,10 +230,10 @@ export default function CreateEmployeePage() {
 
         {/* Employment Details Section */}
         <div>
-          <h3 className="mb-4 text-lg font-semibold text-gray-900">Employment Details</h3>
+          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Employment Details</h3>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-semibold text-gray-900">Employee Number *</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Employee Number *</label>
               <input
                 name="employee_number"
                 required
@@ -243,7 +243,7 @@ export default function CreateEmployeePage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">Join Date *</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Join Date *</label>
               <input
                 name="join_date"
                 type="date"
@@ -254,7 +254,7 @@ export default function CreateEmployeePage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">Employee Status</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Employee Status</label>
               <select
                 name="employee_status"
                 value={form.employee_status}
@@ -271,10 +271,10 @@ export default function CreateEmployeePage() {
 
         {/* Personal Information Section */}
         <div>
-          <h3 className="mb-4 text-lg font-semibold text-gray-900">Personal Information</h3>
+          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Personal Information</h3>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-semibold text-gray-900">NIK</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">NIK</label>
               <input
                 name="nik"
                 value={form.nik}
@@ -283,7 +283,7 @@ export default function CreateEmployeePage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">Gender</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Gender</label>
               <select
                 name="gender"
                 value={form.gender}
@@ -296,7 +296,7 @@ export default function CreateEmployeePage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">Birth Place</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Birth Place</label>
               <input
                 name="birth_place"
                 value={form.birth_place}
@@ -305,7 +305,7 @@ export default function CreateEmployeePage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">Birth Date</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Birth Date</label>
               <input
                 name="birth_date"
                 type="date"
@@ -315,7 +315,7 @@ export default function CreateEmployeePage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">Marital Status</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Marital Status</label>
               <select
                 name="marital_status"
                 value={form.marital_status}
@@ -329,7 +329,7 @@ export default function CreateEmployeePage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">Religion</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Religion</label>
               <input
                 name="religion"
                 value={form.religion}
@@ -342,10 +342,10 @@ export default function CreateEmployeePage() {
 
         {/* Bank & Insurance Section */}
         <div>
-          <h3 className="mb-4 text-lg font-semibold text-gray-900">Bank & Insurance</h3>
+          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Bank & Insurance</h3>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-semibold text-gray-900">Bank Name</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Bank Name</label>
               <input
                 name="bank_name"
                 value={form.bank_name}
@@ -354,7 +354,7 @@ export default function CreateEmployeePage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">Bank Account</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Bank Account</label>
               <input
                 name="bank_account"
                 value={form.bank_account}
@@ -363,7 +363,7 @@ export default function CreateEmployeePage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">BPJS Kesehatan No</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">BPJS Kesehatan No</label>
               <input
                 name="bpjs_kes_no"
                 value={form.bpjs_kes_no}
@@ -372,7 +372,7 @@ export default function CreateEmployeePage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">BPJS Ketenagakerjaan No</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">BPJS Ketenagakerjaan No</label>
               <input
                 name="bpjs_tk_no"
                 value={form.bpjs_tk_no}
@@ -381,7 +381,7 @@ export default function CreateEmployeePage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900">NPWP</label>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">NPWP</label>
               <input
                 name="npwp"
                 value={form.npwp}

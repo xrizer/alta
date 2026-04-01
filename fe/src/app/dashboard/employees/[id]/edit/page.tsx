@@ -140,9 +140,9 @@ export default function EditEmployeePage() {
   };
 
   const inputClass =
-    "mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500";
+    "mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white dark:placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500";
   const readOnlyClass =
-    "mt-1 block w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-500";
+    "mt-1 block w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-gray-500 dark:text-gray-400";
 
   if (isLoading)
     return (
@@ -154,13 +154,13 @@ export default function EditEmployeePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Edit Employee</h2>
-        <p className="mt-1 text-sm text-gray-500">Update employee information</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Employee</h2>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Update employee information</p>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-5 rounded-xl border border-gray-200 bg-white p-6"
+        className="space-y-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6"
       >
         {error && (
           <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>

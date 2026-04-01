@@ -106,14 +106,14 @@ export default function PayslipsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Payslips</h2>
-        <p className="mt-1 text-sm text-gray-600">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Payslips</h2>
+        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
           View and print your salary slips
         </p>
       </div>
 
       {error && (
-        <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-md bg-red-50 dark:bg-red-900/30 p-4 text-sm text-red-700 dark:text-red-400">
           {error}
         </div>
       )}
@@ -123,7 +123,7 @@ export default function PayslipsPage() {
         <select
           value={month}
           onChange={(e) => setMonth(Number(e.target.value))}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900"
+          className="rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm text-gray-900 dark:text-white dark:bg-gray-700"
         >
           {Array.from({ length: 12 }, (_, i) => (
             <option key={i + 1} value={i + 1}>
@@ -134,7 +134,7 @@ export default function PayslipsPage() {
         <select
           value={year}
           onChange={(e) => setYear(Number(e.target.value))}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900"
+          className="rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm text-gray-900 dark:text-white dark:bg-gray-700"
         >
           {Array.from({ length: 5 }, (_, i) => {
             const y = now.getFullYear() - 2 + i;
@@ -148,56 +148,56 @@ export default function PayslipsPage() {
       </div>
 
       {/* Payslips Table */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
               {isAdminOrHR && (
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                   Employee
                 </th>
               )}
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                 Period
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                 Gross Salary
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                 Deductions
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                 Net Salary
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                 Paid Date
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {payslips.map((p) => (
-              <tr key={p.id} className="hover:bg-gray-50">
+              <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                 {isAdminOrHR && (
-                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                     {p.employee?.user?.name || "-"}
                   </td>
                 )}
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                   {formatPeriod(p.period_month, p.period_year)}
                 </td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                   {formatCurrency(p.gross_salary)}
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-red-500">
                   {formatCurrency(p.total_deductions)}
                 </td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-gray-900">
+                <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">
                   {formatCurrency(p.net_salary)}
                 </td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                   {formatDate(p.paid_at)}
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm">
@@ -214,7 +214,7 @@ export default function PayslipsPage() {
               <tr>
                 <td
                   colSpan={isAdminOrHR ? 7 : 6}
-                  className="px-6 py-8 text-center text-sm text-gray-500"
+                  className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400"
                 >
                   No payslips found for this period
                 </td>
