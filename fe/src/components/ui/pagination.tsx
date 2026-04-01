@@ -62,7 +62,7 @@ function PaginationLink({
       aria-current={isActive ? 'page' : undefined}
       data-active={isActive}
       className={cn(
-        'flex h-9 min-w-9 items-center justify-center px-3 text-sm',
+        'flex h-9 min-w-9 items-center justify-center px-3 text-sm cursor-pointer',
         isActive
           ? 'bg-input text-muted-600 font-semibold'
           : 'text-muted-foreground hover:bg-muted',

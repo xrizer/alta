@@ -50,37 +50,39 @@ export function TablePagination({
 
   const pages = getPageRange(page, totalPages);
 
+  const changePage = (next: number) => {
+    const safe = Math.min(Math.max(next, 1), totalPages);
+    if (safe !== page) onChange(safe);
+  };
+
   return (
     <Pagination>
       <PaginationContent>
-        {/* Previous */}
-        <PaginationItem>
-          <PaginationPrevious
-            onClick={() => onChange(page - 1)}
-            aria-disabled={page === 1}
-          />
-        </PaginationItem>
+        {page > 1 && (
+          <PaginationItem>
+            <PaginationPrevious onClick={() => changePage(page - 1)} />
+          </PaginationItem>
+        )}
 
-        {/* Pages */}
         {pages.map((p, idx) => (
           <PaginationItem key={idx}>
             {p === 'ellipsis' ? (
               <PaginationEllipsis />
             ) : (
-              <PaginationLink isActive={p === page} onClick={() => onChange(p)}>
+              <PaginationLink
+                isActive={p === page}
+                onClick={() => changePage(p)}>
                 {p}
               </PaginationLink>
             )}
           </PaginationItem>
         ))}
 
-        {/* Next */}
-        <PaginationItem>
-          <PaginationNext
-            onClick={() => onChange(page + 1)}
-            aria-disabled={page === totalPages}
-          />
-        </PaginationItem>
+        {page < totalPages && (
+          <PaginationItem>
+            <PaginationNext onClick={() => changePage(page + 1)} />
+          </PaginationItem>
+        )}
       </PaginationContent>
     </Pagination>
   );
