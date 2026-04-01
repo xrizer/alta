@@ -12,6 +12,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { convertIDR } from '@/lib/utils';
 
 export type Positions = {
   id: string;
@@ -75,7 +76,7 @@ export const PositionsColumn: ColumnDef<Positions>[] = [
     header: () => <Typography variant="bodyBold">Base Salary</Typography>,
     cell: ({ row }) => (
       <Typography variant="bodyRegular">
-        {row.getValue('base_salary')}
+        {convertIDR(row.getValue('base_salary'))}
       </Typography>
     ),
   },
