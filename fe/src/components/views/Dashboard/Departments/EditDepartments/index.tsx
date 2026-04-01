@@ -40,7 +40,7 @@ const EditDepartments = () => {
                 type="text"
                 placeholder="PT Alta Indonesia"
                 label="Company"
-                value={companies.find((c) => c.id === field.value)?.name}
+                value={companies.find((c) => c.id === field.value)?.name || ''}
                 autoComplete="off"
                 disabled
                 isInvalid={errors.company_id !== undefined}
