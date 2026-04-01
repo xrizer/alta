@@ -6,20 +6,10 @@ import { Shift, Company } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as shiftService from "@/services/shift-service";
 import * as companyService from "@/services/company-service";
+import Pagination from "@/components/pagination";
 
 type SortField = "name" | "company" | "start_time" | "end_time" | "is_active";
 type SortOrder = "asc" | "desc";
-
-function getPageNumbers(current: number, total: number, maxVisible = 3): number[] {
-  if (total <= maxVisible) return Array.from({ length: total }, (_, i) => i + 1);
-  let start = Math.max(1, current - Math.floor(maxVisible / 2));
-  let end = start + maxVisible - 1;
-  if (end > total) {
-    end = total;
-    start = Math.max(1, end - maxVisible + 1);
-  }
-  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-}
 
 const EditIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -150,10 +140,7 @@ export default function ShiftsPage() {
   const totalItems = sorted.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
   const safePage = Math.min(Math.max(currentPage, 1), totalPages);
-  const startItem = totalItems === 0 ? 0 : (safePage - 1) * perPage + 1;
-  const endItem = Math.min(safePage * perPage, totalItems);
   const shifts = sorted.slice((safePage - 1) * perPage, safePage * perPage);
-  const pageNumbers = getPageNumbers(safePage, totalPages);
 
   const colSpan = isAdmin ? 6 : 5;
 
@@ -279,44 +266,14 @@ export default function ShiftsPage() {
           </tbody>
         </table>
 
-        {/* Pagination Footer */}
-        <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 px-6 py-3">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Showing {startItem} to {endItem} of {totalItems} results
-          </p>
-          <div className="flex items-center gap-1">
-            {pageNumbers.map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`min-w-[32px] h-8 rounded px-2 text-sm font-medium transition-colors ${
-                  page === safePage ? "bg-orange-500 text-white" : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-            <button
-              onClick={() => setCurrentPage(Math.min(safePage + 1, totalPages))}
-              disabled={safePage >= totalPages}
-              className="flex h-8 w-8 items-center justify-center rounded text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              &gt;
-            </button>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500 dark:text-gray-400">Page per Row</span>
-            <select
-              value={perPage}
-              onChange={(e) => setPerPage(Number(e.target.value))}
-              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 focus:outline-none focus:border-orange-400 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            >
-              {[5, 10, 25, 50, 100].map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </div>
-        </div>
+        <Pagination
+          currentPage={safePage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          perPage={perPage}
+          onPageChange={setCurrentPage}
+          onPerPageChange={setPerPage}
+        />
       </div>
     </div>
   );
