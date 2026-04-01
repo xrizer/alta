@@ -1,24 +1,20 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import Image from "next/image";
-import { usePathname } from "next/navigation";
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import {
   Home,
   ChevronLeft,
   ChevronRight,
-  Users,
   FileText,
   Clock,
   Calendar,
   DollarSign,
-  Shield,
-  Briefcase,
-  GitBranch,
   X,
-} from "react-feather";
-import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/auth-context";
+} from 'react-feather';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/auth-context';
 import {
   getActiveTab,
   getVisibleTabs,
@@ -26,28 +22,40 @@ import {
   isTabActive,
   isSubItemActive,
   type SubMenuItem,
-} from "@/lib/menu-config";
+} from '@/lib/menu-config';
+import {
+  Briefcase,
+  Copy,
+  House,
+  Settings,
+  Share2,
+  Shield,
+  Target,
+  User,
+  Users2,
+  Wrench,
+} from 'lucide-react';
 
 // Map backend menu keys to react-feather icons
 const menuIconMap: Record<string, React.ReactNode> = {
-  companies: <Users size={18} />,
-  departments: <Users size={18} />,
-  positions: <FileText size={18} />,
-  shifts: <FileText size={18} />,
-  organization_structure: <GitBranch size={18} />,
-  users: <Users size={18} />,
-  employees: <Briefcase size={18} />,
+  companies: <Copy size={18} />,
+  departments: <House size={18} />,
+  positions: <Target size={18} />,
+  shifts: <Settings size={18} />,
+  organization_structure: <Share2 size={18} />,
+  users: <User size={18} />,
+  employees: <Users2 size={18} />,
   attendance: <Clock size={18} />,
   leaves: <Calendar size={18} />,
   payroll: <DollarSign size={18} />,
   payslips: <FileText size={18} />,
-  menu_access_policy: <Shield size={18} />,
+  menu_access_policy: <Wrench size={18} />,
 };
 
 const tabIconMap: Record<string, React.ReactNode> = {
   Dashboard: <Home size={18} />,
   Organization: <Briefcase size={18} />,
-  People: <Users size={18} />,
+  People: <User size={18} />,
   Attendance: <Clock size={18} />,
   Payroll: <DollarSign size={18} />,
   Administration: <Shield size={18} />,
@@ -74,34 +82,31 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
     ? getVisibleSubItems(activeTab.subItems, allowedMenuKeys)
     : [];
 
-  const isDashboardActive = pathname === "/dashboard";
+  const isDashboardActive = pathname === '/dashboard';
 
   // Logo section (shared between mobile and desktop)
   const logoSection = (
     <div
       className={`flex h-16 items-center border-b border-gray-100 dark:border-gray-700 ${
         collapsed && !mobileOpen
-          ? "justify-center gap-0 px-2"
-          : "justify-between px-4"
-      }`}
-    >
+          ? 'justify-center gap-0 px-2'
+          : 'justify-between px-4'
+      }`}>
       {collapsed && !mobileOpen ? (
         <div className="flex w-full items-center justify-between px-1">
           <div
             className="flex-shrink-0 overflow-hidden"
-            style={{ height: "12px", width: "24px" }}
-          >
+            style={{ height: '12px', width: '24px' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo.png"
               alt="Alta"
-              style={{ height: "12px", width: "auto" }}
+              style={{ height: '12px', width: 'auto' }}
             />
           </div>
           <button
             onClick={() => setCollapsed(false)}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-          >
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
             <ChevronRight size={14} />
           </button>
         </div>
@@ -117,15 +122,13 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           {mobileOpen ? (
             <button
               onClick={onMobileClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 md:hidden"
-            >
+              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 md:hidden">
               <X size={20} />
             </button>
           ) : (
             <button
               onClick={() => setCollapsed(true)}
-              className="hidden text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 md:block"
-            >
+              className="hidden text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 md:block">
               <ChevronLeft size={18} />
             </button>
           )}
@@ -149,11 +152,10 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                 href={sub.href}
                 className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   active
-                    ? "bg-orange-50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
-                } ${isCollapsedDesktop ? "justify-center" : ""}`}
-                title={isCollapsedDesktop ? sub.name : undefined}
-              >
+                    ? 'bg-orange-50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100'
+                } ${isCollapsedDesktop ? 'justify-center' : ''}`}
+                title={isCollapsedDesktop ? sub.name : undefined}>
                 {icon}
                 {!isCollapsedDesktop && <span>{sub.name}</span>}
               </Link>
@@ -165,11 +167,10 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           href="/dashboard"
           className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
             isDashboardActive
-              ? "bg-orange-50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400"
-              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
-          } ${collapsed && !mobileOpen ? "justify-center" : ""}`}
-          title={collapsed && !mobileOpen ? "Overview" : undefined}
-        >
+              ? 'bg-orange-50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400'
+              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100'
+          } ${collapsed && !mobileOpen ? 'justify-center' : ''}`}
+          title={collapsed && !mobileOpen ? 'Overview' : undefined}>
           <Home size={18} />
           {!(collapsed && !mobileOpen) && <span>Overview</span>}
         </Link>
@@ -191,10 +192,9 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                 href={tab.href}
                 className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
                   tabActive
-                    ? "text-orange-600 dark:text-orange-400"
-                    : "text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100"
-                }`}
-              >
+                    ? 'text-orange-600 dark:text-orange-400'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100'
+                }`}>
                 {tabIcon}
                 <span>{tab.name}</span>
               </Link>
@@ -209,10 +209,9 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                         href={sub.href}
                         className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                           subActive
-                            ? "bg-orange-50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400"
-                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
-                        }`}
-                      >
+                            ? 'bg-orange-50 text-orange-600 dark:bg-orange-950/30 dark:text-orange-400'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100'
+                        }`}>
                         {icon}
                         <span>{sub.name}</span>
                       </Link>
@@ -239,9 +238,8 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       {/* Desktop sidebar */}
       <aside
         className={`hidden md:flex h-screen flex-col border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 transition-all duration-300 ${
-          collapsed ? "w-16" : "w-60"
-        }`}
-      >
+          collapsed ? 'w-16' : 'w-60'
+        }`}>
         {sidebarContent}
       </aside>
 
