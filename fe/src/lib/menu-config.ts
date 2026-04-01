@@ -64,6 +64,7 @@ export const navTabs: NavTab[] = [
     menuKeys: ["attendance", "leaves"],
     subItems: [
       { name: "Attendance", key: "attendance", href: "/dashboard/attendance" },
+      { name: "Check In / Check Out", key: "attendance", href: "/dashboard/attendance/checkin" },
       { name: "Leaves", key: "leaves", href: "/dashboard/leaves" },
     ],
   },
