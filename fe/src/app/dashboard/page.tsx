@@ -73,6 +73,13 @@ export default function DashboardPage() {
   const router = useRouter();
   const [trendPeriod, setTrendPeriod] = useState<"This Week" | "Last Week">("This Week");
 
+  // Real-time clock
+  const [currentTime, setCurrentTime] = useState(new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   // Raw API data
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [allAttendances, setAllAttendances] = useState<Attendance[]>([]);
@@ -227,14 +234,13 @@ export default function DashboardPage() {
   }, [employees]);
 
   // --- Date / Time display ---
-  const now = new Date();
-  const dayName = now.toLocaleDateString("en-US", { weekday: "long" });
-  const dateStr = now.toLocaleDateString("en-US", {
+  const dayName = currentTime.toLocaleDateString("en-US", { weekday: "long" });
+  const dateStr = currentTime.toLocaleDateString("en-US", {
     day: "2-digit",
     month: "long",
     year: "numeric",
   });
-  const timeStr = now.toLocaleTimeString("en-US", {
+  const timeStr = currentTime.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -382,21 +388,21 @@ export default function DashboardPage() {
                   </p>
                 </div>
               </div>
-              <div className="overflow-hidden rounded-lg border border-gray-100">
-                <div className="flex items-center justify-between bg-orange-50 px-4 py-2">
-                  <span className="text-sm text-orange-500">Late</span>
+              <div className="rounded-lg border border-gray-100 dark:border-gray-700 dark:bg-gray-800 border-l-4 border-l-orange-500 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2">
+                  <span className="text-sm text-orange-500 font-medium">Late</span>
                   <span className="text-base font-bold text-orange-500">{todayAttendance.late}</span>
                 </div>
               </div>
-              <div className="overflow-hidden rounded-lg border border-gray-100">
-                <div className="flex items-center justify-between bg-green-50 px-4 py-2">
-                  <span className="text-sm text-green-600">On Leave</span>
-                  <span className="text-base font-bold text-green-600">{todayAttendance.onLeave}</span>
+              <div className="rounded-lg border border-gray-100 dark:border-gray-700 dark:bg-gray-800 border-l-4 border-l-green-500 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2">
+                  <span className="text-sm text-green-500 font-medium">On Leave</span>
+                  <span className="text-base font-bold text-green-500">{todayAttendance.onLeave}</span>
                 </div>
               </div>
-              <div className="overflow-hidden rounded-lg border border-gray-100">
-                <div className="flex items-center justify-between bg-red-50 px-4 py-2">
-                  <span className="text-sm text-red-500">Absent</span>
+              <div className="rounded-lg border border-gray-100 dark:border-gray-700 dark:bg-gray-800 border-l-4 border-l-red-500 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2">
+                  <span className="text-sm text-red-500 font-medium">Absent</span>
                   <span className="text-base font-bold text-red-500">{todayAttendance.absent}</span>
                 </div>
               </div>
@@ -538,7 +544,7 @@ export default function DashboardPage() {
             </ResponsiveContainer>
             <div className="flex flex-row gap-4 mt-3 sm:mt-0 sm:ml-2 sm:flex-col sm:gap-3">
               {employeeStatusData.map((entry) => (
-                <span key={entry.name} className="flex items-center gap-2 text-xs text-gray-600">
+                <span key={entry.name} className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
                   <span className="h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: entry.color }} />
                   {entry.name}
                 </span>

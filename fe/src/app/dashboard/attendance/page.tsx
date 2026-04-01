@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import Pagination from "@/components/pagination";
 import { Attendance, Employee } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as attendanceService from "@/services/attendance-service";
@@ -200,15 +201,15 @@ export default function AttendancePage() {
   };
 
   const statusColors: Record<string, string> = {
-    hadir: "bg-green-100 text-green-800",
-    terlambat: "bg-yellow-100 text-yellow-800",
-    alpha: "bg-red-100 text-red-800",
-    izin: "bg-blue-100 text-blue-800",
-    sakit: "bg-purple-100 text-purple-800",
-    cuti: "bg-indigo-100 text-indigo-800",
-    early_in: "bg-cyan-100 text-cyan-800",
-    on_time: "bg-green-100 text-green-800",
-    late_in: "bg-orange-100 text-orange-800",
+    hadir: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+    terlambat: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+    alpha: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+    izin: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+    sakit: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+    cuti: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400",
+    early_in: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400",
+    on_time: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+    late_in: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
   };
 
   const statusLabels: Record<string, string> = {
@@ -290,8 +291,6 @@ export default function AttendancePage() {
   // Pagination uses server-side values; column search/sort are client-side on the current page
   const displayData = filteredAndSorted;
   const safePage = Math.min(currentPage, Math.max(1, totalPages));
-  const startItem = totalItems === 0 ? 0 : (safePage - 1) * perPage + 1;
-  const endItem = Math.min(safePage * perPage, totalItems);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -315,14 +314,14 @@ export default function AttendancePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Attendance</h2>
-          <p className="mt-1 text-sm text-gray-600">Track daily attendance</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Attendance</h2>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">Track daily attendance</p>
         </div>
         {isAdminOrHr && (
           <div className="flex items-center gap-2">
             <button
               onClick={handleDownloadTemplate}
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Download Template
             </button>
@@ -341,14 +340,14 @@ export default function AttendancePage() {
         )}
       </div>
 
-      {error && <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>}
-      {success && <div className="rounded-md bg-green-50 p-4 text-sm text-green-700">{success}</div>}
+      {error && <div className="rounded-md bg-red-50 dark:bg-red-900/30 p-4 text-sm text-red-700 dark:text-red-400">{error}</div>}
+      {success && <div className="rounded-md bg-green-50 dark:bg-green-900/30 p-4 text-sm text-green-700 dark:text-green-400">{success}</div>}
 
       {/* Import Result Details */}
       {importResult && importResult.errors.length > 0 && (
-        <div className="rounded-md border border-yellow-200 bg-yellow-50 p-4">
-          <p className="text-sm font-medium text-yellow-800">Import completed with {importResult.errors.length} error(s):</p>
-          <ul className="mt-2 max-h-32 overflow-y-auto text-sm text-yellow-700">
+        <div className="rounded-md border border-yellow-200 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/30 p-4">
+          <p className="text-sm font-medium text-yellow-800 dark:text-yellow-400">Import completed with {importResult.errors.length} error(s):</p>
+          <ul className="mt-2 max-h-32 overflow-y-auto text-sm text-yellow-700 dark:text-yellow-400">
             {importResult.errors.map((err, i) => (
               <li key={i}>- {err}</li>
             ))}
@@ -358,9 +357,9 @@ export default function AttendancePage() {
 
       {/* Clock In/Out Card */}
       {myEmployee && (
-        <div className="rounded-xl border border-gray-200 bg-white p-6">
-          <h3 className="text-lg font-semibold text-gray-900">Today&apos;s Attendance</h3>
-          <p className="mt-1 text-sm text-gray-500">{new Date().toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Today&apos;s Attendance</h3>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{new Date().toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
           <div className="mt-4 flex items-center gap-4">
             {!todayAttendance ? (
               <button onClick={handleClockIn} className="rounded-lg bg-green-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700">
@@ -368,13 +367,13 @@ export default function AttendancePage() {
               </button>
             ) : !todayAttendance.clock_out ? (
               <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">Clocked in at {formatTime(todayAttendance.clock_in)}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Clocked in at {formatTime(todayAttendance.clock_in)}</span>
                 <button onClick={handleClockOut} className="rounded-lg bg-red-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-red-700">
                   Clock Out
                 </button>
               </div>
             ) : (
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
                 Clocked in: {formatTime(todayAttendance.clock_in)} — Clocked out: {formatTime(todayAttendance.clock_out)}
               </div>
             )}
@@ -384,36 +383,36 @@ export default function AttendancePage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-4">
-        <select value={month} onChange={(e) => setMonth(Number(e.target.value))} className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900">
+        <select value={month} onChange={(e) => setMonth(Number(e.target.value))} className="rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm text-gray-900 dark:text-white dark:bg-gray-700">
           {Array.from({ length: 12 }, (_, i) => (
             <option key={i + 1} value={i + 1}>{new Date(2000, i).toLocaleString("id-ID", { month: "long" })}</option>
           ))}
         </select>
-        <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900">
+        <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm text-gray-900 dark:text-white dark:bg-gray-700">
           {Array.from({ length: 5 }, (_, i) => {
             const y = now.getFullYear() - 2 + i;
             return <option key={y} value={y}>{y}</option>;
           })}
         </select>
         <div className="flex items-center gap-2">
-          <label className="text-sm text-gray-600">From</label>
+          <label className="text-sm text-gray-600 dark:text-gray-400">From</label>
           <input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900"
+            className="rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm text-gray-900 dark:text-white dark:bg-gray-700"
           />
-          <label className="text-sm text-gray-600">To</label>
+          <label className="text-sm text-gray-600 dark:text-gray-400">To</label>
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900"
+            className="rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm text-gray-900 dark:text-white dark:bg-gray-700"
           />
           {(startDate || endDate) && (
             <button
               onClick={() => { setStartDate(""); setEndDate(""); }}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-500 hover:bg-gray-50"
+              className="rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Clear
             </button>
@@ -425,118 +424,73 @@ export default function AttendancePage() {
             placeholder="Search all columns..."
             value={globalSearch}
             onChange={(e) => setGlobalSearch(e.target.value)}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 w-64"
+            className="rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm text-gray-900 dark:text-white dark:bg-gray-700 w-64"
           />
         </div>
       </div>
 
       {/* Attendance Table */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none" onClick={() => handleSort("date")}>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300 cursor-pointer select-none" onClick={() => handleSort("date")}>
                   Date<SortIcon columnKey="date" />
                 </th>
                 {isAdminOrHr && (
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none" onClick={() => handleSort("employee")}>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300 cursor-pointer select-none" onClick={() => handleSort("employee")}>
                     Employee<SortIcon columnKey="employee" />
                   </th>
                 )}
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none" onClick={() => handleSort("clock_in")}>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300 cursor-pointer select-none" onClick={() => handleSort("clock_in")}>
                   Clock In<SortIcon columnKey="clock_in" />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none" onClick={() => handleSort("clock_out")}>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300 cursor-pointer select-none" onClick={() => handleSort("clock_out")}>
                   Clock Out<SortIcon columnKey="clock_out" />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none" onClick={() => handleSort("status")}>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300 cursor-pointer select-none" onClick={() => handleSort("status")}>
                   Status<SortIcon columnKey="status" />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none" onClick={() => handleSort("overtime")}>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300 cursor-pointer select-none" onClick={() => handleSort("overtime")}>
                   Overtime<SortIcon columnKey="overtime" />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 cursor-pointer select-none" onClick={() => handleSort("notes")}>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300 cursor-pointer select-none" onClick={() => handleSort("notes")}>
                   Notes<SortIcon columnKey="notes" />
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {displayData.map((att) => (
-                <tr key={att.id} className="hover:bg-gray-50">
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{att.date}</td>
-                  {isAdminOrHr && <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{att.employee?.user?.name || "-"}</td>}
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatTime(att.clock_in)}</td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatTime(att.clock_out)}</td>
+                <tr key={att.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-white">{att.date}</td>
+                  {isAdminOrHr && <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-white">{att.employee?.user?.name || "-"}</td>}
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{formatTime(att.clock_in)}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{formatTime(att.clock_out)}</td>
                   <td className="whitespace-nowrap px-6 py-4">
-                    <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${statusColors[att.status] || "bg-gray-100 text-gray-800"}`}>
+                    <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${statusColors[att.status] || "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"}`}>
                       {statusLabels[att.status] || att.status}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{att.overtime_hours > 0 ? `${att.overtime_hours}h` : "-"}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{att.notes || "-"}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{att.overtime_hours > 0 ? `${att.overtime_hours}h` : "-"}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{att.notes || "-"}</td>
                 </tr>
               ))}
               {displayData.length === 0 && (
-                <tr><td colSpan={isAdminOrHr ? 7 : 6} className="px-6 py-8 text-center text-sm text-gray-500">No attendance records found</td></tr>
+                <tr><td colSpan={isAdminOrHr ? 7 : 6} className="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">No attendance records found</td></tr>
               )}
             </tbody>
           </table>
         </div>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between border-t border-gray-200 px-6 py-3">
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600">Rows per page:</label>
-            <select
-              value={perPage}
-              onChange={(e) => setPerPage(Number(e.target.value))}
-              className="rounded border border-gray-300 px-2 py-1 text-sm text-gray-900"
-            >
-              {[5, 10, 25, 50, 100].map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">
-              {startItem}–{endItem} of {totalItems}
-            </span>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setCurrentPage(1)}
-                disabled={safePage <= 1}
-                className="rounded border border-gray-300 px-2 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                &laquo;
-              </button>
-              <button
-                onClick={() => setCurrentPage(safePage - 1)}
-                disabled={safePage <= 1}
-                className="rounded border border-gray-300 px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Prev
-              </button>
-              <span className="px-2 text-sm text-gray-700">
-                Page {safePage} of {totalPages}
-              </span>
-              <button
-                onClick={() => setCurrentPage(safePage + 1)}
-                disabled={safePage >= totalPages}
-                className="rounded border border-gray-300 px-3 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
-              <button
-                onClick={() => setCurrentPage(totalPages)}
-                disabled={safePage >= totalPages}
-                className="rounded border border-gray-300 px-2 py-1 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                &raquo;
-              </button>
-            </div>
-          </div>
-        </div>
+        <Pagination
+          currentPage={safePage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          perPage={perPage}
+          onPageChange={setCurrentPage}
+          onPerPageChange={setPerPage}
+        />
       </div>
     </div>
   );

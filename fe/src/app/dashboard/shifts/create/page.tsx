@@ -52,20 +52,20 @@ export default function CreateShiftPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Create Shift</h2>
-        <p className="mt-1 text-sm text-gray-500">Add a new work shift</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create Shift</h2>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Add a new work shift</p>
       </div>
-      <form onSubmit={handleSubmit} className="space-y-5 rounded-xl border border-gray-200 bg-white p-6">
+      <form onSubmit={handleSubmit} className="space-y-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
         {error && <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>}
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div className="md:col-span-2">
-            <label className="block text-sm font-semibold text-gray-900">Company *</label>
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white">Company *</label>
             <select
               name="company_id"
               required
               value={form.company_id}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
               <option value="">Select a company</option>
               {companies.map((company) => (
@@ -76,13 +76,13 @@ export default function CreateShiftPage() {
             </select>
           </div>
           <div className="md:col-span-2">
-            <label className="block text-sm font-semibold text-gray-900">Name *</label>
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white">Name *</label>
             <input
               name="name"
               required
               value={form.name}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
             />
           </div>
           <div>

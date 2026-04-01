@@ -5,20 +5,10 @@ import Link from "next/link";
 import { Employee } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as employeeService from "@/services/employee-service";
+import Pagination from "@/components/pagination";
 
 type SortField = "employee_number" | "name" | "department" | "position" | "employee_status" | "join_date";
 type SortOrder = "asc" | "desc";
-
-function getPageNumbers(current: number, total: number, maxVisible = 3): number[] {
-  if (total <= maxVisible) return Array.from({ length: total }, (_, i) => i + 1);
-  let start = Math.max(1, current - Math.floor(maxVisible / 2));
-  let end = start + maxVisible - 1;
-  if (end > total) {
-    end = total;
-    start = Math.max(1, end - maxVisible + 1);
-  }
-  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-}
 
 const EditIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -108,11 +98,11 @@ export default function EmployeesPage() {
 
   const statusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      tetap: "bg-green-100 text-green-800",
-      kontrak: "bg-yellow-100 text-yellow-800",
-      probation: "bg-blue-100 text-blue-800",
+      tetap: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+      kontrak: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+      probation: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
     };
-    return styles[status] || "bg-gray-100 text-gray-800";
+    return styles[status] || "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
   };
 
   const filtered = allEmployees.filter((emp) => {
@@ -141,10 +131,7 @@ export default function EmployeesPage() {
   const totalItems = sorted.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
   const safePage = Math.min(Math.max(currentPage, 1), totalPages);
-  const startItem = totalItems === 0 ? 0 : (safePage - 1) * perPage + 1;
-  const endItem = Math.min(safePage * perPage, totalItems);
   const employees = sorted.slice((safePage - 1) * perPage, safePage * perPage);
-  const pageNumbers = getPageNumbers(safePage, totalPages);
 
   const colSpan = isAdmin ? 7 : 6;
 
@@ -153,8 +140,8 @@ export default function EmployeesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Employees</h2>
-          <p className="mt-1 text-sm text-gray-500">Manage employee data</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Employees</h2>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage employee data</p>
         </div>
         {isAdmin && (
           <Link
@@ -182,15 +169,15 @@ export default function EmployeesPage() {
             placeholder="Search"
             value={searchInput}
             onChange={(e) => handleSearchInput(e.target.value)}
-            className="w-64 rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+            className="w-64 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 pl-9 pr-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
           />
         </div>
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-white">
+      <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-white dark:bg-gray-700">
             <tr>
               {(
                 [
@@ -205,18 +192,18 @@ export default function EmployeesPage() {
                 <th
                   key={field}
                   onClick={() => handleSort(field)}
-                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer select-none hover:text-gray-900"
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer select-none hover:text-gray-900 dark:hover:text-white"
                 >
                   {label}
                   <SortIcon field={field} />
                 </th>
               ))}
               {isAdmin && (
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Actions</th>
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
             {isLoading ? (
               <tr>
                 <td colSpan={colSpan} className="px-6 py-10 text-center text-sm text-gray-400">
@@ -231,17 +218,17 @@ export default function EmployeesPage() {
               </tr>
             ) : (
               employees.map((emp) => (
-                <tr key={emp.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{emp.employee_number}</td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{emp.user?.name || "-"}</td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{emp.department?.name || "-"}</td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{emp.position?.name || "-"}</td>
+                <tr key={emp.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{emp.employee_number}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-white">{emp.user?.name || "-"}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{emp.department?.name || "-"}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{emp.position?.name || "-"}</td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <span className={`inline-flex rounded-full px-3 py-0.5 text-xs font-semibold ${statusBadge(emp.employee_status)}`}>
                       {emp.employee_status}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{formatDate(emp.join_date)}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{formatDate(emp.join_date)}</td>
                   {isAdmin && (
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -268,44 +255,14 @@ export default function EmployeesPage() {
           </tbody>
         </table>
 
-        {/* Pagination Footer */}
-        <div className="flex items-center justify-between border-t border-gray-100 px-6 py-3">
-          <p className="text-sm text-gray-500">
-            Showing {startItem} to {endItem} of {totalItems} results
-          </p>
-          <div className="flex items-center gap-1">
-            {pageNumbers.map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`min-w-[32px] h-8 rounded px-2 text-sm font-medium transition-colors ${
-                  page === safePage ? "bg-orange-500 text-white" : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-            <button
-              onClick={() => setCurrentPage(Math.min(safePage + 1, totalPages))}
-              disabled={safePage >= totalPages}
-              className="flex h-8 w-8 items-center justify-center rounded text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              &gt;
-            </button>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Page per Row</span>
-            <select
-              value={perPage}
-              onChange={(e) => setPerPage(Number(e.target.value))}
-              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 focus:outline-none focus:border-orange-400"
-            >
-              {[5, 10, 25, 50, 100].map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </div>
-        </div>
+        <Pagination
+          currentPage={safePage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          perPage={perPage}
+          onPageChange={setCurrentPage}
+          onPerPageChange={setPerPage}
+        />
       </div>
     </div>
   );
