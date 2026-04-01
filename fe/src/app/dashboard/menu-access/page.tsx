@@ -46,6 +46,11 @@ const ALL_MENU_SECTIONS = [
 
 // Default menu keys per role
 const ROLE_DEFAULTS: Record<string, string[]> = {
+  superadmin: [
+    "dashboard", "companies", "departments", "positions", "shifts",
+    "organization_structure", "users", "employees", "attendance", "leaves",
+    "payroll", "menu_access_policy",
+  ],
   admin: [
     "dashboard", "companies", "departments", "positions", "shifts",
     "organization_structure", "users", "employees", "attendance", "leaves",
@@ -240,7 +245,9 @@ export default function MenuAccessPage() {
                       <td className="whitespace-nowrap px-6 py-4 text-sm">
                         <span
                           className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                            user.role === "admin"
+                            user.role === "superadmin"
+                              ? "bg-red-100 text-red-700"
+                              : user.role === "admin"
                               ? "bg-purple-100 text-purple-700"
                               : user.role === "hr"
                               ? "bg-blue-100 text-blue-700"
@@ -265,7 +272,7 @@ export default function MenuAccessPage() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => openConfigModal(user)}
-                            className="rounded bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors"
+                            className="rounded bg-orange-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-orange-600 transition-colors"
                           >
                             Configure
                           </button>
@@ -380,7 +387,7 @@ export default function MenuAccessPage() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 disabled:opacity-50"
               >
                 {saving ? "Saving..." : "Save"}
               </button>

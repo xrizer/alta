@@ -43,7 +43,7 @@ const useEditCompanies = () => {
     },
   });
 
-  const fetchCompany = async () => {
+  const getCompanyById = async () => {
     const res = await companyService.getCompanyById(companyId);
 
     if (!res.success) {
@@ -54,7 +54,7 @@ const useEditCompanies = () => {
 
   const { data: company, isLoading: isLoadingCompany } = useQuery({
     queryKey: ['company', companyId],
-    queryFn: fetchCompany,
+    queryFn: getCompanyById,
   });
 
   useEffect(() => {

@@ -11,6 +11,7 @@ import (
 	"hris-backend/internal/repository"
 	"hris-backend/internal/service"
 	"hris-backend/pkg/hash"
+	"hris-backend/pkg/kafka"
 
 	_ "hris-backend/docs" // swagger docs
 
@@ -45,7 +46,14 @@ func main() {
 	cfg := config.Load()
 	db := config.ConnectDatabase(cfg)
 
+	seedSuperAdmin(db, cfg)
 	seedAdmin(db, cfg)
+
+	// Kafka producer (fire-and-forget; logs errors if broker unavailable)
+	kafkaProducer := kafka.NewProducer(cfg.KafkaBrokers, kafka.TopicNotifications)
+
+	// Notification repository (needed by both the Kafka consumer and the HTTP handler)
+	notifRepo := repository.NewNotificationRepository(db)
 
 	// Repositories
 	userRepo := repository.NewUserRepository(db)
@@ -76,6 +84,7 @@ func main() {
 	orgService := service.NewOrganizationService(companyRepo)
 	menuAccessRepo := repository.NewMenuAccessRepository(db)
 	menuAccessService := service.NewMenuAccessService(menuAccessRepo, userRepo)
+	notifService := service.NewNotificationService(notifRepo)
 
 	// Handlers
 	authHandler := handler.NewAuthHandler(authService)
@@ -88,10 +97,16 @@ func main() {
 	empSalaryHandler := handler.NewEmployeeSalaryHandler(empSalaryService)
 	holidayHandler := handler.NewHolidayHandler(holidayService)
 	attHandler := handler.NewAttendanceHandler(attService, empService)
-	leaveHandler := handler.NewLeaveHandler(leaveService)
+	leaveHandler := handler.NewLeaveHandler(leaveService, kafkaProducer)
 	payrollHandler := handler.NewPayrollHandler(payrollService, empService)
 	orgHandler := handler.NewOrganizationHandler(orgService)
 	menuAccessHandler := handler.NewMenuAccessHandler(menuAccessService)
+	notifHandler := handler.NewNotificationHandler(notifService)
+
+	// Start Kafka consumer — processes events and writes notifications to DB
+	processor := kafka.NewEventProcessor(notifRepo, userRepo)
+	consumer := kafka.NewConsumer(cfg.KafkaBrokers, kafka.TopicNotifications, "hris-notification-group", processor.Handle)
+	consumer.Start()
 
 	app := fiber.New(fiber.Config{
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
@@ -232,11 +247,47 @@ func main() {
 	menuAccess.Post("/", middleware.RoleMiddleware("admin"), menuAccessHandler.Set)
 	menuAccess.Delete("/:user_id", middleware.RoleMiddleware("admin"), menuAccessHandler.Delete)
 
+	// Notification routes (all authenticated)
+	notifications := api.Group("/notifications", middleware.AuthMiddleware(cfg))
+	notifications.Get("/", notifHandler.GetMyNotifications)
+	notifications.Get("/unread-count", notifHandler.GetUnreadCount)
+	notifications.Put("/read-all", notifHandler.MarkAllAsRead)
+	notifications.Put("/:id/read", notifHandler.MarkAsRead)
+
 	// Swagger documentation
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
 	log.Printf("Server starting on port %s", cfg.AppPort)
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", cfg.AppPort)))
+}
+
+func seedSuperAdmin(db *gorm.DB, cfg *config.Config) {
+	var count int64
+	db.Model(&model.User{}).Where("role = ?", "superadmin").Count(&count)
+	if count > 0 {
+		return
+	}
+
+	hashedPassword, err := hash.HashPassword(cfg.SuperAdminPassword)
+	if err != nil {
+		log.Printf("Failed to hash superadmin password: %v", err)
+		return
+	}
+
+	superAdmin := &model.User{
+		Name:     "Super Administrator",
+		Email:    cfg.SuperAdminEmail,
+		Password: hashedPassword,
+		Role:     model.RoleSuperAdmin,
+		IsActive: true,
+	}
+
+	if err := db.Create(superAdmin).Error; err != nil {
+		log.Printf("Failed to seed superadmin user: %v", err)
+		return
+	}
+
+	log.Printf("Superadmin user seeded: %s", cfg.SuperAdminEmail)
 }
 
 func seedAdmin(db *gorm.DB, cfg *config.Config) {

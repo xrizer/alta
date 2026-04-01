@@ -3,10 +3,10 @@ import Typography from '@/components/ui/typography';
 import { ColumnDef } from '@tanstack/react-table';
 import { SquarePen, Trash } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog } from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import DeleteDepartmentsModal from './DeleteDepartmentsModal';
 import {
+  Dialog,
   DialogContent,
   DialogTitle,
   DialogTrigger,

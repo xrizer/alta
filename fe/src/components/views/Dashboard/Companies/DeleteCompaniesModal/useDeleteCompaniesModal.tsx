@@ -7,7 +7,7 @@ const useDeleteCompaniesModal = () => {
   const queryClient = useQueryClient();
   const { setToaster } = useContext(ToasterContext);
 
-  const deleteBanner = async (id: string) => {
+  const deleteCompany = async (id: string) => {
     const res = await companyService.deleteCompany(id);
 
     return res;
@@ -18,7 +18,7 @@ const useDeleteCompaniesModal = () => {
     isPending: isPendingMutateDeleteCompanies,
     isSuccess: isSuccessMutateDeleteCompanies,
   } = useMutation({
-    mutationFn: deleteBanner,
+    mutationFn: deleteCompany,
     onSuccess: () => {
       setToaster({
         type: 'success',

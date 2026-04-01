@@ -34,13 +34,13 @@ export function Input({
         <div className="flex items-center rounded-lg border border-border overflow-hidden w-full">
           <label
             htmlFor={inputId}
-            className="px-4 py-2 text-disable cursor-pointer whitespace-nowrap">
+            className="px-4 py-2 text-disabled cursor-pointer whitespace-nowrap">
             Pilih Foto
           </label>
 
           <span
             id={`${inputId}-filename`}
-            className="px-4 py-2 text-disable truncate select-none">
+            className="px-4 py-2 text-disabled truncate select-none">
             Tidak ada file yang dipilih
           </span>
 
@@ -77,7 +77,8 @@ export function Input({
             inputMode={isPhoneInput ? 'numeric' : undefined}
             pattern={isPhoneInput ? '[0-9]*' : undefined}
             className={cn(
-              'w-full rounded-lg px-5 py-2 text-base outline-none transition-all placeholder:text-disable focus:ring-0 border border-divider',
+              'w-full rounded-lg px-5 py-2 text-base outline-none transition-all placeholder:text-disabled focus:ring-0 border border-divider',
+              'disabled:bg-muted disabled:text-disabled disabled:cursor-not-allowed disabled:border-border',
               icon && 'pl-12',
               className,
             )}

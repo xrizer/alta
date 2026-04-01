@@ -1,4 +1,4 @@
-export type Role = "admin" | "hr" | "employee";
+export type Role = "superadmin" | "admin" | "hr" | "employee";
 
 export interface User {
   id: string;
@@ -378,4 +378,22 @@ export interface Payroll {
   notes: string;
   created_at: string;
   updated_at: string;
+}
+
+export type NotificationType = "info" | "success" | "warning" | "error";
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  ref_id?: string;
+  ref_type?: string;
+  is_read: boolean;
+  read_at?: string;
+  created_at: string;
+}
+
+export interface UnreadCountResponse {
+  count: number;
 }

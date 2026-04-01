@@ -6,14 +6,6 @@ import { Button } from '@/components/ui/button';
 import Typography from '@/components/ui/typography';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 const EditDepartments = () => {
   const {
@@ -43,32 +35,17 @@ const EditDepartments = () => {
             name="company_id"
             control={control}
             render={({ field }) => (
-              <div className="space-y-1">
-                <Typography variant="bodyMedium">Company</Typography>
-                <Select
-                  value={field.value || ''}
-                  onValueChange={(val) => field.onChange(val)}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Company" />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectGroup>
-                      {companies?.map((item) => (
-                        <SelectItem key={item.id} value={item.id}>
-                          {item.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-
-                {errors.company_id && (
-                  <p className="text-sm text-red-500">
-                    {errors.company_id.message}
-                  </p>
-                )}
-              </div>
+              <Input
+                {...field}
+                type="text"
+                placeholder="PT Alta Indonesia"
+                label="Company"
+                value={companies.find((c) => c.id === field.value)?.name}
+                autoComplete="off"
+                disabled
+                isInvalid={errors.company_id !== undefined}
+                errorMessage={errors.company_id?.message}
+              />
             )}
           />
           <Controller

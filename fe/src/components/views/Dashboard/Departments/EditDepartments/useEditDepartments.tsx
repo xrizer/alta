@@ -52,7 +52,7 @@ const useEditDepartments = () => {
     },
   });
 
-  const fetchDepartment = async () => {
+  const getDepartmenById = async () => {
     const res = await departmentsService.getDepartmentById(departmentId);
 
     if (!res.success) {
@@ -63,21 +63,20 @@ const useEditDepartments = () => {
 
   const { data: department, isLoading: isLoadingDepartment } = useQuery({
     queryKey: ['department', departmentId],
-    queryFn: fetchDepartment,
+    queryFn: getDepartmenById,
   });
 
   useEffect(() => {
-    if (department && companies && companies.length > 0) {
+    if (department) {
       reset({
         name: department.name || '',
         company_id: department.company_id || '',
         description: department.description || '',
       });
     }
-  }, [department, companies, reset]);
+  }, [department, reset]);
 
   const updateDepartment = async (payload: EditDepartmentPayload) => {
-    console.log('Payload ke API:', payload);
     const res = await departmentsService.updateDepartment(
       departmentId,
       payload,
@@ -104,7 +103,6 @@ const useEditDepartments = () => {
   });
 
   const handleUpdateDepartment = (data: EditDepartmentPayload) => {
-    console.log('Payload yang dikirim:', data);
     mutateUpdateDepartment(data);
   };
 

@@ -57,8 +57,8 @@ const useCompanies = () => {
         type: 'success',
         message: 'Delete companies success',
       });
-      setRowSelection({}); // ← reset checkbox
-      queryClient.invalidateQueries({ queryKey: ['companies'] }); // ← ganti refetch() dengan ini
+      setRowSelection({});
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
     },
   });
 

@@ -26,8 +26,6 @@ const CreateDepartments = () => {
     router,
   } = useCreateDepartment();
 
-  console.log(companies);
-
   return (
     <div className="space-y-4">
       <div className="space-y-1">
