@@ -1,7 +1,7 @@
 /**
- * Client-side Dynatrace error reporter.
+ * Client-side SigNoz error reporter.
  * Sends errors to the internal Next.js API route which forwards them to
- * Dynatrace using the server-side token (never exposed to the browser).
+ * SigNoz via OTLP/HTTP using the server-side token (never exposed to the browser).
  */
 
 interface ErrorPayload {
@@ -18,7 +18,6 @@ export function reportError(payload: ErrorPayload): void {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
-    // keepalive lets the request complete even if the page unloads
     keepalive: true,
   }).catch(() => {
     // Silently ignore logging failures

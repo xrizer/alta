@@ -3,7 +3,7 @@ package response
 import (
 	"fmt"
 
-	"hris-backend/pkg/dynatrace"
+	"hris-backend/pkg/signoz"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -34,9 +34,9 @@ func Error(c *fiber.Ctx, statusCode int, message string) error {
 	}
 
 	if statusCode >= 500 {
-		dynatrace.LogError(message, attrs)
+		signoz.LogError(message, attrs)
 	} else {
-		dynatrace.LogWarn(message, attrs)
+		signoz.LogWarn(message, attrs)
 	}
 
 	return c.Status(statusCode).JSON(Response{

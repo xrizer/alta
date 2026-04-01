@@ -1,5 +1,5 @@
 import axios from "axios";
-import { reportError } from "@/lib/dynatrace";
+import { reportError } from "@/lib/signoz";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,

@@ -33,8 +33,8 @@ type Config struct {
 
 	KafkaBrokers []string
 
-	DynatraceAPIURL   string
-	DynatraceAPIToken string
+	SigNozEndpoint    string
+	SigNozAccessToken string
 }
 
 func Load() *Config {
@@ -76,8 +76,8 @@ func Load() *Config {
 
 		KafkaBrokers: splitBrokers(getEnv("KAFKA_BROKERS", "localhost:9092")),
 
-		DynatraceAPIURL:   getEnv("DYNATRACE_API_URL", ""),
-		DynatraceAPIToken: getEnv("DYNATRACE_API_TOKEN", ""),
+		SigNozEndpoint:    getEnv("SIGNOZ_ENDPOINT", ""),
+		SigNozAccessToken: getEnv("SIGNOZ_ACCESS_TOKEN", ""),
 	}
 }
 
