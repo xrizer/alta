@@ -17,10 +17,10 @@ import { convertIDR } from '@/lib/utils';
 export type Positions = {
   id: string;
   name: string;
-  company: {
+  company?: {
     name: string;
   };
-  department: {
+  department?: {
     name: string;
   };
   base_salary: number;

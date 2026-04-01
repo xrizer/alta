@@ -16,7 +16,7 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 export type Departments = {
   id: string;
   name: string;
-  company: {
+  company?: {
     name: string;
   };
   is_active: boolean;
