@@ -388,21 +388,21 @@ export default function DashboardPage() {
                   </p>
                 </div>
               </div>
-              <div className="overflow-hidden rounded-lg border border-gray-100 dark:border-orange-900/30">
-                <div className="flex items-center justify-between bg-orange-50 dark:bg-orange-950/30 px-4 py-2">
-                  <span className="text-sm text-orange-500">Late</span>
+              <div className="rounded-lg border border-gray-100 dark:border-gray-700 dark:bg-gray-800 border-l-4 border-l-orange-500 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2">
+                  <span className="text-sm text-orange-500 font-medium">Late</span>
                   <span className="text-base font-bold text-orange-500">{todayAttendance.late}</span>
                 </div>
               </div>
-              <div className="overflow-hidden rounded-lg border border-gray-100 dark:border-green-900/30">
-                <div className="flex items-center justify-between bg-green-50 dark:bg-green-950/30 px-4 py-2">
-                  <span className="text-sm text-green-600">On Leave</span>
-                  <span className="text-base font-bold text-green-600">{todayAttendance.onLeave}</span>
+              <div className="rounded-lg border border-gray-100 dark:border-gray-700 dark:bg-gray-800 border-l-4 border-l-green-500 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2">
+                  <span className="text-sm text-green-500 font-medium">On Leave</span>
+                  <span className="text-base font-bold text-green-500">{todayAttendance.onLeave}</span>
                 </div>
               </div>
-              <div className="overflow-hidden rounded-lg border border-gray-100 dark:border-red-900/30">
-                <div className="flex items-center justify-between bg-red-50 dark:bg-red-950/30 px-4 py-2">
-                  <span className="text-sm text-red-500">Absent</span>
+              <div className="rounded-lg border border-gray-100 dark:border-gray-700 dark:bg-gray-800 border-l-4 border-l-red-500 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2">
+                  <span className="text-sm text-red-500 font-medium">Absent</span>
                   <span className="text-base font-bold text-red-500">{todayAttendance.absent}</span>
                 </div>
               </div>
