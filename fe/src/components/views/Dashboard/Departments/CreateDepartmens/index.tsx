@@ -35,7 +35,7 @@ const CreateDepartments = () => {
 
       <form
         onSubmit={handleSubmitForm(handleCreateDepartments)}
-        className="space-y-6 rounded-xl border border-gray-200 bg-white p-6">
+        className="space-y-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
         <div className="space-y-6">
           <Controller
             name="company_id"
