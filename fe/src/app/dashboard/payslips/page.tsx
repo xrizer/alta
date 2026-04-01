@@ -203,7 +203,7 @@ export default function PayslipsPage() {
                 <td className="whitespace-nowrap px-6 py-4 text-sm">
                   <button
                     onClick={() => setSelectedPayslip(p)}
-                    className="text-blue-600 hover:text-blue-900"
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
                   >
                     View Slip
                   </button>
