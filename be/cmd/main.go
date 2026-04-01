@@ -10,6 +10,7 @@ import (
 	"hris-backend/internal/model"
 	"hris-backend/internal/repository"
 	"hris-backend/internal/service"
+	"hris-backend/pkg/dynatrace"
 	"hris-backend/pkg/hash"
 	"hris-backend/pkg/kafka"
 
@@ -44,6 +45,7 @@ import (
 
 func main() {
 	cfg := config.Load()
+	dynatrace.Init(cfg.DynatraceAPIURL, cfg.DynatraceAPIToken)
 	db := config.ConnectDatabase(cfg)
 
 	seedSuperAdmin(db, cfg)
@@ -113,6 +115,17 @@ func main() {
 			code := fiber.StatusInternalServerError
 			if e, ok := err.(*fiber.Error); ok {
 				code = e.Code
+			}
+			attrs := map[string]interface{}{
+				"service":     "hris-backend",
+				"path":        c.Path(),
+				"method":      c.Method(),
+				"status_code": code,
+			}
+			if code >= 500 {
+				dynatrace.LogError(err.Error(), attrs)
+			} else {
+				dynatrace.LogWarn(err.Error(), attrs)
 			}
 			return c.Status(code).JSON(fiber.Map{
 				"success": false,

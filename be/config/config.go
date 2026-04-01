@@ -32,6 +32,9 @@ type Config struct {
 	AdminPassword string
 
 	KafkaBrokers []string
+
+	DynatraceAPIURL   string
+	DynatraceAPIToken string
 }
 
 func Load() *Config {
@@ -72,6 +75,9 @@ func Load() *Config {
 		AdminPassword: getEnv("ADMIN_PASSWORD", "admin123"),
 
 		KafkaBrokers: splitBrokers(getEnv("KAFKA_BROKERS", "localhost:9092")),
+
+		DynatraceAPIURL:   getEnv("DYNATRACE_API_URL", ""),
+		DynatraceAPIToken: getEnv("DYNATRACE_API_TOKEN", ""),
 	}
 }
 
