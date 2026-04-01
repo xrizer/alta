@@ -149,8 +149,8 @@ export default function UsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Users</h2>
-          <p className="mt-1 text-sm text-gray-500">Manage system users and their roles</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Users</h2>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage system users and their roles</p>
         </div>
         {isAdmin && (
           <Link
@@ -164,7 +164,7 @@ export default function UsersPage() {
       </div>
 
       {error && (
-        <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">{error}</div>
+        <div className="rounded-md bg-red-50 dark:bg-red-900/30 p-4 text-sm text-red-700 dark:text-red-400">{error}</div>
       )}
 
       {/* Search */}
@@ -178,15 +178,15 @@ export default function UsersPage() {
             placeholder="Search"
             value={searchInput}
             onChange={(e) => handleSearchInput(e.target.value)}
-            className="w-64 rounded-lg border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
+            className="w-64 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 pl-9 pr-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-orange-400 focus:outline-none focus:ring-1 focus:ring-orange-400"
           />
         </div>
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-white">
+      <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-white dark:bg-gray-800">
             <tr>
               {(
                 [
@@ -200,55 +200,55 @@ export default function UsersPage() {
                 <th
                   key={field}
                   onClick={() => handleSort(field)}
-                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 cursor-pointer select-none hover:text-gray-900"
+                  className="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer select-none hover:text-gray-900 dark:hover:text-white"
                 >
                   {label}
                   <SortIcon field={field} />
                 </th>
               ))}
               {isAdmin && (
-                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Actions</th>
               )}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
             {isLoading ? (
               <tr>
-                <td colSpan={colSpan} className="px-6 py-10 text-center text-sm text-gray-400">
+                <td colSpan={colSpan} className="px-6 py-10 text-center text-sm text-gray-400 dark:text-gray-500">
                   Loading users...
                 </td>
               </tr>
             ) : users.length === 0 ? (
               <tr>
-                <td colSpan={colSpan} className="px-6 py-10 text-center text-sm text-gray-400">
+                <td colSpan={colSpan} className="px-6 py-10 text-center text-sm text-gray-400 dark:text-gray-500">
                   No users found
                 </td>
               </tr>
             ) : (
               users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{user.name}</td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{user.email}</td>
+                <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">{user.name}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{user.email}</td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm">
                     <span
                       className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
                         user.role === "superadmin"
-                          ? "bg-red-100 text-red-800"
+                          ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
                           : user.role === "admin"
-                            ? "bg-purple-100 text-purple-800"
+                            ? "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400"
                             : user.role === "hr"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-gray-100 text-gray-800"
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
+                              : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
                       }`}
                     >
                       {user.role}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{user.phone || "-"}</td>
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{user.phone || "-"}</td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <span
                       className={`inline-flex rounded-full px-3 py-0.5 text-xs font-semibold ${
-                        user.is_active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                        user.is_active ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
                       }`}
                     >
                       {user.is_active ? "Active" : "Inactive"}
@@ -283,8 +283,8 @@ export default function UsersPage() {
         </table>
 
         {/* Pagination Footer */}
-        <div className="flex items-center justify-between border-t border-gray-100 px-6 py-3">
-          <p className="text-sm text-gray-500">
+        <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 px-6 py-3">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             Showing {startItem} to {endItem} of {totalItems} results
           </p>
           <div className="flex items-center gap-1">
@@ -293,7 +293,7 @@ export default function UsersPage() {
                 key={page}
                 onClick={() => setCurrentPage(page)}
                 className={`min-w-[32px] h-8 rounded px-2 text-sm font-medium transition-colors ${
-                  page === safePage ? "bg-orange-500 text-white" : "text-gray-600 hover:bg-gray-100"
+                  page === safePage ? "bg-orange-500 text-white" : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                 }`}
               >
                 {page}
@@ -302,17 +302,17 @@ export default function UsersPage() {
             <button
               onClick={() => setCurrentPage(Math.min(safePage + 1, totalPages))}
               disabled={safePage >= totalPages}
-              className="flex h-8 w-8 items-center justify-center rounded text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               &gt;
             </button>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Page per Row</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Page per Row</span>
             <select
               value={perPage}
               onChange={(e) => setPerPage(Number(e.target.value))}
-              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 focus:outline-none focus:border-orange-400"
+              className="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-sm text-gray-700 dark:text-white focus:outline-none focus:border-orange-400"
             >
               {[5, 10, 25, 50, 100].map((n) => (
                 <option key={n} value={n}>{n}</option>
