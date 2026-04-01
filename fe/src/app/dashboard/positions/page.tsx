@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
+import { SquarePen, Trash } from "lucide-react";
 import { Position } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as positionService from "@/services/position-service";
@@ -9,22 +10,6 @@ import Pagination from "@/components/pagination";
 
 type SortField = "name" | "company" | "department" | "base_salary" | "is_active";
 type SortOrder = "asc" | "desc";
-
-const EditIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-  </svg>
-);
-
-const TrashIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="3 6 5 6 21 6" />
-    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-    <path d="M10 11v6M14 11v6" />
-    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-  </svg>
-);
 
 const SearchIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
@@ -235,16 +220,15 @@ export default function PositionsPage() {
                       <div className="flex items-center gap-3">
                         <Link
                           href={`/dashboard/positions/${position.id}/edit`}
-                          className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                          className="flex gap-2 font-medium items-center text-[#1890FF] hover:text-[#1890FF]/90"
                         >
-                          <EditIcon />
-                          Edit
+                          <SquarePen width={20} color="#1890FF" /> Edit
                         </Link>
                         <button
                           onClick={() => handleDelete(position.id)}
-                          className="inline-flex items-center gap-1.5 text-sm font-medium text-red-500 hover:text-red-700 transition-colors"
+                          className="flex gap-2 font-medium items-center text-[#FF4D4F] hover:text-[#FF4D4F]/90"
                         >
-                          <TrashIcon />
+                          <Trash width={20} color="#FF4D4F" />
                           Delete
                         </button>
                       </div>

@@ -140,9 +140,9 @@ export default function LeavesPage() {
                 {isAdminOrHr && (
                   <td className="whitespace-nowrap px-6 py-4 text-sm">
                     {leave.status === "pending" && (
-                      <div className="flex gap-2">
-                        <button onClick={() => handleApprove(leave.id, "approved")} className="text-green-600 hover:text-green-900">Approve</button>
-                        <button onClick={() => handleApprove(leave.id, "rejected")} className="text-red-600 hover:text-red-900">Reject</button>
+                      <div className="flex items-center gap-3">
+                        <button onClick={() => handleApprove(leave.id, "approved")} className="inline-flex items-center gap-1.5 text-sm font-medium text-green-600 hover:text-green-800 transition-colors">Approve</button>
+                        <button onClick={() => handleApprove(leave.id, "rejected")} className="inline-flex items-center gap-1.5 text-sm font-medium text-red-500 hover:text-red-700 transition-colors">Reject</button>
                       </div>
                     )}
                     {leave.status === "rejected" && leave.rejection_reason && (

@@ -205,13 +205,15 @@ export default function PayrollPage() {
                   </span>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm">
-                  <button onClick={() => setShowDetail(p)} className="text-blue-600 hover:text-blue-900 mr-3">Detail</button>
-                  {isAdmin && p.status === "draft" && (
-                    <button onClick={() => handleStatusUpdate(p.id, "processed")} className="text-blue-600 hover:text-blue-900 mr-3">Process</button>
-                  )}
-                  {isAdmin && p.status === "processed" && (
-                    <button onClick={() => handleStatusUpdate(p.id, "paid")} className="text-green-600 hover:text-green-900">Mark Paid</button>
-                  )}
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => setShowDetail(p)} className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">Detail</button>
+                    {isAdmin && p.status === "draft" && (
+                      <button onClick={() => handleStatusUpdate(p.id, "processed")} className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">Process</button>
+                    )}
+                    {isAdmin && p.status === "processed" && (
+                      <button onClick={() => handleStatusUpdate(p.id, "paid")} className="inline-flex items-center gap-1.5 text-sm font-medium text-green-600 hover:text-green-800 transition-colors">Mark Paid</button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
