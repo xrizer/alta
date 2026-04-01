@@ -42,7 +42,7 @@ export default function Departments() {
 
       <DataTable
         columns={DepartmensColumn}
-        data={departments}
+        data={departments ?? []}
         filterKey="departmentsName"
         // totalPages={data.pagination.totalPage}
       />

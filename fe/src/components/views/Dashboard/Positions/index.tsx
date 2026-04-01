@@ -42,7 +42,7 @@ export default function Positions() {
 
       <DataTable
         columns={PositionsColumn}
-        data={positions}
+        data={positions ?? []}
         filterKey="name"
         // totalPages={data.pagination.totalPage}
       />
