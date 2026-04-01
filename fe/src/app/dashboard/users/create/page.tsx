@@ -49,15 +49,15 @@ export default function CreateUserPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Create User</h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create User</h2>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           Add a new user to the system
         </p>
       </div>
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-5 rounded-xl border border-gray-200 bg-white p-6"
+        className="space-y-5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6"
       >
         {error && (
           <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">
@@ -67,7 +67,7 @@ export default function CreateUserPage() {
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div>
-            <label className="block text-sm font-semibold text-gray-900">
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white">
               Name
             </label>
             <input
@@ -76,12 +76,12 @@ export default function CreateUserPage() {
               required
               value={form.name}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-700 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900">
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white">
               Email
             </label>
             <input
@@ -90,12 +90,12 @@ export default function CreateUserPage() {
               required
               value={form.email}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-700 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900">
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white">
               Password
             </label>
             <input
@@ -105,19 +105,19 @@ export default function CreateUserPage() {
               minLength={6}
               value={form.password}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-700 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900">
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white">
               Role
             </label>
             <select
               name="role"
               value={form.role}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-700 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             >
               <option value="employee">Employee</option>
               <option value="hr">HR</option>
@@ -126,7 +126,7 @@ export default function CreateUserPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900">
+            <label className="block text-sm font-semibold text-gray-900 dark:text-white">
               Phone
             </label>
             <input
@@ -134,7 +134,7 @@ export default function CreateUserPage() {
               type="text"
               value={form.phone}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
+              className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-700 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
             />
           </div>
         </div>

@@ -38,7 +38,7 @@ const EditCompanies = () => {
 
       <form
         onSubmit={handleSubmitForm(handleUpdateCompany)}
-        className="space-y-6 rounded-xl border border-gray-200 bg-white p-6">
+        className="space-y-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Controller
             name="name"
