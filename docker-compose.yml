@@ -146,7 +146,10 @@ services:
   signoz-schema-migrator:
     image: signoz/signoz-schema-migrator:latest
     container_name: signoz-schema-migrator
-    command: ["--dsn=tcp://clickhouse:9000"]
+    command:
+      - "--dsn=tcp://clickhouse:9000"
+      - "--replication=false"
+      - "--cluster=cluster"
     depends_on:
       clickhouse:
         condition: service_healthy
@@ -164,16 +167,20 @@ services:
     depends_on:
       clickhouse:
         condition: service_healthy
+      signoz-schema-migrator:
+        condition: service_completed_successfully
 
   signoz-query-service:
     image: signoz/query-service:latest
     container_name: signoz-query-service
     restart: unless-stopped
     environment:
-      ClickHouseUrl: tcp://clickhouse:9000
-      STORAGE: clickhouse
+      SIGNOZ_TELEMETRYSTORE_PROVIDER: clickhouse
+      SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN: tcp://clickhouse:9000
       GODEBUG: netdns=go
       DEPLOYMENT_TYPE: docker-standalone
+    volumes:
+      - signoz_sqlite:/var/lib/signoz
     depends_on:
       clickhouse:
         condition: service_healthy
@@ -195,3 +202,4 @@ volumes:
   zookeeper_log:
   kafka_data:
   signoz_clickhouse:
+  signoz_sqlite:
