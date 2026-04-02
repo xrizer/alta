@@ -136,6 +136,7 @@ services:
     restart: unless-stopped
     volumes:
       - signoz_clickhouse:/var/lib/clickhouse
+      - ./signoz/clickhouse-cluster.xml:/etc/clickhouse-server/config.d/cluster.xml:ro
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "localhost:8123/ping"]
       interval: 30s
