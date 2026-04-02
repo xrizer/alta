@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"hris-backend/internal/dto"
@@ -37,8 +38,13 @@ func NewAttendanceService(attRepo repository.AttendanceRepository, empRepo repos
 	}
 }
 
-// calculateAttendanceStatus determines the status based on clock-in time and shift start time
-func calculateAttendanceStatus(clockIn time.Time, shiftStart time.Time) (model.AttendanceStatus, error) {
+// calculateAttendanceStatus determines the status based on clock-in time and shift start time (HH:mm string)
+func calculateAttendanceStatus(clockIn time.Time, shiftStartStr string) (model.AttendanceStatus, error) {
+	shiftStart, err := time.Parse("15:04", shiftStartStr)
+	if err != nil {
+		return "", fmt.Errorf("invalid shift start time format: %w", err)
+	}
+
 	// Normalize shift start to same date as clock-in
 	shiftStartNormalized := time.Date(
 		clockIn.Year(),
