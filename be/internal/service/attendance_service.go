@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"hris-backend/internal/dto"
@@ -39,40 +38,29 @@ func NewAttendanceService(attRepo repository.AttendanceRepository, empRepo repos
 }
 
 // calculateAttendanceStatus determines the status based on clock-in time and shift start time
-func calculateAttendanceStatus(clockIn time.Time, shiftStartTime string) (model.AttendanceStatus, error) {
-	// Parse shift start time (format: "HH:MM" or "HH:MM:SS")
-	var hour, minute int
-	_, err := fmt.Sscanf(shiftStartTime, "%d:%d", &hour, &minute)
-	if err != nil {
-		return model.AttendanceHadir, err
-	}
-
-	// Create the expected shift start time on the same date as clock-in
-	shiftStart := time.Date(
+func calculateAttendanceStatus(clockIn time.Time, shiftStart time.Time) (model.AttendanceStatus, error) {
+	// Normalize shift start to same date as clock-in
+	shiftStartNormalized := time.Date(
 		clockIn.Year(),
 		clockIn.Month(),
 		clockIn.Day(),
-		hour,
-		minute,
+		shiftStart.Hour(),
+		shiftStart.Minute(),
 		0,
 		0,
 		clockIn.Location(),
 	)
 
-	// Calculate the difference in minutes
-	diff := clockIn.Sub(shiftStart).Minutes()
+	// Calculate difference in minutes
+	diff := clockIn.Sub(shiftStartNormalized).Minutes()
 
-	// Grace period: 5 minutes before or after shift start is considered "on time"
 	const gracePeriod = 5.0
 
 	if diff < -gracePeriod {
-		// Clocked in more than 5 minutes early
 		return model.AttendanceEarlyIn, nil
 	} else if diff <= gracePeriod {
-		// Clocked in within grace period (5 minutes before to 5 minutes after)
 		return model.AttendanceOnTime, nil
 	} else {
-		// Clocked in more than 5 minutes late
 		return model.AttendanceLateIn, nil
 	}
 }
