@@ -140,7 +140,7 @@ services:
     volumes:
       - signoz_clickhouse:/var/lib/clickhouse
       - ./signoz/clickhouse-cluster.xml:/etc/clickhouse-server/config.d/cluster.xml:ro
-      - ./signoz/clickhouse-users.xml:/etc/clickhouse-server/users.d/default-user.xml:ro
+      - ./signoz/clickhouse-users.xml:/etc/clickhouse-server/users.d/z-signoz-users.xml:ro
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "localhost:8123/ping"]
       interval: 30s
