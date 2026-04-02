@@ -63,21 +63,19 @@ func (s *shiftService) Create(req dto.CreateShiftRequest) (*dto.ShiftResponse, e
 
 	layout := "15:04"
 
-	startTime, err := time.Parse(layout, req.StartTime)
-	if err != nil {
+	if _, err := time.Parse(layout, req.StartTime); err != nil {
 		return nil, errors.New("invalid start_time format, use HH:mm")
 	}
 
-	endTime, err := time.Parse(layout, req.EndTime)
-	if err != nil {
+	if _, err := time.Parse(layout, req.EndTime); err != nil {
 		return nil, errors.New("invalid end_time format, use HH:mm")
 	}
 
 	shift := &model.Shift{
 		CompanyID: req.CompanyID,
 		Name:      req.Name,
-		StartTime: startTime,
-		EndTime:   endTime,
+		StartTime: req.StartTime,
+		EndTime:   req.EndTime,
 		IsActive:  true,
 	}
 
@@ -107,19 +105,17 @@ func (s *shiftService) Update(id string, req dto.UpdateShiftRequest) (*dto.Shift
 	}
 
 	if req.StartTime != "" {
-		startTime, err := time.Parse(layout, req.StartTime)
-		if err != nil {
+		if _, err := time.Parse(layout, req.StartTime); err != nil {
 			return nil, errors.New("invalid start_time format, use HH:mm")
 		}
-		shift.StartTime = startTime
+		shift.StartTime = req.StartTime
 	}
 
 	if req.EndTime != "" {
-		endTime, err := time.Parse(layout, req.EndTime)
-		if err != nil {
+		if _, err := time.Parse(layout, req.EndTime); err != nil {
 			return nil, errors.New("invalid end_time format, use HH:mm")
 		}
-		shift.EndTime = endTime
+		shift.EndTime = req.EndTime
 	}
 
 	if req.IsActive != nil {
