@@ -131,7 +131,7 @@ services:
   # ---------------------------------------------------------------------------
 
   clickhouse:
-    image: clickhouse/clickhouse-server:24.1.2-alpine
+    image: clickhouse/clickhouse-server:24.8-alpine
     container_name: signoz-clickhouse
     restart: unless-stopped
     volumes:
