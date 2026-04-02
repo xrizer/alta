@@ -1,4 +1,9 @@
 <clickhouse>
+    <profiles>
+        <default>
+            <allow_experimental_json_type>1</allow_experimental_json_type>
+        </default>
+    </profiles>
     <users>
         <default>
             <password></password>
