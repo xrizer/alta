@@ -12,8 +12,8 @@ type Shift struct {
 	CompanyID string         `gorm:"type:uuid;not null" json:"company_id"`
 	Company   Company        `gorm:"foreignKey:CompanyID" json:"company,omitempty"`
 	Name      string         `gorm:"type:varchar(100);not null" json:"name"`
-	StartTime string         `gorm:"type:time;not null" json:"start_time"`
-	EndTime   string         `gorm:"type:time;not null" json:"end_time"`
+	StartTime time.Time      `gorm:"type:time;not null"`
+	EndTime   time.Time      `gorm:"type:time;not null"`
 	IsActive  bool           `gorm:"default:true" json:"is_active"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
