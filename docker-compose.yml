@@ -80,16 +80,16 @@ services:
       ADMIN_EMAIL: admin@hris.com
       ADMIN_PASSWORD: admin123
       KAFKA_BROKERS: kafka:29092
-      SIGNOZ_ENDPOINT: http://host.docker.internal:4318
+      SIGNOZ_ENDPOINT: http://signoz-otel-collector:4318
       SIGNOZ_ACCESS_TOKEN: ""
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     ports:
       - '8080:8080'
     depends_on:
       postgres:
         condition: service_healthy
       kafka:
+        condition: service_started
+      signoz-otel-collector:
         condition: service_started
 
   # Next.js Frontend
@@ -102,10 +102,8 @@ services:
     container_name: hris-frontend
     restart: unless-stopped
     environment:
-      SIGNOZ_ENDPOINT: http://host.docker.internal:4318
+      SIGNOZ_ENDPOINT: http://signoz-otel-collector:4318
       SIGNOZ_ACCESS_TOKEN: ""
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     ports:
       - '3000:3000'
     depends_on:
@@ -126,8 +124,73 @@ services:
       - frontend
       - backend
 
+  # ---------------------------------------------------------------------------
+  # SigNoz — Observability (error logging via OTLP)
+  # UI: http://<your-vm-ip>:3301
+  # ---------------------------------------------------------------------------
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.1.2-alpine
+    container_name: signoz-clickhouse
+    restart: unless-stopped
+    volumes:
+      - signoz_clickhouse:/var/lib/clickhouse
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "localhost:8123/ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  signoz-schema-migrator:
+    image: signoz/signoz-schema-migrator:0.55.0
+    container_name: signoz-schema-migrator
+    command: ["--dsn=tcp://clickhouse:9000"]
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    restart: on-failure
+
+  signoz-otel-collector:
+    image: signoz/signoz-otel-collector:0.111.18
+    container_name: signoz-otel-collector
+    restart: unless-stopped
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./signoz/otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4318:4318"
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+
+  signoz-query-service:
+    image: signoz/query-service:0.55.0
+    container_name: signoz-query-service
+    restart: unless-stopped
+    environment:
+      ClickHouseUrl: tcp://clickhouse:9000
+      STORAGE: clickhouse
+      GODEBUG: netdns=go
+      DEPLOYMENT_TYPE: docker-standalone
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+      signoz-schema-migrator:
+        condition: service_completed_successfully
+
+  signoz-frontend:
+    image: signoz/frontend:0.55.0
+    container_name: signoz-frontend
+    restart: unless-stopped
+    ports:
+      - "3301:3301"
+    depends_on:
+      - signoz-query-service
+
 volumes:
   postgres_data:
   zookeeper_data:
   zookeeper_log:
   kafka_data:
+  signoz_clickhouse:
