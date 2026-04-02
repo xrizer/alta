@@ -147,9 +147,8 @@ services:
     image: signoz/signoz-schema-migrator:latest
     container_name: signoz-schema-migrator
     command:
+      - "sync"
       - "--dsn=tcp://clickhouse:9000"
-      - "--replication=false"
-      - "--cluster=cluster"
     depends_on:
       clickhouse:
         condition: service_healthy
