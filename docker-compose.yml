@@ -150,6 +150,7 @@ services:
     command:
       - "sync"
       - "--dsn=tcp://clickhouse:9000"
+      - "--dev"
     depends_on:
       clickhouse:
         condition: service_healthy
