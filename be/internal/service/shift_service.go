@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"time"
 
 	"hris-backend/internal/dto"
 	"hris-backend/internal/model"
@@ -55,17 +56,28 @@ func (s *shiftService) GetByCompanyID(companyID string) ([]dto.ShiftResponse, er
 }
 
 func (s *shiftService) Create(req dto.CreateShiftRequest) (*dto.ShiftResponse, error) {
-	// Validate company exists
 	_, err := s.companyRepo.FindByID(req.CompanyID)
 	if err != nil {
 		return nil, errors.New("company not found")
 	}
 
+	layout := "15:04"
+
+	startTime, err := time.Parse(layout, req.StartTime)
+	if err != nil {
+		return nil, errors.New("invalid start_time format, use HH:mm")
+	}
+
+	endTime, err := time.Parse(layout, req.EndTime)
+	if err != nil {
+		return nil, errors.New("invalid end_time format, use HH:mm")
+	}
+
 	shift := &model.Shift{
 		CompanyID: req.CompanyID,
 		Name:      req.Name,
-		StartTime: req.StartTime,
-		EndTime:   req.EndTime,
+		StartTime: startTime,
+		EndTime:   endTime,
 		IsActive:  true,
 	}
 
@@ -73,7 +85,6 @@ func (s *shiftService) Create(req dto.CreateShiftRequest) (*dto.ShiftResponse, e
 		return nil, errors.New("failed to create shift")
 	}
 
-	// Reload with company preloaded
 	created, err := s.shiftRepo.FindByID(shift.ID)
 	if err != nil {
 		return nil, errors.New("failed to load shift")
@@ -89,15 +100,28 @@ func (s *shiftService) Update(id string, req dto.UpdateShiftRequest) (*dto.Shift
 		return nil, errors.New("shift not found")
 	}
 
+	layout := "15:04"
+
 	if req.Name != "" {
 		shift.Name = req.Name
 	}
+
 	if req.StartTime != "" {
-		shift.StartTime = req.StartTime
+		startTime, err := time.Parse(layout, req.StartTime)
+		if err != nil {
+			return nil, errors.New("invalid start_time format, use HH:mm")
+		}
+		shift.StartTime = startTime
 	}
+
 	if req.EndTime != "" {
-		shift.EndTime = req.EndTime
+		endTime, err := time.Parse(layout, req.EndTime)
+		if err != nil {
+			return nil, errors.New("invalid end_time format, use HH:mm")
+		}
+		shift.EndTime = endTime
 	}
+
 	if req.IsActive != nil {
 		shift.IsActive = *req.IsActive
 	}
