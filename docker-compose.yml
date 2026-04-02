@@ -80,6 +80,10 @@ services:
       ADMIN_EMAIL: admin@hris.com
       ADMIN_PASSWORD: admin123
       KAFKA_BROKERS: kafka:29092
+      SIGNOZ_ENDPOINT: http://host.docker.internal:4318
+      SIGNOZ_ACCESS_TOKEN: ""
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - '8080:8080'
     depends_on:
@@ -97,6 +101,11 @@ services:
         NEXT_PUBLIC_API_URL: /api
     container_name: hris-frontend
     restart: unless-stopped
+    environment:
+      SIGNOZ_ENDPOINT: http://host.docker.internal:4318
+      SIGNOZ_ACCESS_TOKEN: ""
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - '3000:3000'
     depends_on:
