@@ -148,7 +148,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
             const isCollapsedDesktop = collapsed && !mobileOpen;
             return (
               <Link
-                key={sub.key}
+                key={sub.href}
                 href={sub.href}
                 className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   active
@@ -205,7 +205,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                     const icon = menuIconMap[sub.key] || <FileText size={16} />;
                     return (
                       <Link
-                        key={sub.key}
+                        key={sub.href}
                         href={sub.href}
                         className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                           subActive
