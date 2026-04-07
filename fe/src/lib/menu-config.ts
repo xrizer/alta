@@ -63,7 +63,7 @@ export const navTabs: NavTab[] = [
     href: "/dashboard/attendance",
     menuKeys: ["attendance", "leaves"],
     subItems: [
-      { name: "Attendance", key: "attendance", href: "/dashboard/attendance" },
+      { name: "Attendance Records", key: "attendance", href: "/dashboard/attendance" },
       { name: "Check In / Check Out", key: "attendance", href: "/dashboard/attendance/checkin" },
       { name: "Leaves", key: "leaves", href: "/dashboard/leaves" },
     ],
@@ -73,7 +73,7 @@ export const navTabs: NavTab[] = [
     href: "/dashboard/payroll",
     menuKeys: ["payroll", "payslips"],
     subItems: [
-      { name: "Payroll", key: "payroll", href: "/dashboard/payroll" },
+      { name: "Payroll Records", key: "payroll", href: "/dashboard/payroll" },
       { name: "Payslips", key: "payslips", href: "/dashboard/payslips" },
     ],
   },
