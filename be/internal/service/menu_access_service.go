@@ -15,6 +15,32 @@ type MenuAccessService interface {
 	DeleteUserMenuAccess(userID string) error
 }
 
+// roleDefaultMenuKeys defines the default menu access per role,
+// mirroring ROLE_DEFAULTS in the frontend menu-access page.
+var roleDefaultMenuKeys = map[model.Role][]string{
+	model.RoleSuperAdmin: {
+		model.MenuDashboard, model.MenuCompanies, model.MenuDepartments,
+		model.MenuPositions, model.MenuShifts, model.MenuOrganizationStructure,
+		model.MenuUsers, model.MenuEmployees, model.MenuAttendance,
+		model.MenuLeaves, model.MenuPayroll, model.MenuMenuAccessPolicy,
+	},
+	model.RoleAdmin: {
+		model.MenuDashboard, model.MenuCompanies, model.MenuDepartments,
+		model.MenuPositions, model.MenuShifts, model.MenuOrganizationStructure,
+		model.MenuUsers, model.MenuEmployees, model.MenuAttendance,
+		model.MenuLeaves, model.MenuPayroll, model.MenuMenuAccessPolicy,
+	},
+	model.RoleHR: {
+		model.MenuDashboard, model.MenuCompanies, model.MenuDepartments,
+		model.MenuPositions, model.MenuShifts, model.MenuOrganizationStructure,
+		model.MenuUsers, model.MenuEmployees, model.MenuAttendance,
+		model.MenuLeaves, model.MenuPayroll,
+	},
+	model.RoleEmployee: {
+		model.MenuDashboard, model.MenuAttendance, model.MenuLeaves,
+	},
+}
+
 type menuAccessService struct {
 	menuRepo repository.MenuAccessRepository
 	userRepo repository.UserRepository
@@ -33,12 +59,25 @@ func (s *menuAccessService) GetUserMenuKeys(userID string) (*dto.UserMenuKeysRes
 		return nil, errors.New("failed to fetch menu access")
 	}
 
-	keys := make([]string, 0, len(accesses))
-	for _, a := range accesses {
-		keys = append(keys, a.MenuKey)
+	if len(accesses) > 0 {
+		keys := make([]string, 0, len(accesses))
+		for _, a := range accesses {
+			keys = append(keys, a.MenuKey)
+		}
+		return &dto.UserMenuKeysResponse{MenuKeys: keys}, nil
 	}
 
-	return &dto.UserMenuKeysResponse{MenuKeys: keys}, nil
+	// No custom config — return role-based defaults
+	user, err := s.userRepo.FindByID(userID)
+	if err != nil {
+		return nil, errors.New("failed to fetch user")
+	}
+
+	defaults, ok := roleDefaultMenuKeys[user.Role]
+	if !ok {
+		defaults = []string{model.MenuDashboard}
+	}
+	return &dto.UserMenuKeysResponse{MenuKeys: defaults}, nil
 }
 
 func (s *menuAccessService) GetAll() ([]dto.MenuAccessResponse, error) {
