@@ -50,7 +50,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -170,9 +169,7 @@ DataTableProps<TData, TValue>) {
                 </Button>
               </DialogTrigger>
               <DialogContent>
-                <VisuallyHidden>
-                  <DialogTitle>Dialog</DialogTitle>
-                </VisuallyHidden>
+                <DialogTitle>Dialog</DialogTitle>
                 <div className="flex justify-center flex-col items-center gap-6">
                   <Typography variant="h3">
                     Anda yakin ingin menghapus data?
