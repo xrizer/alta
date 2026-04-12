@@ -16,7 +16,6 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 
 const roleOptions = [
-  { value: 'superadmin', label: 'Super Admin' },
   { value: 'admin', label: 'Admin' },
   { value: 'hr', label: 'HR' },
   { value: 'employee', label: 'Employee' },

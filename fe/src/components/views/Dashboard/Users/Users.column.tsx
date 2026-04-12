@@ -34,7 +34,7 @@ const roleConfig: Record<string, { label: string; style: string }> = {
   },
   employee: {
     label: 'Employee',
-    style: 'bg-divider text-secondary',
+    style: 'bg-input text-divider',
   },
 };
 
