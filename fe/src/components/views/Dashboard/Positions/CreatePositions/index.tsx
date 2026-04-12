@@ -29,8 +29,8 @@ const CreatePositions = () => {
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <Typography variant="h2">Create Positions</Typography>
-        <Typography variant="bodyRegular">Add New Positions</Typography>
+        <Typography variant="h2">Create Position</Typography>
+        <Typography variant="bodyRegular">Add New Position</Typography>
       </div>
 
       <form

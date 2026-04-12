@@ -16,6 +16,7 @@ export const editDepartmentSchema = yup.object({
   name: yup.string().required('Name is required'),
   company_id: yup.string().required('Company is required'),
   description: yup.string().required('Description is required'),
+  is_active: yup.boolean(),
 });
 
 export type EditDepartmentPayload = yup.InferType<typeof editDepartmentSchema>;
@@ -49,6 +50,7 @@ const useEditDepartments = () => {
       name: '',
       company_id: '',
       description: '',
+      is_active: false,
     },
   });
 
@@ -72,6 +74,7 @@ const useEditDepartments = () => {
         name: department.name || '',
         company_id: department.company_id || '',
         description: department.description || '',
+        is_active: department.is_active,
       });
     }
   }, [department, reset]);

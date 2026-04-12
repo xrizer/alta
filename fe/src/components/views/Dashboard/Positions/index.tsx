@@ -34,7 +34,7 @@ export default function Positions() {
           <Link href="/dashboard/positions/create">
             <Button>
               <Plus />
-              Add Positions
+              Add Position
             </Button>
           </Link>
         )}

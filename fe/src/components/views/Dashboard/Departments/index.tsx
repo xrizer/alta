@@ -34,7 +34,7 @@ export default function Departments() {
           <Link href="/dashboard/departments/create">
             <Button>
               <Plus />
-              Add Departmens
+              Add Departmen
             </Button>
           </Link>
         )}

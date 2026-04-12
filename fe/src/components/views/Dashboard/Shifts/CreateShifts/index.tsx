@@ -28,8 +28,8 @@ const CreateShifts = () => {
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <Typography variant="h2">Create Positions</Typography>
-        <Typography variant="bodyRegular">Add New Positions</Typography>
+        <Typography variant="h2">Create Shift</Typography>
+        <Typography variant="bodyRegular">Add New Shift</Typography>
       </div>
 
       <form
@@ -128,7 +128,7 @@ const CreateShifts = () => {
           </Button>
 
           <Button type="submit" disabled={isPendingMutateCreateShifts}>
-            {isPendingMutateCreateShifts ? 'Creating...' : 'Create Position'}
+            {isPendingMutateCreateShifts ? 'Creating...' : 'Create Shift'}
           </Button>
         </div>
       </form>

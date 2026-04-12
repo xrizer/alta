@@ -20,6 +20,7 @@ export const editDepartmentSchema = yup.object({
     .min(3, 'Nama minimal 3 karakter'),
   start_time: yup.string().required('Waktu mulai wajib diisi'),
   end_time: yup.string().required('Waktu selesai wajib diisi'),
+  is_active: yup.boolean(),
 });
 
 export type EditPositionPayload = yup.InferType<typeof editDepartmentSchema>;
@@ -54,6 +55,7 @@ const useEditPositions = () => {
       name: '',
       start_time: '',
       end_time: '',
+      is_active: false,
     },
   });
 
@@ -66,7 +68,7 @@ const useEditPositions = () => {
     return res.data;
   };
 
-  const { data: shift, isLoading: isLoadingshift } = useQuery({
+  const { data: shift } = useQuery({
     queryKey: ['shift', shiftId],
     queryFn: getShiftById,
   });
@@ -78,6 +80,7 @@ const useEditPositions = () => {
         name: shift.name || '',
         start_time: shift.start_time || '',
         end_time: shift.end_time || '',
+        is_active: shift.is_active,
       });
     }
   }, [shift, companies, reset]);

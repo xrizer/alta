@@ -20,10 +20,8 @@ const EditShifts = () => {
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <Typography variant="h2">Edit Department</Typography>
-        <Typography variant="bodyRegular">
-          Update department information
-        </Typography>
+        <Typography variant="h2">Edit Shift</Typography>
+        <Typography variant="bodyRegular">Update shift information</Typography>
       </div>
 
       <form
@@ -94,6 +92,25 @@ const EditShifts = () => {
               )}
             />
           </div>
+
+          {/* checkbox */}
+          <Controller
+            name="is_active"
+            control={control}
+            render={({ field }) => (
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={field.value}
+                  onChange={(e) => field.onChange(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 accent-primary "
+                />
+                <label className="text-sm font-medium text-gray-700">
+                  Active
+                </label>
+              </div>
+            )}
+          />
         </div>
 
         <div className="flex justify-end gap-3">
