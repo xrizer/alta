@@ -18,6 +18,7 @@ export const editDepartmentSchema = yup.object({
   company_id: yup.string().required('Company is required'),
   department_id: yup.string().required('Department is required'),
   base_salary: yup.number().required('Base Salary is required'),
+  is_active: yup.boolean(),
 });
 
 export type EditPositionPayload = yup.InferType<typeof editDepartmentSchema>;
@@ -64,6 +65,7 @@ const useEditPositions = () => {
       department_id: '',
       name: '',
       base_salary: 0,
+      is_active: false,
     },
   });
 
@@ -88,6 +90,7 @@ const useEditPositions = () => {
         company_id: position.company_id || '',
         department_id: position.department_id || '',
         base_salary: position.base_salary || 0,
+        is_active: position.is_active,
       });
     }
   }, [position, companies, reset]);

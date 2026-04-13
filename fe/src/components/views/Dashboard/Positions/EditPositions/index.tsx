@@ -29,9 +29,9 @@ const EditPositions = () => {
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <Typography variant="h2">Edit Department</Typography>
+        <Typography variant="h2">Edit Position</Typography>
         <Typography variant="bodyRegular">
-          Update department information
+          Update position information
         </Typography>
       </div>
 
@@ -119,6 +119,25 @@ const EditPositions = () => {
                 isInvalid={errors.base_salary !== undefined}
                 errorMessage={errors.base_salary?.message}
               />
+            )}
+          />
+
+          {/* checkbox */}
+          <Controller
+            name="is_active"
+            control={control}
+            render={({ field }) => (
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={field.value}
+                  onChange={(e) => field.onChange(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 accent-primary "
+                />
+                <label className="text-sm font-medium text-gray-700">
+                  Active
+                </label>
+              </div>
             )}
           />
         </div>

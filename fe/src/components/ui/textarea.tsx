@@ -23,7 +23,7 @@ export function Textarea({
     'w-full rounded-lg px-4 py-2 text-base outline-none transition-all placeholder:text-disable ';
 
   const stateStyle: Record<string, string> = {
-    default: 'border border-input text-foreground',
+    default: 'border border-divider text-foreground',
     error: 'border-2 border-error bg-error-surface text-foreground',
   };
 

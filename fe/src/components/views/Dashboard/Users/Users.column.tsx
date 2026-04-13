@@ -4,7 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { SquarePen, Trash } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import DeleteDepartmentsModal from './DeleteDepartmentsModal';
+import DeleteDepartmentsModal from './DeleteUsersModal';
 import {
   Dialog,
   DialogContent,
@@ -12,16 +12,33 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-export type Departments = {
+export type Users = {
   id: string;
   name: string;
-  company?: {
-    name: string;
-  };
+  role: string;
   is_active: boolean;
 };
 
-export const DepartmensColumn: ColumnDef<Departments>[] = [
+const roleConfig: Record<string, { label: string; style: string }> = {
+  superadmin: {
+    label: 'Superadmin',
+    style: 'bg-primary-surface text-error',
+  },
+  admin: {
+    label: 'Administrator',
+    style: 'bg-primary-surface text-primary',
+  },
+  hr: {
+    label: 'HR',
+    style: 'bg-[#CBE2F7] text-secondary',
+  },
+  employee: {
+    label: 'Employee',
+    style: 'bg-input text-divider',
+  },
+};
+
+export const UsersColumn: ColumnDef<Users>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -48,21 +65,36 @@ export const DepartmensColumn: ColumnDef<Departments>[] = [
     cell: ({ row }) => <div>{row.getValue('name')}</div>,
   },
   {
-    accessorKey: 'company',
-    header: () => <Typography variant="bodyBold">Company</Typography>,
+    accessorKey: 'email',
+    header: () => <Typography variant="bodyBold">Email</Typography>,
     cell: ({ row }) => (
-      <Typography variant="bodyRegular">
-        {row.original.company?.name}
-      </Typography>
+      <Typography variant="bodyRegular">{row.getValue('email')}</Typography>
     ),
   },
   {
-    accessorKey: 'description',
-    header: () => <Typography variant="bodyBold">Description</Typography>,
+    accessorKey: 'role',
+    header: () => <Typography variant="bodyBold">Role</Typography>,
+    cell: ({ row }) => {
+      const roleKey = row.original.role?.toLowerCase();
+
+      const config = roleConfig[roleKey] || {
+        label: 'Employee',
+        style: 'bg-gray-100 text-gray-800',
+      };
+
+      return (
+        <span
+          className={`inline-flex rounded-full px-3 py-0.5 text-xs font-semibold leading-5 ${config.style}`}>
+          {config.label}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: 'phone',
+    header: () => <Typography variant="bodyBold">Phone</Typography>,
     cell: ({ row }) => (
-      <Typography variant="bodyRegular">
-        {row.getValue('description')}
-      </Typography>
+      <Typography variant="bodyRegular">{row.getValue('phone')}</Typography>
     ),
   },
   {
@@ -88,7 +120,7 @@ export const DepartmensColumn: ColumnDef<Departments>[] = [
       return (
         <div className="flex space-x-3 items-center">
           <Link
-            href={`/dashboard/departments/${row.original.id}/edit`}
+            href={`/dashboard/users/${row.original.id}/edit`}
             className="text-secondary hover:text-secondary/90 flex gap-2 font-medium items-center">
             <SquarePen width={20} color="#1890FF" /> Edit
           </Link>

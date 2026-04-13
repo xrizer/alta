@@ -4,7 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { SquarePen, Trash } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import DeleteDepartmentsModal from './DeleteDepartmentsModal';
+import DeleteDepartmentsModal from './DeleteShiftsModal';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-export type Departments = {
+export type Shifts = {
   id: string;
   name: string;
   company?: {
@@ -21,7 +21,7 @@ export type Departments = {
   is_active: boolean;
 };
 
-export const DepartmensColumn: ColumnDef<Departments>[] = [
+export const ShiftsColumn: ColumnDef<Shifts>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -57,12 +57,19 @@ export const DepartmensColumn: ColumnDef<Departments>[] = [
     ),
   },
   {
-    accessorKey: 'description',
-    header: () => <Typography variant="bodyBold">Description</Typography>,
+    accessorKey: 'start_time',
+    header: () => <Typography variant="bodyBold">Start Time</Typography>,
     cell: ({ row }) => (
       <Typography variant="bodyRegular">
-        {row.getValue('description')}
+        {row.getValue('start_time')}
       </Typography>
+    ),
+  },
+  {
+    accessorKey: 'end_time',
+    header: () => <Typography variant="bodyBold">End Time</Typography>,
+    cell: ({ row }) => (
+      <Typography variant="bodyRegular">{row.getValue('end_time')}</Typography>
     ),
   },
   {
@@ -88,7 +95,7 @@ export const DepartmensColumn: ColumnDef<Departments>[] = [
       return (
         <div className="flex space-x-3 items-center">
           <Link
-            href={`/dashboard/departments/${row.original.id}/edit`}
+            href={`/dashboard/shifts/${row.original.id}/edit`}
             className="text-secondary hover:text-secondary/90 flex gap-2 font-medium items-center">
             <SquarePen width={20} color="#1890FF" /> Edit
           </Link>
