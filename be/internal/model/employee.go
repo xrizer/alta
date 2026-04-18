@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -53,6 +54,7 @@ type Employee struct {
 	BPJSKesNo         string         `gorm:"type:varchar(20)" json:"bpjs_kes_no"`
 	BPJSTKNo          string         `gorm:"type:varchar(20)" json:"bpjs_tk_no"`
 	NPWP              string         `gorm:"type:varchar(30)" json:"npwp"`
+	CustomFields      datatypes.JSON `gorm:"type:jsonb" json:"custom_fields,omitempty"`
 	CreatedAt         time.Time      `json:"created_at"`
 	UpdatedAt         time.Time      `json:"updated_at"`
 	DeletedAt         gorm.DeletedAt `gorm:"index" json:"-"`

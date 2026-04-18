@@ -150,6 +150,45 @@ export interface UpdateGradeRequest {
   is_active?: boolean;
 }
 
+// Custom Field Definitions (JSONB-backed)
+export type CustomFieldType = "text" | "number" | "date" | "boolean" | "select";
+export type CustomFieldEntity = "employee";
+
+export interface CustomFieldDefinition {
+  id: string;
+  company_id: string;
+  entity_type: CustomFieldEntity;
+  field_key: string;
+  label: string;
+  field_type: CustomFieldType;
+  options?: string[];
+  is_required: boolean;
+  display_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateCustomFieldDefinitionRequest {
+  company_id: string;
+  entity_type?: CustomFieldEntity;
+  field_key: string;
+  label: string;
+  field_type: CustomFieldType;
+  options?: string[];
+  is_required?: boolean;
+  display_order?: number;
+}
+
+export interface UpdateCustomFieldDefinitionRequest {
+  label?: string;
+  field_type?: CustomFieldType;
+  options?: string[];
+  is_required?: boolean;
+  display_order?: number;
+  is_active?: boolean;
+}
+
 // Department
 export interface Department {
   id: string;
@@ -273,6 +312,7 @@ export interface Employee {
   bpjs_kes_no: string;
   bpjs_tk_no: string;
   npwp: string;
+  custom_fields?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -303,6 +343,7 @@ export interface CreateEmployeeRequest {
   bpjs_kes_no?: string;
   bpjs_tk_no?: string;
   npwp?: string;
+  custom_fields?: Record<string, unknown>;
 }
 
 export interface UpdateEmployeeRequest {
@@ -328,6 +369,7 @@ export interface UpdateEmployeeRequest {
   bpjs_kes_no?: string;
   bpjs_tk_no?: string;
   npwp?: string;
+  custom_fields?: Record<string, unknown>;
 }
 
 // Attendance

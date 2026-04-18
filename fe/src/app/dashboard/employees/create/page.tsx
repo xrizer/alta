@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { User, Company, Department, Position, Shift, JobLevel, Grade, EmployeeStatus } from "@/lib/types";
+import { User, Company, Department, Position, Shift, JobLevel, Grade, EmployeeStatus, CustomFieldDefinition } from "@/lib/types";
 import * as employeeService from "@/services/employee-service";
 import * as userService from "@/services/user-service";
 import * as companyService from "@/services/company-service";
@@ -11,6 +11,8 @@ import * as positionService from "@/services/position-service";
 import * as shiftService from "@/services/shift-service";
 import * as jobLevelService from "@/services/job-level-service";
 import * as gradeService from "@/services/grade-service";
+import * as customFieldService from "@/services/custom-field-service";
+import CustomFieldsForm, { serializeCustomValues } from "@/components/custom-fields-form";
 import { getErrorMessage } from "@/lib/api";
 
 const CONTRACT_STATUSES: EmployeeStatus[] = ["kontrak", "probation", "pkwt", "internship"];
@@ -29,6 +31,8 @@ export default function CreateEmployeePage() {
   const [shifts, setShifts] = useState<Shift[]>([]);
   const [jobLevels, setJobLevels] = useState<JobLevel[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
+  const [customFieldDefs, setCustomFieldDefs] = useState<CustomFieldDefinition[]>([]);
+  const [customValues, setCustomValues] = useState<Record<string, unknown>>({});
 
   const [form, setForm] = useState({
     user_id: "",
@@ -85,6 +89,34 @@ export default function CreateEmployeePage() {
     loadDropdowns();
   }, []);
 
+  // Load custom field definitions whenever the selected company changes
+  useEffect(() => {
+    if (!form.company_id) {
+      setCustomFieldDefs([]);
+      return;
+    }
+    const loadDefs = async () => {
+      try {
+        const res = await customFieldService.getCustomFields({
+          company_id: form.company_id,
+          entity_type: "employee",
+        });
+        if (res.success && res.data) {
+          setCustomFieldDefs(res.data);
+        } else {
+          setCustomFieldDefs([]);
+        }
+      } catch {
+        setCustomFieldDefs([]);
+      }
+    };
+    loadDefs();
+  }, [form.company_id]);
+
+  const handleCustomChange = (key: string, value: unknown) => {
+    setCustomValues((prev) => ({ ...prev, [key]: value }));
+  };
+
   // Filter grades by selected job level
   const filteredGrades = useMemo(() => {
     if (!form.job_level_id) return grades;
@@ -110,6 +142,7 @@ export default function CreateEmployeePage() {
     setError("");
     setIsSubmitting(true);
     try {
+      const custom_fields = serializeCustomValues(customFieldDefs, customValues);
       const res = await employeeService.createEmployee({
         user_id: form.user_id,
         company_id: form.company_id,
@@ -134,6 +167,7 @@ export default function CreateEmployeePage() {
         bpjs_kes_no: form.bpjs_kes_no || undefined,
         bpjs_tk_no: form.bpjs_tk_no || undefined,
         npwp: form.npwp || undefined,
+        custom_fields: Object.keys(custom_fields).length > 0 ? custom_fields : undefined,
       });
       if (res.success) router.push("/dashboard/employees");
       else setError(res.message);
@@ -486,6 +520,14 @@ export default function CreateEmployeePage() {
             </div>
           </div>
         </div>
+
+        {/* Custom Fields Section */}
+        <CustomFieldsForm
+          definitions={customFieldDefs}
+          values={customValues}
+          onChange={handleCustomChange}
+          disabled={isSubmitting}
+        />
 
         <div className="flex justify-end gap-3">
           <button

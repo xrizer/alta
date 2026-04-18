@@ -42,6 +42,7 @@ func ConnectDatabase(cfg *Config) *gorm.DB {
 		&model.Notification{},
 		&model.JobLevel{},
 		&model.Grade{},
+		&model.CustomFieldDefinition{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}

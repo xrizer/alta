@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -20,14 +21,15 @@ type EmployeeService interface {
 }
 
 type employeeService struct {
-	empRepo      repository.EmployeeRepository
-	userRepo     repository.UserRepository
-	companyRepo  repository.CompanyRepository
-	deptRepo     repository.DepartmentRepository
-	posRepo      repository.PositionRepository
-	shiftRepo    repository.ShiftRepository
-	jobLevelRepo repository.JobLevelRepository
-	gradeRepo    repository.GradeRepository
+	empRepo         repository.EmployeeRepository
+	userRepo        repository.UserRepository
+	companyRepo     repository.CompanyRepository
+	deptRepo        repository.DepartmentRepository
+	posRepo         repository.PositionRepository
+	shiftRepo       repository.ShiftRepository
+	jobLevelRepo    repository.JobLevelRepository
+	gradeRepo       repository.GradeRepository
+	customFieldSvc  CustomFieldDefinitionService
 }
 
 func NewEmployeeService(
@@ -39,16 +41,18 @@ func NewEmployeeService(
 	shiftRepo repository.ShiftRepository,
 	jobLevelRepo repository.JobLevelRepository,
 	gradeRepo repository.GradeRepository,
+	customFieldSvc CustomFieldDefinitionService,
 ) EmployeeService {
 	return &employeeService{
-		empRepo:      empRepo,
-		userRepo:     userRepo,
-		companyRepo:  companyRepo,
-		deptRepo:     deptRepo,
-		posRepo:      posRepo,
-		shiftRepo:    shiftRepo,
-		jobLevelRepo: jobLevelRepo,
-		gradeRepo:    gradeRepo,
+		empRepo:        empRepo,
+		userRepo:       userRepo,
+		companyRepo:    companyRepo,
+		deptRepo:       deptRepo,
+		posRepo:        posRepo,
+		shiftRepo:      shiftRepo,
+		jobLevelRepo:   jobLevelRepo,
+		gradeRepo:      gradeRepo,
+		customFieldSvc: customFieldSvc,
 	}
 }
 
@@ -221,6 +225,21 @@ func (s *employeeService) Create(req dto.CreateEmployeeRequest) (*dto.EmployeeRe
 		}
 	}
 
+	// Validate custom fields against definitions for this company
+	if s.customFieldSvc != nil {
+		sanitized, err := s.customFieldSvc.ValidateValues(req.CompanyID, model.CustomFieldEntityEmployee, req.CustomFields)
+		if err != nil {
+			return nil, err
+		}
+		if len(sanitized) > 0 {
+			b, err := json.Marshal(sanitized)
+			if err != nil {
+				return nil, errors.New("failed to encode custom fields")
+			}
+			emp.CustomFields = b
+		}
+	}
+
 	if err := s.empRepo.Create(emp); err != nil {
 		return nil, errors.New("failed to create employee")
 	}
@@ -350,6 +369,23 @@ func (s *employeeService) Update(id string, req dto.UpdateEmployeeRequest) (*dto
 	}
 	if req.NPWP != "" {
 		emp.NPWP = req.NPWP
+	}
+
+	// Update custom fields if provided (nil = untouched; empty map = clear)
+	if req.CustomFields != nil && s.customFieldSvc != nil {
+		sanitized, err := s.customFieldSvc.ValidateValues(emp.CompanyID, model.CustomFieldEntityEmployee, req.CustomFields)
+		if err != nil {
+			return nil, err
+		}
+		if len(sanitized) == 0 {
+			emp.CustomFields = nil
+		} else {
+			b, err := json.Marshal(sanitized)
+			if err != nil {
+				return nil, errors.New("failed to encode custom fields")
+			}
+			emp.CustomFields = b
+		}
 	}
 
 	if err := s.empRepo.Update(emp); err != nil {

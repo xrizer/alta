@@ -93,10 +93,11 @@ export const navTabs: NavTab[] = [
   {
     name: "Settings",
     href: "/dashboard/settings/job-levels",
-    menuKeys: ["job_levels", "grades"],
+    menuKeys: ["job_levels", "grades", "custom_fields"],
     subItems: [
       { name: "Job Levels", key: "job_levels", href: "/dashboard/settings/job-levels" },
       { name: "Grades", key: "grades", href: "/dashboard/settings/grades" },
+      { name: "Custom Fields", key: "custom_fields", href: "/dashboard/settings/custom-fields" },
     ],
   },
 ];

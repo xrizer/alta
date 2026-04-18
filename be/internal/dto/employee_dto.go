@@ -1,6 +1,8 @@
 package dto
 
 import (
+	"encoding/json"
+
 	"hris-backend/internal/model"
 )
 
@@ -30,6 +32,7 @@ type CreateEmployeeRequest struct {
 	BPJSKesNo         string               `json:"bpjs_kes_no"`
 	BPJSTKNo          string               `json:"bpjs_tk_no"`
 	NPWP              string               `json:"npwp"`
+	CustomFields      map[string]interface{} `json:"custom_fields"`
 }
 
 type UpdateEmployeeRequest struct {
@@ -55,6 +58,7 @@ type UpdateEmployeeRequest struct {
 	BPJSKesNo         string               `json:"bpjs_kes_no"`
 	BPJSTKNo          string               `json:"bpjs_tk_no"`
 	NPWP              string               `json:"npwp"`
+	CustomFields      map[string]interface{} `json:"custom_fields"`
 }
 
 type EmployeeResponse struct {
@@ -92,6 +96,7 @@ type EmployeeResponse struct {
 	BPJSKesNo         string               `json:"bpjs_kes_no"`
 	BPJSTKNo          string               `json:"bpjs_tk_no"`
 	NPWP              string               `json:"npwp"`
+	CustomFields      map[string]interface{} `json:"custom_fields,omitempty"`
 	CreatedAt         string               `json:"created_at"`
 	UpdatedAt         string               `json:"updated_at"`
 }
@@ -140,6 +145,12 @@ func ToEmployeeResponse(emp *model.Employee) EmployeeResponse {
 	}
 	if emp.GradeID != nil {
 		resp.GradeID = *emp.GradeID
+	}
+	if len(emp.CustomFields) > 0 {
+		var cf map[string]interface{}
+		if err := json.Unmarshal(emp.CustomFields, &cf); err == nil {
+			resp.CustomFields = cf
+		}
 	}
 
 	if emp.User.ID != "" {

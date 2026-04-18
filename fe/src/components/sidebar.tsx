@@ -36,6 +36,7 @@ import {
   Wrench,
   SlidersHorizontal,
   Layers,
+  ListPlus,
 } from 'lucide-react';
 
 // Map backend menu keys to react-feather icons
@@ -54,6 +55,7 @@ const menuIconMap: Record<string, React.ReactNode> = {
   menu_access_policy: <Wrench size={18} />,
   job_levels: <Layers size={18} />,
   grades: <SlidersHorizontal size={18} />,
+  custom_fields: <ListPlus size={18} />,
 };
 
 const tabIconMap: Record<string, React.ReactNode> = {

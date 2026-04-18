@@ -72,6 +72,7 @@ func main() {
 	payrollRepo := repository.NewPayrollRepository(db)
 	jobLevelRepo := repository.NewJobLevelRepository(db)
 	gradeRepo := repository.NewGradeRepository(db)
+	customFieldRepo := repository.NewCustomFieldDefinitionRepository(db)
 
 	// Services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -80,7 +81,8 @@ func main() {
 	deptService := service.NewDepartmentService(deptRepo, companyRepo)
 	posService := service.NewPositionService(posRepo, companyRepo)
 	shiftService := service.NewShiftService(shiftRepo, companyRepo)
-	empService := service.NewEmployeeService(empRepo, userRepo, companyRepo, deptRepo, posRepo, shiftRepo, jobLevelRepo, gradeRepo)
+	customFieldService := service.NewCustomFieldDefinitionService(customFieldRepo, companyRepo)
+	empService := service.NewEmployeeService(empRepo, userRepo, companyRepo, deptRepo, posRepo, shiftRepo, jobLevelRepo, gradeRepo, customFieldService)
 	empSalaryService := service.NewEmployeeSalaryService(empSalaryRepo, empRepo)
 	holidayService := service.NewHolidayService(holidayRepo, companyRepo)
 	attService := service.NewAttendanceService(attRepo, empRepo, shiftRepo)
@@ -111,6 +113,7 @@ func main() {
 	notifHandler := handler.NewNotificationHandler(notifService)
 	jobLevelHandler := handler.NewJobLevelHandler(jobLevelService)
 	gradeHandler := handler.NewGradeHandler(gradeService)
+	customFieldHandler := handler.NewCustomFieldDefinitionHandler(customFieldService)
 
 	// Start Kafka consumer — processes events and writes notifications to DB
 	processor := kafka.NewEventProcessor(notifRepo, userRepo)
@@ -289,6 +292,14 @@ func main() {
 	grades.Post("/", middleware.RoleMiddleware("admin"), gradeHandler.Create)
 	grades.Put("/:id", middleware.RoleMiddleware("admin"), gradeHandler.Update)
 	grades.Delete("/:id", middleware.RoleMiddleware("admin"), gradeHandler.Delete)
+
+	// Custom field definition routes (admin, hr can view; admin can manage)
+	customFields := api.Group("/custom-fields", middleware.AuthMiddleware(cfg), middleware.RoleMiddleware("admin", "hr"))
+	customFields.Get("/", customFieldHandler.GetAll)
+	customFields.Get("/:id", customFieldHandler.GetByID)
+	customFields.Post("/", middleware.RoleMiddleware("admin"), customFieldHandler.Create)
+	customFields.Put("/:id", middleware.RoleMiddleware("admin"), customFieldHandler.Update)
+	customFields.Delete("/:id", middleware.RoleMiddleware("admin"), customFieldHandler.Delete)
 
 	// Swagger documentation
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)

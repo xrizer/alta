@@ -24,6 +24,7 @@ const (
 	MenuMenuAccessPolicy     = "menu_access_policy"
 	MenuJobLevels            = "job_levels"
 	MenuGrades               = "grades"
+	MenuCustomFields         = "custom_fields"
 )
 
 var ValidMenuKeys = map[string]bool{
@@ -42,6 +43,7 @@ var ValidMenuKeys = map[string]bool{
 	MenuMenuAccessPolicy:     true,
 	MenuJobLevels:            true,
 	MenuGrades:               true,
+	MenuCustomFields:         true,
 }
 
 type MenuAccess struct {
