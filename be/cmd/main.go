@@ -205,6 +205,7 @@ func main() {
 	empSalaries.Get("/:id", empSalaryHandler.GetByID)
 	empSalaries.Get("/employee/:employeeId/latest", empSalaryHandler.GetLatest)
 	empSalaries.Post("/", middleware.RoleMiddleware("admin"), empSalaryHandler.Create)
+	empSalaries.Post("/seed-from-position/:employeeId", middleware.RoleMiddleware("admin"), empSalaryHandler.SeedFromPosition)
 	empSalaries.Put("/:id", middleware.RoleMiddleware("admin"), empSalaryHandler.Update)
 	empSalaries.Delete("/:id", middleware.RoleMiddleware("admin"), empSalaryHandler.Delete)
 

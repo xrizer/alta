@@ -380,6 +380,38 @@ export interface Payroll {
   updated_at: string;
 }
 
+// Employee Salary
+export interface EmployeeSalary {
+  id: string;
+  employee_id: string;
+  basic_salary: number;
+  transport_allowance: number;
+  meal_allowance: number;
+  housing_allowance: number;
+  position_allowance: number;
+  bpjs_kes_employee: number;
+  bpjs_kes_company: number;
+  bpjs_tk_jht_employee: number;
+  bpjs_tk_jht_company: number;
+  bpjs_tk_jkk: number;
+  bpjs_tk_jkm: number;
+  bpjs_tk_jp_employee: number;
+  bpjs_tk_jp_company: number;
+  effective_date: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateEmployeeSalaryRequest {
+  employee_id: string;
+  basic_salary: number;
+  transport_allowance?: number;
+  meal_allowance?: number;
+  housing_allowance?: number;
+  position_allowance?: number;
+  effective_date: string;
+}
+
 export type NotificationType = "info" | "success" | "warning" | "error";
 
 export interface Notification {

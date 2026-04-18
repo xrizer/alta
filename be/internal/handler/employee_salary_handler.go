@@ -117,6 +117,25 @@ func (h *EmployeeSalaryHandler) Create(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusCreated, "Employee salary created", salary)
 }
 
+// SeedFromPosition godoc
+// @Summary Seed salary from position base salary
+// @Description Create an employee salary record using the position's base salary and standard Indonesian BPJS rates. Fails if a salary record already exists.
+// @Tags Employee Salaries
+// @Security Bearer
+// @Produce json
+// @Param employeeId path string true "Employee ID"
+// @Success 201 {object} response.Response{data=dto.EmployeeSalaryResponse} "Employee salary seeded"
+// @Failure 400 {object} response.Response "Seed failed"
+// @Router /employee-salaries/seed-from-position/{employeeId} [post]
+func (h *EmployeeSalaryHandler) SeedFromPosition(c *fiber.Ctx) error {
+	employeeID := c.Params("employeeId")
+	salary, err := h.salaryService.SeedFromPosition(employeeID)
+	if err != nil {
+		return response.Error(c, fiber.StatusBadRequest, err.Error())
+	}
+	return response.Success(c, fiber.StatusCreated, "Employee salary seeded from position", salary)
+}
+
 // Update godoc
 // @Summary Update an employee salary
 // @Description Update an existing salary record by ID
