@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 export type Companies = {
   id: string;
@@ -111,7 +112,9 @@ export const CompaniesColumn: ColumnDef<Companies>[] = [
               </Button>
             </DialogTrigger>
             <DialogContent>
-              <DialogTitle></DialogTitle>
+              <VisuallyHidden>
+                <DialogTitle>Dialog</DialogTitle>
+              </VisuallyHidden>
               <DeleteClientsModal id={row.original.id} />
             </DialogContent>
           </Dialog>
