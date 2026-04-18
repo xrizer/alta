@@ -76,6 +76,32 @@ export const navTabs: NavTab[] = [
     ],
   },
   {
+    name: "Field Ops",
+    href: "/dashboard/visits",
+    menuKeys: ["attendance"], // reuse attendance key; gated further by module
+    moduleKey: "visit_tracking",
+    subItems: [
+      {
+        name: "Visits",
+        key: "attendance",
+        href: "/dashboard/visits",
+        moduleKey: "visit_tracking",
+      },
+      {
+        name: "Visit Plans",
+        key: "attendance",
+        href: "/dashboard/visit-plans",
+        moduleKey: "visit_planning",
+      },
+      {
+        name: "Adherence Report",
+        key: "attendance",
+        href: "/dashboard/visit-plans/report",
+        moduleKey: "visit_planning",
+      },
+    ],
+  },
+  {
     name: "Payroll",
     href: "/dashboard/payroll",
     menuKeys: ["payroll", "payslips"],

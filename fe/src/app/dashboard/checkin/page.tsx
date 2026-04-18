@@ -8,7 +8,8 @@ import * as employeeService from "@/services/employee-service";
 import { getErrorMessage } from "@/lib/api";
 
 export default function CheckInPage() {
-  const { user } = useAuth();
+  const { user, enabledModules } = useAuth();
+  const geoEnabled = enabledModules?.includes("geo_attendance") ?? false;
   const [myEmployee, setMyEmployee] = useState<Employee | null>(null);
   const [todayAttendance, setTodayAttendance] = useState<Attendance | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -17,6 +18,10 @@ export default function CheckInPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
+  // GPS + photo capture state (only used when geo_attendance module is on)
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [photoDataUrl, setPhotoDataUrl] = useState<string>("");
+  const [isLocating, setIsLocating] = useState(false);
 
   // Live clock
   useEffect(() => {
@@ -60,17 +65,58 @@ export default function CheckInPage() {
     init();
   }, [fetchTodayAttendance]);
 
+  const captureLocation = useCallback(() => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      setError("Geolocation is not available in this browser");
+      return;
+    }
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setIsLocating(false);
+      },
+      (err) => {
+        setError(`Failed to get location: ${err.message}`);
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, []);
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setPhotoDataUrl(typeof reader.result === "string" ? reader.result : "");
+    reader.readAsDataURL(file);
+  };
+
+  const buildGeoPayload = () => {
+    if (!geoEnabled) return {};
+    return {
+      lat: coords?.lat,
+      lng: coords?.lng,
+      photo: photoDataUrl || undefined,
+    };
+  };
+
   const handleClockIn = async () => {
     if (!myEmployee) return;
     setError("");
     setSuccess("");
     setIsSubmitting(true);
     try {
-      const res = await attendanceService.clockIn({ employee_id: myEmployee.id, notes: notes || undefined });
+      const res = await attendanceService.clockIn({
+        employee_id: myEmployee.id,
+        notes: notes || undefined,
+        ...buildGeoPayload(),
+      });
       if (res.success && res.data) {
         setTodayAttendance(res.data);
         setSuccess("Clock in successful!");
         setNotes("");
+        setPhotoDataUrl("");
       } else {
         setError(res.message);
       }
@@ -87,11 +133,15 @@ export default function CheckInPage() {
     setSuccess("");
     setIsSubmitting(true);
     try {
-      const res = await attendanceService.clockOut(todayAttendance.id, { notes: notes || undefined });
+      const res = await attendanceService.clockOut(todayAttendance.id, {
+        notes: notes || undefined,
+        ...buildGeoPayload(),
+      });
       if (res.success && res.data) {
         setTodayAttendance(res.data);
         setSuccess("Clock out successful!");
         setNotes("");
+        setPhotoDataUrl("");
       } else {
         setError(res.message);
       }
@@ -192,6 +242,42 @@ export default function CheckInPage() {
                   onChange={(e) => setNotes(e.target.value)}
                   className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm text-gray-900 dark:text-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+              </div>
+            )}
+
+            {/* GPS + photo — only when geo_attendance module enabled */}
+            {geoEnabled && checkInState !== "completed" && (
+              <div className="w-full space-y-2 rounded-lg border border-gray-200 dark:border-gray-700 p-3 text-left">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Location</span>
+                  <button
+                    type="button"
+                    onClick={captureLocation}
+                    disabled={isLocating}
+                    className="text-xs rounded-md bg-blue-600 px-2 py-1 text-white hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {isLocating ? "Locating..." : coords ? "Re-capture" : "Capture GPS"}
+                  </button>
+                </div>
+                {coords && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 tabular-nums">
+                    {coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}
+                  </p>
+                )}
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Photo</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handlePhotoChange}
+                    className="text-xs text-gray-600 dark:text-gray-300"
+                  />
+                </div>
+                {photoDataUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={photoDataUrl} alt="Capture preview" className="w-full h-24 object-cover rounded-md" />
+                )}
               </div>
             )}
 

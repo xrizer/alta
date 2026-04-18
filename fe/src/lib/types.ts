@@ -569,3 +569,120 @@ export interface SetCompanyModuleRequest {
   config?: string;
 }
 
+// Visits (opt-in: visit_tracking) — multi-point check-ins inside an attendance
+export interface Visit {
+  id: string;
+  attendance_id: string;
+  employee_id: string;
+  company_id: string;
+  location: string;
+  sub_location: string;
+  purpose: string;
+  arrived_at: string;
+  left_at?: string;
+  result_notes: string;
+  photos: string[];
+  lat?: number;
+  lng?: number;
+  visit_plan_item_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StartVisitRequest {
+  attendance_id: string;
+  location: string;
+  sub_location?: string;
+  purpose?: string;
+  lat?: number;
+  lng?: number;
+  photos?: string[];
+  visit_plan_item_id?: string;
+}
+
+export interface EndVisitRequest {
+  result_notes?: string;
+  photos?: string[];
+}
+
+export interface PaginatedVisitResponse {
+  data: Visit[];
+  page: number;
+  limit: number;
+  total_items: number;
+  total_pages: number;
+}
+
+// Visit plans (opt-in: visit_planning)
+export interface VisitPlanItem {
+  id: string;
+  visit_plan_id: string;
+  location: string;
+  sub_location: string;
+  purpose: string;
+  scheduled_time?: string;
+  sequence_order: number;
+  status: "pending" | "visited" | "skipped";
+  linked_visit_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VisitPlan {
+  id: string;
+  employee_id: string;
+  company_id: string;
+  plan_date: string;
+  status: string;
+  notes: string;
+  created_by: string;
+  items: VisitPlanItem[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VisitPlanItemInput {
+  location: string;
+  sub_location?: string;
+  purpose?: string;
+  scheduled_time?: string;
+  sequence_order?: number;
+}
+
+export interface CreateVisitPlanRequest {
+  employee_id: string;
+  plan_date: string; // YYYY-MM-DD
+  notes?: string;
+  status?: string;
+  items?: VisitPlanItemInput[];
+}
+
+export interface UpdateVisitPlanRequest {
+  notes?: string;
+  status?: string;
+}
+
+export interface UpdateVisitPlanItemRequest {
+  location?: string;
+  sub_location?: string;
+  purpose?: string;
+  scheduled_time?: string;
+  sequence_order?: number;
+  status?: "pending" | "visited" | "skipped";
+}
+
+export interface VisitAdherenceRow {
+  employee_id: string;
+  employee_name: string;
+  planned_count: number;
+  actual_count: number;
+  matched_count: number;
+  under_minimum: boolean;
+  minimum_target: number;
+}
+
+export interface VisitAdherenceReport {
+  date: string;
+  minimum: number;
+  rows: VisitAdherenceRow[];
+}
