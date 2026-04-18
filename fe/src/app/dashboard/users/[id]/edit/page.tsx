@@ -4,6 +4,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Role, User } from "@/lib/types";
 import * as userService from "@/services/user-service";
+import { getErrorMessage } from "@/lib/api";
 
 export default function EditUserPage() {
   const router = useRouter();
@@ -42,8 +43,8 @@ export default function EditUserPage() {
         } else {
           setError("User not found");
         }
-      } catch {
-        setError("Failed to fetch user");
+      } catch (err) {
+        setError(getErrorMessage(err, "Failed to fetch user"));
       } finally {
         setIsLoading(false);
       }
@@ -90,8 +91,8 @@ export default function EditUserPage() {
       } else {
         setError(res.message);
       }
-    } catch {
-      setError("Failed to update user");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to update user"));
     } finally {
       setIsSubmitting(false);
     }

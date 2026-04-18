@@ -6,6 +6,7 @@ import { SquarePen, Trash } from 'lucide-react';
 import { Employee } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context';
 import * as employeeService from '@/services/employee-service';
+import { getErrorMessage } from '@/lib/api';
 import Pagination from '@/components/pagination';
 
 type SortField =
@@ -55,8 +56,8 @@ export default function EmployeesPage() {
     try {
       const res = await employeeService.getEmployees();
       if (res.success && res.data) setAllEmployees(res.data);
-    } catch {
-      setError('Failed to fetch employees');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to fetch employees'));
     } finally {
       setIsLoading(false);
     }
@@ -100,8 +101,8 @@ export default function EmployeesPage() {
       if (res.success)
         setAllEmployees((prev) => prev.filter((e) => e.id !== id));
       else setError(res.message);
-    } catch {
-      setError('Failed to delete employee');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to delete employee'));
     }
   };
 

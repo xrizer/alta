@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Employee, LeaveType } from "@/lib/types";
 import * as leaveService from "@/services/leave-service";
 import * as employeeService from "@/services/employee-service";
+import { getErrorMessage } from "@/lib/api";
 
 export default function CreateLeavePage() {
   const router = useRouter();
@@ -27,8 +28,8 @@ export default function CreateLeavePage() {
         const res = await employeeService.getMyEmployee();
         if (res.success && res.data) setMyEmployee(res.data);
         else setError("Employee record not found. Please contact admin.");
-      } catch {
-        setError("Failed to load employee data");
+      } catch (err) {
+        setError(getErrorMessage(err, "Failed to load employee data"));
       } finally {
         setIsLoading(false);
       }
@@ -53,8 +54,8 @@ export default function CreateLeavePage() {
       });
       if (res.success) router.push("/dashboard/leaves");
       else setError(res.message);
-    } catch {
-      setError("Failed to create leave request");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to create leave request"));
     } finally {
       setIsSubmitting(false);
     }

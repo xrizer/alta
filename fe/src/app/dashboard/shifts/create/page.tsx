@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Company } from "@/lib/types";
 import * as shiftService from "@/services/shift-service";
 import * as companyService from "@/services/company-service";
+import { getErrorMessage } from "@/lib/api";
 
 export default function CreateShiftPage() {
   const router = useRouter();
@@ -23,8 +24,8 @@ export default function CreateShiftPage() {
       try {
         const res = await companyService.getCompaniesAll();
         if (res.success && res.data) setCompanies(res.data);
-      } catch {
-        setError("Failed to fetch companies");
+      } catch (err) {
+        setError(getErrorMessage(err, "Failed to fetch companies"));
       }
     };
     fetchCompanies();
@@ -42,8 +43,8 @@ export default function CreateShiftPage() {
       const res = await shiftService.createShift(form);
       if (res.success) router.push("/dashboard/shifts");
       else setError(res.message);
-    } catch {
-      setError("Failed to create shift");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to create shift"));
     } finally {
       setIsSubmitting(false);
     }

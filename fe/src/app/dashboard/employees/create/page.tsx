@@ -9,6 +9,7 @@ import * as companyService from "@/services/company-service";
 import * as departmentService from "@/services/department-service";
 import * as positionService from "@/services/position-service";
 import * as shiftService from "@/services/shift-service";
+import { getErrorMessage } from "@/lib/api";
 
 export default function CreateEmployeePage() {
   const router = useRouter();
@@ -61,8 +62,8 @@ export default function CreateEmployeePage() {
         if (departmentsRes.success && departmentsRes.data) setDepartments(departmentsRes.data);
         if (positionsRes.success && positionsRes.data) setPositions(positionsRes.data);
         if (shiftsRes.success && shiftsRes.data) setShifts(shiftsRes.data);
-      } catch {
-        setError("Failed to load dropdown data");
+      } catch (err) {
+        setError(getErrorMessage(err, "Failed to load dropdown data"));
       } finally {
         setIsLoadingData(false);
       }
@@ -104,8 +105,8 @@ export default function CreateEmployeePage() {
       });
       if (res.success) router.push("/dashboard/employees");
       else setError(res.message);
-    } catch {
-      setError("Failed to create employee");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to create employee"));
     } finally {
       setIsSubmitting(false);
     }

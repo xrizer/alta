@@ -6,6 +6,7 @@ import { SquarePen, Trash } from "lucide-react";
 import { Position } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as positionService from "@/services/position-service";
+import { getErrorMessage } from "@/lib/api";
 import Pagination from "@/components/pagination";
 
 type SortField = "name" | "company" | "department" | "base_salary" | "is_active";
@@ -42,8 +43,8 @@ export default function PositionsPage() {
     try {
       const res = await positionService.getPositions();
       if (res.success && res.data) setAllPositions(res.data);
-    } catch {
-      setError("Failed to fetch positions");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to fetch positions"));
     } finally {
       setIsLoading(false);
     }
@@ -74,8 +75,8 @@ export default function PositionsPage() {
       const res = await positionService.deletePosition(id);
       if (res.success) setAllPositions((prev) => prev.filter((p) => p.id !== id));
       else setError(res.message);
-    } catch {
-      setError("Failed to delete position");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to delete position"));
     }
   };
 

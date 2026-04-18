@@ -4,6 +4,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { useRouter, useParams } from "next/navigation";
 import * as shiftService from "@/services/shift-service";
 import * as companyService from "@/services/company-service";
+import { getErrorMessage } from "@/lib/api";
 
 export default function EditShiftPage() {
   const router = useRouter();
@@ -44,8 +45,8 @@ export default function EditShiftPage() {
         } else {
           setError("Shift not found");
         }
-      } catch {
-        setError("Failed to fetch shift");
+      } catch (err) {
+        setError(getErrorMessage(err, "Failed to fetch shift"));
       } finally {
         setIsLoading(false);
       }
@@ -67,8 +68,8 @@ export default function EditShiftPage() {
       const res = await shiftService.updateShift(shiftId, form);
       if (res.success) router.push("/dashboard/shifts");
       else setError(res.message);
-    } catch {
-      setError("Failed to update shift");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to update shift"));
     } finally {
       setIsSubmitting(false);
     }

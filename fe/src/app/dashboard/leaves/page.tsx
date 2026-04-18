@@ -7,6 +7,7 @@ import { Leave, Employee } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as leaveService from "@/services/leave-service";
 import * as employeeService from "@/services/employee-service";
+import { getErrorMessage } from "@/lib/api";
 
 export default function LeavesPage() {
   const { user } = useAuth();
@@ -37,8 +38,8 @@ export default function LeavesPage() {
           // Employee record not found for this user
         }
       }
-    } catch {
-      setError("Failed to fetch leaves");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to fetch leaves"));
     } finally {
       setIsLoading(false);
     }
@@ -64,8 +65,8 @@ export default function LeavesPage() {
       } else {
         setError(res.message);
       }
-    } catch {
-      setError("Failed to update leave");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to update leave"));
     }
   };
 

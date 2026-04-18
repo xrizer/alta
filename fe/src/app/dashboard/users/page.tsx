@@ -6,6 +6,7 @@ import { SquarePen, Trash } from "lucide-react";
 import { User } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as userService from "@/services/user-service";
+import { getErrorMessage } from "@/lib/api";
 import Pagination from "@/components/pagination";
 
 type SortField = "name" | "email" | "role" | "phone" | "is_active";
@@ -39,8 +40,8 @@ export default function UsersPage() {
     try {
       const res = await userService.getUsers();
       if (res.success && res.data) setAllUsers(res.data);
-    } catch {
-      setError("Failed to fetch users");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to fetch users"));
     } finally {
       setIsLoading(false);
     }
@@ -71,8 +72,8 @@ export default function UsersPage() {
       const res = await userService.deleteUser(id);
       if (res.success) setAllUsers((prev) => prev.filter((u) => u.id !== id));
       else setError(res.message);
-    } catch {
-      setError("Failed to delete user");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to delete user"));
     }
   };
 

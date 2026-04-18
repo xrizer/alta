@@ -9,6 +9,7 @@ import {
 } from "@/lib/types";
 import * as companyService from "@/services/company-service";
 import * as organizationService from "@/services/organization-service";
+import { getErrorMessage } from "@/lib/api";
 
 function EmployeeIcon() {
   return (
@@ -104,8 +105,8 @@ export default function OrganizationStructurePage() {
             setSelectedCompany(res.data[0].id);
           }
         }
-      } catch {
-        setError("Failed to load companies");
+      } catch (err) {
+        setError(getErrorMessage(err, "Failed to load companies"));
       } finally {
         setLoadingCompanies(false);
       }
@@ -129,8 +130,8 @@ export default function OrganizationStructurePage() {
         } else {
           setError(res.message || "Failed to load organization structure");
         }
-      } catch {
-        setError("Failed to load organization structure");
+      } catch (err) {
+        setError(getErrorMessage(err, "Failed to load organization structure"));
       } finally {
         setLoading(false);
       }
