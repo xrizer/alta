@@ -15,11 +15,15 @@ import { setAccessToken } from "@/lib/api";
 import * as authService from "@/services/auth-service";
 import * as userService from "@/services/user-service";
 import * as menuAccessService from "@/services/menu-access-service";
+import * as moduleService from "@/services/module-service";
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   allowedMenuKeys: string[] | null;
+  // Feature modules enabled for the user's company.
+  // null = still loading or unknown; [] = none; array = effective list.
+  enabledModules: string[] | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -30,6 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [allowedMenuKeys, setAllowedMenuKeys] = useState<string[] | null>(null);
+  const [enabledModules, setEnabledModules] = useState<string[] | null>(null);
   const router = useRouter();
   const hasAttemptedRefresh = useRef(false);
 
@@ -47,6 +52,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const loadEnabledModules = useCallback(async () => {
+    try {
+      const res = await moduleService.getMyModules();
+      if (res.success && res.data) {
+        setEnabledModules(res.data.enabled_modules);
+      } else {
+        setEnabledModules(null);
+      }
+    } catch {
+      setEnabledModules(null);
+    }
+  }, []);
+
   const loadUser = useCallback(async () => {
     // Only attempt refresh once per mount to avoid loops
     if (hasAttemptedRefresh.current) return;
@@ -59,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const meRes = await userService.getMe();
         if (meRes.success && meRes.data) {
           setUser(meRes.data);
-          await loadMenuKeys();
+          await Promise.all([loadMenuKeys(), loadEnabledModules()]);
         }
       }
     } catch {
@@ -67,10 +85,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAccessToken(null);
       setUser(null);
       setAllowedMenuKeys(null);
+      setEnabledModules(null);
     } finally {
       setIsLoading(false);
     }
-  }, [loadMenuKeys]);
+  }, [loadMenuKeys, loadEnabledModules]);
 
   useEffect(() => {
     loadUser();
@@ -83,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const meRes = await userService.getMe();
       if (meRes.success && meRes.data) {
         setUser(meRes.data);
-        await loadMenuKeys();
+        await Promise.all([loadMenuKeys(), loadEnabledModules()]);
       }
       router.push("/dashboard");
     } else {
@@ -98,12 +117,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setAccessToken(null);
       setUser(null);
       setAllowedMenuKeys(null);
+      setEnabledModules(null);
       router.push("/login");
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, allowedMenuKeys, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, allowedMenuKeys, enabledModules, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

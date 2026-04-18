@@ -73,7 +73,7 @@ interface SidebarProps {
 
 export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
-  const { allowedMenuKeys } = useAuth();
+  const { allowedMenuKeys, enabledModules } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
 
   // Close mobile sidebar on route change
@@ -82,9 +82,9 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activeTab = getActiveTab(pathname);
-  const visibleTabs = getVisibleTabs(allowedMenuKeys);
+  const visibleTabs = getVisibleTabs(allowedMenuKeys, enabledModules);
   const subItems = activeTab
-    ? getVisibleSubItems(activeTab.subItems, allowedMenuKeys)
+    ? getVisibleSubItems(activeTab.subItems, allowedMenuKeys, enabledModules)
     : [];
 
   const isDashboardActive = pathname === '/dashboard';
@@ -189,7 +189,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       <div className="flex flex-col gap-1">
         {visibleTabs.map((tab) => {
           const tabActive = isTabActive(pathname, tab);
-          const visibleSubs = getVisibleSubItems(tab.subItems, allowedMenuKeys);
+          const visibleSubs = getVisibleSubItems(tab.subItems, allowedMenuKeys, enabledModules);
           const tabIcon = tabIconMap[tab.name] || <FileText size={18} />;
           return (
             <div key={tab.name}>

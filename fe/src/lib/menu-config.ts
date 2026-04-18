@@ -3,11 +3,16 @@
 // organization_structure, users, employees, attendance,
 // leaves, payroll, payslips, menu_access_policy,
 // job_levels, grades
+//
+// Each tab and sub-item may also declare a `moduleKey` — the feature-module
+// toggle that gates visibility. If omitted, visibility is not gated by modules
+// (treated as always-available). See internal/modules/registry.go for the list.
 
 export interface SubMenuItem {
   name: string;
   key: string; // matches backend menu key
   href: string;
+  moduleKey?: string; // optional feature module gate
 }
 
 export interface NavTab {
@@ -15,6 +20,7 @@ export interface NavTab {
   href: string;
   menuKeys: string[]; // all backend menu keys under this tab
   subItems: SubMenuItem[];
+  moduleKey?: string; // optional feature module gate for the whole tab
 }
 
 export const navTabs: NavTab[] = [
@@ -88,6 +94,11 @@ export const navTabs: NavTab[] = [
         key: "menu_access_policy",
         href: "/dashboard/menu-access",
       },
+      {
+        name: "Module Management",
+        key: "menu_access_policy",
+        href: "/dashboard/settings/modules",
+      },
     ],
   },
   {
@@ -138,29 +149,67 @@ export function isSubItemActive(
 }
 
 /**
- * Filter nav tabs based on allowedMenuKeys.
- * If allowedMenuKeys is null, all tabs are shown (role defaults).
- * Otherwise, only tabs with at least one allowed sub-item are shown.
+ * Check if an item's required feature module is enabled.
+ * An item with no moduleKey is always allowed.
+ * enabledModules === null means "unknown/loading" — treat as allow to avoid flicker.
  */
-export function getVisibleTabs(allowedMenuKeys: string[] | null): NavTab[] {
-  if (allowedMenuKeys === null) return navTabs;
+function moduleAllowed(
+  moduleKey: string | undefined,
+  enabledModules: string[] | null
+): boolean {
+  if (!moduleKey) return true;
+  if (enabledModules === null) return true;
+  return enabledModules.includes(moduleKey);
+}
 
+/**
+ * Filter nav tabs based on allowedMenuKeys and enabledModules.
+ * If allowedMenuKeys is null, all tabs pass the menu-key check (role defaults).
+ * A tab is shown if it has at least one sub-item that passes BOTH filters.
+ */
+export function getVisibleTabs(
+  allowedMenuKeys: string[] | null,
+  enabledModules: string[] | null = null
+): NavTab[] {
   return navTabs.filter((tab) => {
     // Dashboard is always visible
     if (tab.name === "Dashboard") return true;
-    // Show tab if at least one of its menu keys is allowed
-    return tab.menuKeys.some((key) => allowedMenuKeys.includes(key));
+
+    // Tab-level module gate
+    if (!moduleAllowed(tab.moduleKey, enabledModules)) return false;
+
+    // Menu key gate
+    const menuOk =
+      allowedMenuKeys === null ||
+      tab.menuKeys.some((key) => allowedMenuKeys.includes(key));
+    if (!menuOk) return false;
+
+    // At least one visible sub-item must remain after module filtering
+    if (tab.subItems.length > 0) {
+      const anyVisibleSub = tab.subItems.some((sub) => {
+        const keyOk =
+          allowedMenuKeys === null || allowedMenuKeys.includes(sub.key);
+        return keyOk && moduleAllowed(sub.moduleKey, enabledModules);
+      });
+      if (!anyVisibleSub) return false;
+    }
+
+    return true;
   });
 }
 
 /**
- * Filter sub-items based on allowedMenuKeys.
- * If allowedMenuKeys is null, all sub-items are shown.
+ * Filter sub-items based on allowedMenuKeys and enabledModules.
+ * If allowedMenuKeys is null, the menu-key check is skipped.
  */
 export function getVisibleSubItems(
   subItems: SubMenuItem[],
-  allowedMenuKeys: string[] | null
+  allowedMenuKeys: string[] | null,
+  enabledModules: string[] | null = null
 ): SubMenuItem[] {
-  if (allowedMenuKeys === null) return subItems;
-  return subItems.filter((sub) => allowedMenuKeys.includes(sub.key));
+  return subItems.filter((sub) => {
+    const keyOk =
+      allowedMenuKeys === null || allowedMenuKeys.includes(sub.key);
+    return keyOk && moduleAllowed(sub.moduleKey, enabledModules);
+  });
 }
