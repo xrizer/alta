@@ -8,6 +8,7 @@ type CreateCompanyRequest struct {
 	Phone   string `json:"phone"`
 	Email   string `json:"email"`
 	NPWP    string `json:"npwp"`
+	NPP     string `json:"npp"`
 	Logo    string `json:"logo"`
 }
 
@@ -17,6 +18,7 @@ type UpdateCompanyRequest struct {
 	Phone    string `json:"phone"`
 	Email    string `json:"email"`
 	NPWP     string `json:"npwp"`
+	NPP      string `json:"npp"`
 	Logo     string `json:"logo"`
 	IsActive *bool  `json:"is_active"`
 }
@@ -28,6 +30,7 @@ type CompanyResponse struct {
 	Phone     string `json:"phone"`
 	Email     string `json:"email"`
 	NPWP      string `json:"npwp"`
+	NPP       string `json:"npp"`
 	Logo      string `json:"logo"`
 	IsActive  bool   `json:"is_active"`
 	CreatedAt string `json:"created_at"`
@@ -42,6 +45,7 @@ func ToCompanyResponse(company *model.Company) CompanyResponse {
 		Phone:     company.Phone,
 		Email:     company.Email,
 		NPWP:      company.NPWP,
+		NPP:       company.NPP,
 		Logo:      company.Logo,
 		IsActive:  company.IsActive,
 		CreatedAt: company.CreatedAt.Format("2006-01-02T15:04:05Z"),

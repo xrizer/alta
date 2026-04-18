@@ -50,6 +50,7 @@ func main() {
 
 	seedSuperAdmin(db, cfg)
 	seedAdmin(db, cfg)
+	seedJobLevels(db)
 
 	// Kafka producer (fire-and-forget; logs errors if broker unavailable)
 	kafkaProducer := kafka.NewProducer(cfg.KafkaBrokers, kafka.TopicNotifications)
@@ -69,6 +70,8 @@ func main() {
 	attRepo := repository.NewAttendanceRepository(db)
 	leaveRepo := repository.NewLeaveRepository(db)
 	payrollRepo := repository.NewPayrollRepository(db)
+	jobLevelRepo := repository.NewJobLevelRepository(db)
+	gradeRepo := repository.NewGradeRepository(db)
 
 	// Services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -87,6 +90,8 @@ func main() {
 	menuAccessRepo := repository.NewMenuAccessRepository(db)
 	menuAccessService := service.NewMenuAccessService(menuAccessRepo, userRepo)
 	notifService := service.NewNotificationService(notifRepo)
+	jobLevelService := service.NewJobLevelService(jobLevelRepo, companyRepo)
+	gradeService := service.NewGradeService(gradeRepo, jobLevelRepo, companyRepo)
 
 	// Handlers
 	authHandler := handler.NewAuthHandler(authService)
@@ -104,6 +109,8 @@ func main() {
 	orgHandler := handler.NewOrganizationHandler(orgService)
 	menuAccessHandler := handler.NewMenuAccessHandler(menuAccessService)
 	notifHandler := handler.NewNotificationHandler(notifService)
+	jobLevelHandler := handler.NewJobLevelHandler(jobLevelService)
+	gradeHandler := handler.NewGradeHandler(gradeService)
 
 	// Start Kafka consumer — processes events and writes notifications to DB
 	processor := kafka.NewEventProcessor(notifRepo, userRepo)
@@ -268,6 +275,22 @@ func main() {
 	notifications.Put("/read-all", notifHandler.MarkAllAsRead)
 	notifications.Put("/:id/read", notifHandler.MarkAsRead)
 
+	// Job level routes (admin, hr can view; admin can manage)
+	jobLevels := api.Group("/job-levels", middleware.AuthMiddleware(cfg), middleware.RoleMiddleware("admin", "hr"))
+	jobLevels.Get("/", jobLevelHandler.GetAll)
+	jobLevels.Get("/:id", jobLevelHandler.GetByID)
+	jobLevels.Post("/", middleware.RoleMiddleware("admin"), jobLevelHandler.Create)
+	jobLevels.Put("/:id", middleware.RoleMiddleware("admin"), jobLevelHandler.Update)
+	jobLevels.Delete("/:id", middleware.RoleMiddleware("admin"), jobLevelHandler.Delete)
+
+	// Grade routes (admin, hr can view; admin can manage)
+	grades := api.Group("/grades", middleware.AuthMiddleware(cfg), middleware.RoleMiddleware("admin", "hr"))
+	grades.Get("/", gradeHandler.GetAll)
+	grades.Get("/:id", gradeHandler.GetByID)
+	grades.Post("/", middleware.RoleMiddleware("admin"), gradeHandler.Create)
+	grades.Put("/:id", middleware.RoleMiddleware("admin"), gradeHandler.Update)
+	grades.Delete("/:id", middleware.RoleMiddleware("admin"), gradeHandler.Delete)
+
 	// Swagger documentation
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
@@ -302,6 +325,37 @@ func seedSuperAdmin(db *gorm.DB, cfg *config.Config) {
 	}
 
 	log.Printf("Superadmin user seeded: %s", cfg.SuperAdminEmail)
+}
+
+func seedJobLevels(db *gorm.DB) {
+	// Skip if any job levels already exist
+	var count int64
+	db.Model(&model.JobLevel{}).Count(&count)
+	if count > 0 {
+		return
+	}
+
+	// Find the first company to attach levels to
+	var company model.Company
+	if err := db.First(&company).Error; err != nil {
+		return // No company yet — levels will be created manually
+	}
+
+	levels := []model.JobLevel{
+		{CompanyID: company.ID, Name: "Staff", LevelOrder: 1, IsActive: true},
+		{CompanyID: company.ID, Name: "Senior Staff", LevelOrder: 2, IsActive: true},
+		{CompanyID: company.ID, Name: "Supervisor", LevelOrder: 3, IsActive: true},
+		{CompanyID: company.ID, Name: "Manager", LevelOrder: 4, IsActive: true},
+		{CompanyID: company.ID, Name: "Senior Manager", LevelOrder: 5, IsActive: true},
+		{CompanyID: company.ID, Name: "Director", LevelOrder: 6, IsActive: true},
+	}
+
+	for i := range levels {
+		if err := db.Create(&levels[i]).Error; err != nil {
+			log.Printf("Failed to seed job level %s: %v", levels[i].Name, err)
+		}
+	}
+	log.Printf("Job levels seeded for company: %s", company.Name)
 }
 
 func seedAdmin(db *gorm.DB, cfg *config.Config) {

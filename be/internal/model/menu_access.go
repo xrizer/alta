@@ -22,6 +22,8 @@ const (
 	MenuPayroll              = "payroll"
 	MenuPayslips             = "payslips"
 	MenuMenuAccessPolicy     = "menu_access_policy"
+	MenuJobLevels            = "job_levels"
+	MenuGrades               = "grades"
 )
 
 var ValidMenuKeys = map[string]bool{
@@ -38,6 +40,8 @@ var ValidMenuKeys = map[string]bool{
 	MenuPayroll:              true,
 	MenuPayslips:             true,
 	MenuMenuAccessPolicy:     true,
+	MenuJobLevels:            true,
+	MenuGrades:               true,
 }
 
 type MenuAccess struct {

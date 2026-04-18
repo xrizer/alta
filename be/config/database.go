@@ -40,6 +40,8 @@ func ConnectDatabase(cfg *Config) *gorm.DB {
 		&model.RolePermission{},
 		&model.MenuAccess{},
 		&model.Notification{},
+		&model.JobLevel{},
+		&model.Grade{},
 	); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
