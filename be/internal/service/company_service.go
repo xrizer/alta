@@ -70,6 +70,7 @@ func (s *companyService) Create(req dto.CreateCompanyRequest) (*dto.CompanyRespo
 		Phone:    req.Phone,
 		Email:    req.Email,
 		NPWP:     req.NPWP,
+		NPP:      req.NPP,
 		Logo:     req.Logo,
 		IsActive: true,
 	}
@@ -102,6 +103,9 @@ func (s *companyService) Update(id string, req dto.UpdateCompanyRequest) (*dto.C
 	}
 	if req.NPWP != "" {
 		company.NPWP = req.NPWP
+	}
+	if req.NPP != "" {
+		company.NPP = req.NPP
 	}
 	if req.Logo != "" {
 		company.Logo = req.Logo

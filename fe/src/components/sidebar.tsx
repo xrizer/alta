@@ -34,6 +34,8 @@ import {
   User,
   Users2,
   Wrench,
+  SlidersHorizontal,
+  Layers,
 } from 'lucide-react';
 
 // Map backend menu keys to react-feather icons
@@ -50,6 +52,8 @@ const menuIconMap: Record<string, React.ReactNode> = {
   payroll: <DollarSign size={18} />,
   payslips: <FileText size={18} />,
   menu_access_policy: <Wrench size={18} />,
+  job_levels: <Layers size={18} />,
+  grades: <SlidersHorizontal size={18} />,
 };
 
 const tabIconMap: Record<string, React.ReactNode> = {
@@ -59,6 +63,7 @@ const tabIconMap: Record<string, React.ReactNode> = {
   Attendance: <Clock size={18} />,
   Payroll: <DollarSign size={18} />,
   Administration: <Shield size={18} />,
+  Settings: <Settings size={18} />,
 };
 
 interface SidebarProps {

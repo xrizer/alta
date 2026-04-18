@@ -56,6 +56,7 @@ export interface Company {
   phone: string;
   email: string;
   npwp: string;
+  npp: string;
   logo: string;
   is_active: boolean;
   created_at: string;
@@ -76,6 +77,7 @@ export interface CreateCompanyRequest {
   phone?: string;
   email?: string;
   npwp?: string;
+  npp?: string;
   logo?: string;
 }
 
@@ -85,7 +87,66 @@ export interface UpdateCompanyRequest {
   phone?: string;
   email?: string;
   npwp?: string;
+  npp?: string;
   logo?: string;
+  is_active?: boolean;
+}
+
+// Job Level & Grade
+export interface JobLevel {
+  id: string;
+  company_id: string;
+  name: string;
+  description: string;
+  level_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateJobLevelRequest {
+  company_id: string;
+  name: string;
+  description?: string;
+  level_order?: number;
+}
+
+export interface UpdateJobLevelRequest {
+  name?: string;
+  description?: string;
+  level_order?: number;
+  is_active?: boolean;
+}
+
+export interface Grade {
+  id: string;
+  company_id: string;
+  job_level_id: string;
+  job_level_name?: string;
+  name: string;
+  description: string;
+  min_salary: number;
+  max_salary: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateGradeRequest {
+  company_id: string;
+  job_level_id: string;
+  name: string;
+  description?: string;
+  min_salary?: number;
+  max_salary?: number;
+}
+
+export interface UpdateGradeRequest {
+  job_level_id?: string;
+  name?: string;
+  description?: string;
+  min_salary?: number;
+  max_salary?: number;
   is_active?: boolean;
 }
 

@@ -14,6 +14,7 @@ type Company struct {
 	Phone     string         `gorm:"type:varchar(20)" json:"phone"`
 	Email     string         `gorm:"type:varchar(255)" json:"email"`
 	NPWP      string         `gorm:"type:varchar(30)" json:"npwp"`
+	NPP       string         `gorm:"type:varchar(30)" json:"npp"`
 	Logo      string         `gorm:"type:varchar(255)" json:"logo"`
 	IsActive    bool           `gorm:"default:true" json:"is_active"`
 	Departments []Department   `gorm:"foreignKey:CompanyID" json:"departments,omitempty"`

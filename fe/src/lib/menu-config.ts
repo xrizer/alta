@@ -1,7 +1,8 @@
 // Menu configuration matching backend valid menu keys:
 // dashboard, companies, departments, positions, shifts,
 // organization_structure, users, employees, attendance,
-// leaves, payroll, payslips, menu_access_policy
+// leaves, payroll, payslips, menu_access_policy,
+// job_levels, grades
 
 export interface SubMenuItem {
   name: string;
@@ -87,6 +88,15 @@ export const navTabs: NavTab[] = [
         key: "menu_access_policy",
         href: "/dashboard/menu-access",
       },
+    ],
+  },
+  {
+    name: "Settings",
+    href: "/dashboard/settings/job-levels",
+    menuKeys: ["job_levels", "grades"],
+    subItems: [
+      { name: "Job Levels", key: "job_levels", href: "/dashboard/settings/job-levels" },
+      { name: "Grades", key: "grades", href: "/dashboard/settings/grades" },
     ],
   },
 ];
