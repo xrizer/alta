@@ -141,6 +141,15 @@ func (h *PayrollHandler) Generate(c *fiber.Ctx) error {
 
 	payroll, err := h.payrollService.Generate(req)
 	if err != nil {
+		if err.Error() == "employee salary not found, please set salary first" {
+			emp, lookupErr := h.empService.GetByID(req.EmployeeID)
+			if lookupErr == nil && emp.Position != nil && emp.Position.BaseSalary > 0 {
+				return response.ErrorWithData(c, fiber.StatusBadRequest, err.Error(), fiber.Map{
+					"suggested_basic_salary": emp.Position.BaseSalary,
+					"employee_id":            req.EmployeeID,
+				})
+			}
+		}
 		return response.Error(c, fiber.StatusBadRequest, err.Error())
 	}
 	return response.Success(c, fiber.StatusCreated, "Payroll generated", payroll)

@@ -6,6 +6,7 @@ import { Payroll, Employee } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as payrollService from "@/services/payroll-service";
 import * as employeeService from "@/services/employee-service";
+import { seedSalaryFromPosition } from "@/services/employee-salary-service";
 import { getErrorMessage } from "@/lib/api";
 
 const formatCurrency = (n: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(n);
@@ -32,6 +33,8 @@ export default function PayrollPage() {
   const [genMonth, setGenMonth] = useState(now.getMonth() + 1);
   const [genYear, setGenYear] = useState(now.getFullYear());
   const [isGenerating, setIsGenerating] = useState(false);
+  const [salarySetup, setSalarySetup] = useState<{ employeeId: string; suggestedBasic: number } | null>(null);
+  const [isSeeding, setIsSeeding] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
@@ -64,6 +67,7 @@ export default function PayrollPage() {
     if (!genEmployee) return;
     setError("");
     setSuccess("");
+    setSalarySetup(null);
     setIsGenerating(true);
     try {
       const res = await payrollService.generatePayroll({
@@ -79,10 +83,36 @@ export default function PayrollPage() {
         setError(res.message);
       }
     } catch (err) {
-      const apiErr = err as { response?: { data?: { message?: string } } };
-      setError(apiErr?.response?.data?.message || "Failed to generate payroll");
+      const apiErr = err as { response?: { data?: { message?: string; data?: { suggested_basic_salary?: number; employee_id?: string } } } };
+      const errMsg = apiErr?.response?.data?.message || "Failed to generate payroll";
+      const suggestedBasic = apiErr?.response?.data?.data?.suggested_basic_salary;
+      setError(errMsg);
+      if (suggestedBasic && suggestedBasic > 0) {
+        setSalarySetup({ employeeId: genEmployee, suggestedBasic });
+      }
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleSeedAndRetry = async () => {
+    if (!salarySetup) return;
+    setIsSeeding(true);
+    setError("");
+    try {
+      const seedRes = await seedSalaryFromPosition(salarySetup.employeeId);
+      if (!seedRes.success) {
+        setError(seedRes.message);
+        return;
+      }
+      setSalarySetup(null);
+      // Retry payroll generation now that salary exists
+      await handleGenerate();
+    } catch (err) {
+      const apiErr = err as { response?: { data?: { message?: string } } };
+      setError(apiErr?.response?.data?.message || "Failed to set up salary");
+    } finally {
+      setIsSeeding(false);
     }
   };
 
@@ -129,7 +159,22 @@ export default function PayrollPage() {
         )}
       </div>
 
-      {error && <div className="rounded-md bg-red-50 dark:bg-red-900/30 p-4 text-sm text-red-700 dark:text-red-400">{error}</div>}
+      {error && (
+        <div className="rounded-md bg-red-50 dark:bg-red-900/30 p-4 text-sm text-red-700 dark:text-red-400">
+          <span>{error}</span>
+          {salarySetup && (
+            <span className="ml-3">
+              <button
+                onClick={handleSeedAndRetry}
+                disabled={isSeeding}
+                className="font-semibold underline hover:no-underline disabled:opacity-50"
+              >
+                {isSeeding ? "Setting up..." : `Quick Setup (${formatCurrency(salarySetup.suggestedBasic)} from position)`}
+              </button>
+            </span>
+          )}
+        </div>
+      )}
       {success && <div className="rounded-md bg-green-50 dark:bg-green-900/30 p-4 text-sm text-green-700 dark:text-green-400">{success}</div>}
 
       {/* Generate Modal */}

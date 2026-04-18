@@ -16,6 +16,7 @@ type EmployeeSalaryService interface {
 	GetByEmployeeID(employeeID string) ([]dto.EmployeeSalaryResponse, error)
 	GetLatestByEmployeeID(employeeID string) (*dto.EmployeeSalaryResponse, error)
 	Create(req dto.CreateEmployeeSalaryRequest) (*dto.EmployeeSalaryResponse, error)
+	SeedFromPosition(employeeID string) (*dto.EmployeeSalaryResponse, error)
 	Update(id string, req dto.UpdateEmployeeSalaryRequest) (*dto.EmployeeSalaryResponse, error)
 	Delete(id string) error
 }
@@ -98,6 +99,50 @@ func (s *employeeSalaryService) Create(req dto.CreateEmployeeSalaryRequest) (*dt
 		BPJSTKJPEmployee:   jpEmp,
 		BPJSTKJPCompany:    jpCom,
 		EffectiveDate:      effectiveDate,
+	}
+
+	if err := s.salaryRepo.Create(salary); err != nil {
+		return nil, errors.New("failed to create employee salary")
+	}
+
+	response := dto.ToEmployeeSalaryResponse(salary)
+	return &response, nil
+}
+
+// SeedFromPosition creates an employee_salaries row using the employee's position base_salary,
+// zero allowances, and auto-calculated Indonesian BPJS amounts. Effective date is today.
+// Returns an error if the employee already has a salary record or the position has no base_salary.
+func (s *employeeSalaryService) SeedFromPosition(employeeID string) (*dto.EmployeeSalaryResponse, error) {
+	emp, err := s.empRepo.FindByID(employeeID)
+	if err != nil {
+		return nil, errors.New("employee not found")
+	}
+
+	if emp.Position.BaseSalary <= 0 {
+		return nil, errors.New("position has no base salary set")
+	}
+
+	// Block if salary already exists so seed is not misused
+	existing, _ := s.salaryRepo.FindLatestByEmployeeID(employeeID)
+	if existing != nil {
+		return nil, errors.New("employee already has a salary record")
+	}
+
+	basicSalary := emp.Position.BaseSalary
+	bpjsKesEmp, bpjsKesCom, jhtEmp, jhtCom, jkk, jkm, jpEmp, jpCom := calculator.CalculateBPJS(basicSalary)
+
+	salary := &model.EmployeeSalary{
+		EmployeeID:        employeeID,
+		BasicSalary:       basicSalary,
+		BPJSKesEmployee:   bpjsKesEmp,
+		BPJSKesCompany:    bpjsKesCom,
+		BPJSTKJHTEmployee: jhtEmp,
+		BPJSTKJHTCompany:  jhtCom,
+		BPJSTKJKK:         jkk,
+		BPJSTKJKM:         jkm,
+		BPJSTKJPEmployee:  jpEmp,
+		BPJSTKJPCompany:   jpCom,
+		EffectiveDate:     time.Now(),
 	}
 
 	if err := s.salaryRepo.Create(salary); err != nil {
