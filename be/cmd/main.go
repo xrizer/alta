@@ -72,6 +72,8 @@ func main() {
 	payrollRepo := repository.NewPayrollRepository(db)
 	jobLevelRepo := repository.NewJobLevelRepository(db)
 	gradeRepo := repository.NewGradeRepository(db)
+	moduleRepo := repository.NewModuleRepository(db)
+	compModuleRepo := repository.NewCompanyModuleRepository(db)
 
 	// Services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -92,6 +94,12 @@ func main() {
 	notifService := service.NewNotificationService(notifRepo)
 	jobLevelService := service.NewJobLevelService(jobLevelRepo, companyRepo)
 	gradeService := service.NewGradeService(gradeRepo, jobLevelRepo, companyRepo)
+	moduleService := service.NewModuleService(moduleRepo, compModuleRepo, companyRepo)
+
+	// Sync the code-defined module registry into the DB on every startup.
+	if err := moduleService.SyncRegistry(); err != nil {
+		log.Printf("Failed to sync module registry: %v", err)
+	}
 
 	// Handlers
 	authHandler := handler.NewAuthHandler(authService)
@@ -111,6 +119,7 @@ func main() {
 	notifHandler := handler.NewNotificationHandler(notifService)
 	jobLevelHandler := handler.NewJobLevelHandler(jobLevelService)
 	gradeHandler := handler.NewGradeHandler(gradeService)
+	moduleHandler := handler.NewModuleHandler(moduleService, empService)
 
 	// Start Kafka consumer — processes events and writes notifications to DB
 	processor := kafka.NewEventProcessor(notifRepo, userRepo)
@@ -290,6 +299,18 @@ func main() {
 	grades.Post("/", middleware.RoleMiddleware("admin"), gradeHandler.Create)
 	grades.Put("/:id", middleware.RoleMiddleware("admin"), gradeHandler.Update)
 	grades.Delete("/:id", middleware.RoleMiddleware("admin"), gradeHandler.Delete)
+
+	// Module catalog (all authenticated users can read catalog; superadmin manages per-company toggles)
+	modulesRoutes := api.Group("/modules", middleware.AuthMiddleware(cfg))
+	modulesRoutes.Get("/", moduleHandler.ListCatalog)
+
+	// Per-user effective modules — used by FE to filter the sidebar
+	api.Get("/me/modules", middleware.AuthMiddleware(cfg), moduleHandler.GetMyModules)
+
+	// Superadmin-only: manage per-company module toggles
+	companyModules := api.Group("/companies/:id/modules", middleware.AuthMiddleware(cfg), middleware.RoleMiddleware("superadmin"))
+	companyModules.Get("/", moduleHandler.ListForCompany)
+	companyModules.Put("/:key", moduleHandler.SetForCompany)
 
 	// Swagger documentation
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)

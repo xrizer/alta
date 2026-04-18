@@ -490,3 +490,36 @@ export interface Notification {
 export interface UnreadCountResponse {
   count: number;
 }
+
+// Feature Modules
+export interface Module {
+  key: string;
+  name: string;
+  description: string;
+  category: string;
+  depends_on: string[];
+  is_core: boolean;
+}
+
+export interface CompanyModule {
+  id: string;
+  company_id: string;
+  module_key: string;
+  module?: Module;
+  enabled: boolean;
+  config: string;
+  enabled_at: string | null;
+  enabled_by: string;
+  updated_at: string;
+}
+
+export interface MyModulesResponse {
+  company_id: string;
+  enabled_modules: string[];
+}
+
+export interface SetCompanyModuleRequest {
+  enabled: boolean;
+  config?: string;
+}
+
