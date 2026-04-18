@@ -324,8 +324,34 @@ export interface Attendance {
   status: AttendanceStatus;
   overtime_hours: number;
   notes: string;
+  // GPS + photo capture (populated when geo_attendance module is enabled)
+  clock_in_lat?: number;
+  clock_in_lng?: number;
+  clock_in_photo?: string;
+  clock_in_distance_m?: number;
+  clock_out_lat?: number;
+  clock_out_lng?: number;
+  clock_out_photo?: string;
+  clock_out_distance_m?: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface ClockInRequest {
+  employee_id: string;
+  notes?: string;
+  lat?: number;
+  lng?: number;
+  photo?: string;
+  distance_m?: number;
+}
+
+export interface ClockOutRequest {
+  notes?: string;
+  lat?: number;
+  lng?: number;
+  photo?: string;
+  distance_m?: number;
 }
 
 export interface PaginatedAttendanceResponse {
