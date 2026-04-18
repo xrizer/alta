@@ -26,7 +26,14 @@ func NewEmployeeRepository(db *gorm.DB) EmployeeRepository {
 }
 
 func (r *employeeRepository) preload(db *gorm.DB) *gorm.DB {
-	return db.Preload("User").Preload("Company").Preload("Department").Preload("Position").Preload("Shift")
+	return db.
+		Preload("User").
+		Preload("Company").
+		Preload("Department").
+		Preload("Position").
+		Preload("Shift").
+		Preload("JobLevel").
+		Preload("Grade")
 }
 
 func (r *employeeRepository) Create(emp *model.Employee) error {

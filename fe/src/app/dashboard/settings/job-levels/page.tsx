@@ -34,7 +34,7 @@ export default function JobLevelsPage() {
     setError("");
     try {
       const [compRes, levelsRes] = await Promise.allSettled([
-        companyService.getCompanies(),
+        companyService.getCompaniesAll(),
         jobLevelService.getJobLevels(),
       ]);
       if (compRes.status === "fulfilled" && compRes.value.success && compRes.value.data?.length) {

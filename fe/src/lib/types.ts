@@ -230,7 +230,13 @@ export interface UpdateShiftRequest {
 }
 
 // Employee
-export type EmployeeStatus = "tetap" | "kontrak" | "probation";
+export type EmployeeStatus =
+  | "tetap"
+  | "kontrak"
+  | "probation"
+  | "pkwt"
+  | "pkwtt"
+  | "internship";
 
 export interface Employee {
   id: string;
@@ -244,6 +250,10 @@ export interface Employee {
   position?: Position;
   shift_id: string;
   shift?: Shift;
+  job_level_id: string;
+  job_level?: JobLevel;
+  grade_id: string;
+  grade?: Grade;
   employee_number: string;
   nik: string;
   gender: string;
@@ -254,6 +264,8 @@ export interface Employee {
   blood_type: string;
   last_education: string;
   join_date: string;
+  contract_start_date: string;
+  contract_end_date: string;
   resign_date: string;
   employee_status: EmployeeStatus;
   bank_name: string;
@@ -271,8 +283,12 @@ export interface CreateEmployeeRequest {
   department_id: string;
   position_id: string;
   shift_id: string;
+  job_level_id?: string;
+  grade_id?: string;
   employee_number: string;
   join_date: string;
+  contract_start_date?: string;
+  contract_end_date?: string;
   employee_status?: EmployeeStatus;
   nik?: string;
   gender?: string;
@@ -293,6 +309,8 @@ export interface UpdateEmployeeRequest {
   department_id?: string;
   position_id?: string;
   shift_id?: string;
+  job_level_id?: string;
+  grade_id?: string;
   nik?: string;
   gender?: string;
   birth_place?: string;
@@ -301,6 +319,8 @@ export interface UpdateEmployeeRequest {
   religion?: string;
   blood_type?: string;
   last_education?: string;
+  contract_start_date?: string;
+  contract_end_date?: string;
   resign_date?: string;
   employee_status?: EmployeeStatus;
   bank_name?: string;

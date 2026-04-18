@@ -80,7 +80,7 @@ func main() {
 	deptService := service.NewDepartmentService(deptRepo, companyRepo)
 	posService := service.NewPositionService(posRepo, companyRepo)
 	shiftService := service.NewShiftService(shiftRepo, companyRepo)
-	empService := service.NewEmployeeService(empRepo, userRepo, companyRepo, deptRepo, posRepo, shiftRepo)
+	empService := service.NewEmployeeService(empRepo, userRepo, companyRepo, deptRepo, posRepo, shiftRepo, jobLevelRepo, gradeRepo)
 	empSalaryService := service.NewEmployeeSalaryService(empSalaryRepo, empRepo)
 	holidayService := service.NewHolidayService(holidayRepo, companyRepo)
 	attService := service.NewAttendanceService(attRepo, empRepo, shiftRepo)
