@@ -1,5 +1,11 @@
 import api from "@/lib/api";
-import { ApiResponse, Attendance, PaginatedAttendanceResponse } from "@/lib/types";
+import {
+  ApiResponse,
+  Attendance,
+  ClockInRequest,
+  ClockOutRequest,
+  PaginatedAttendanceResponse,
+} from "@/lib/types";
 
 export async function getAttendances(params?: {
   employee_id?: string;
@@ -30,17 +36,16 @@ export async function getAttendanceById(
   return response.data;
 }
 
-export async function clockIn(data: {
-  employee_id: string;
-  notes?: string;
-}): Promise<ApiResponse<Attendance>> {
+export async function clockIn(
+  data: ClockInRequest
+): Promise<ApiResponse<Attendance>> {
   const response = await api.post("/attendances/clock-in", data);
   return response.data;
 }
 
 export async function clockOut(
   id: string,
-  data?: { notes?: string }
+  data?: ClockOutRequest
 ): Promise<ApiResponse<Attendance>> {
   const response = await api.put(`/attendances/${id}/clock-out`, data || {});
   return response.data;
