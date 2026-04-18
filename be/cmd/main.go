@@ -74,6 +74,7 @@ func main() {
 	gradeRepo := repository.NewGradeRepository(db)
 	moduleRepo := repository.NewModuleRepository(db)
 	compModuleRepo := repository.NewCompanyModuleRepository(db)
+	visitRepo := repository.NewVisitRepository(db)
 
 	// Services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -95,6 +96,7 @@ func main() {
 	jobLevelService := service.NewJobLevelService(jobLevelRepo, companyRepo)
 	gradeService := service.NewGradeService(gradeRepo, jobLevelRepo, companyRepo)
 	moduleService := service.NewModuleService(moduleRepo, compModuleRepo, companyRepo)
+	visitService := service.NewVisitService(visitRepo, attRepo, empRepo)
 
 	// Sync the code-defined module registry into the DB on every startup.
 	if err := moduleService.SyncRegistry(); err != nil {
@@ -120,6 +122,7 @@ func main() {
 	jobLevelHandler := handler.NewJobLevelHandler(jobLevelService)
 	gradeHandler := handler.NewGradeHandler(gradeService)
 	moduleHandler := handler.NewModuleHandler(moduleService, empService)
+	visitHandler := handler.NewVisitHandler(visitService, empService)
 
 	// Start Kafka consumer — processes events and writes notifications to DB
 	processor := kafka.NewEventProcessor(notifRepo, userRepo)
@@ -311,6 +314,15 @@ func main() {
 	companyModules := api.Group("/companies/:id/modules", middleware.AuthMiddleware(cfg), middleware.RoleMiddleware("superadmin"))
 	companyModules.Get("/", moduleHandler.ListForCompany)
 	companyModules.Put("/:key", moduleHandler.SetForCompany)
+
+	// Visit tracking (opt-in module: visit_tracking) — multi-point check-ins inside one attendance session
+	visits := api.Group("/visits", middleware.AuthMiddleware(cfg), middleware.RequireModule("visit_tracking", moduleService, empService))
+	visits.Post("/start", visitHandler.Start)
+	visits.Post("/:id/end", visitHandler.End)
+	visits.Get("/attendance/:attendanceId", visitHandler.GetByAttendanceID)
+	visits.Get("/", middleware.RoleMiddleware("admin", "hr"), visitHandler.List)
+	visits.Get("/:id", visitHandler.GetByID)
+	visits.Delete("/:id", middleware.RoleMiddleware("admin"), visitHandler.Delete)
 
 	// Swagger documentation
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
