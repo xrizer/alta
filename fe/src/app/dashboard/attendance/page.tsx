@@ -6,6 +6,7 @@ import { Attendance, Employee } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as attendanceService from "@/services/attendance-service";
 import * as employeeService from "@/services/employee-service";
+import { getErrorMessage } from "@/lib/api";
 
 type SortKey = "date" | "employee" | "clock_in" | "clock_out" | "status" | "overtime" | "notes";
 type SortDir = "asc" | "desc";
@@ -108,8 +109,8 @@ export default function AttendancePage() {
           // Non-critical
         }
       }
-    } catch {
-      setError("Failed to fetch attendance data");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to fetch attendance data"));
     } finally {
       setIsLoading(false);
     }
@@ -133,8 +134,8 @@ export default function AttendancePage() {
       } else {
         setError(res.message);
       }
-    } catch {
-      setError("Failed to clock in");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to clock in"));
     }
   };
 
@@ -151,8 +152,8 @@ export default function AttendancePage() {
       } else {
         setError(res.message);
       }
-    } catch {
-      setError("Failed to clock out");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to clock out"));
     }
   };
 
@@ -174,8 +175,8 @@ export default function AttendancePage() {
       } else {
         setError(res.message);
       }
-    } catch {
-      setError("Failed to import file");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to import file"));
     } finally {
       setIsImporting(false);
       if (fileInputRef.current) fileInputRef.current.value = "";

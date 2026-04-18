@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Payroll } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as payrollService from "@/services/payroll-service";
+import { getErrorMessage } from "@/lib/api";
 
 const formatCurrency = (n: number) =>
   new Intl.NumberFormat("id-ID", {
@@ -74,8 +75,8 @@ export default function PayslipsPage() {
           setError(res.message);
         }
       }
-    } catch {
-      setError("Failed to fetch payslips");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to fetch payslips"));
     } finally {
       setIsLoading(false);
     }

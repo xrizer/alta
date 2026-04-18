@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { User, MenuAccessConfig } from "@/lib/types";
 import * as userService from "@/services/user-service";
 import * as menuAccessService from "@/services/menu-access-service";
+import { getErrorMessage } from "@/lib/api";
 
 const ALL_MENU_SECTIONS = [
   {
@@ -91,8 +92,8 @@ export default function MenuAccessPage() {
       if (menuRes.success && menuRes.data) {
         setMenuConfigs(menuRes.data);
       }
-    } catch {
-      setError("Failed to load data");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to load data"));
     } finally {
       setLoading(false);
     }
@@ -154,8 +155,8 @@ export default function MenuAccessPage() {
       } else {
         setError(res.message || "Failed to save");
       }
-    } catch {
-      setError("Failed to save menu access");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to save menu access"));
     } finally {
       setSaving(false);
     }
@@ -172,8 +173,8 @@ export default function MenuAccessPage() {
       } else {
         setError(res.message || "Failed to reset");
       }
-    } catch {
-      setError("Failed to reset menu access");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to reset menu access"));
     } finally {
       setSaving(false);
     }

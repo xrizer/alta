@@ -6,6 +6,7 @@ import { SquarePen, Trash } from "lucide-react";
 import { Department } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as departmentService from "@/services/department-service";
+import { getErrorMessage } from "@/lib/api";
 import Pagination from "@/components/pagination";
 
 type SortField = "name" | "company" | "description" | "is_active";
@@ -39,8 +40,8 @@ export default function DepartmentsPage() {
     try {
       const res = await departmentService.getDepartments();
       if (res.success && res.data) setAllDepartments(res.data);
-    } catch {
-      setError("Failed to fetch departments");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to fetch departments"));
     } finally {
       setIsLoading(false);
     }
@@ -71,8 +72,8 @@ export default function DepartmentsPage() {
       const res = await departmentService.deleteDepartment(id);
       if (res.success) setAllDepartments((prev) => prev.filter((d) => d.id !== id));
       else setError(res.message);
-    } catch {
-      setError("Failed to delete department");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to delete department"));
     }
   };
 

@@ -7,6 +7,7 @@ import * as employeeService from "@/services/employee-service";
 import * as departmentService from "@/services/department-service";
 import * as positionService from "@/services/position-service";
 import * as shiftService from "@/services/shift-service";
+import { getErrorMessage } from "@/lib/api";
 
 export default function EditEmployeePage() {
   const router = useRouter();
@@ -92,8 +93,8 @@ export default function EditEmployeePage() {
         } else {
           setError("Employee not found");
         }
-      } catch {
-        setError("Failed to load employee data");
+      } catch (err) {
+        setError(getErrorMessage(err, "Failed to load employee data"));
       } finally {
         setIsLoading(false);
       }
@@ -132,8 +133,8 @@ export default function EditEmployeePage() {
       });
       if (res.success) router.push("/dashboard/employees");
       else setError(res.message);
-    } catch {
-      setError("Failed to update employee");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to update employee"));
     } finally {
       setIsSubmitting(false);
     }

@@ -6,6 +6,7 @@ import { Payroll, Employee } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as payrollService from "@/services/payroll-service";
 import * as employeeService from "@/services/employee-service";
+import { getErrorMessage } from "@/lib/api";
 
 const formatCurrency = (n: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(n);
 
@@ -50,8 +51,8 @@ export default function PayrollPage() {
       if (payrollRes.status === "rejected" && empRes.status === "rejected") {
         setError("Failed to fetch data");
       }
-    } catch {
-      setError("Failed to fetch data");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to fetch data"));
     } finally {
       setIsLoading(false);
     }
@@ -77,8 +78,9 @@ export default function PayrollPage() {
       } else {
         setError(res.message);
       }
-    } catch {
-      setError("Failed to generate payroll");
+    } catch (err) {
+      const apiErr = err as { response?: { data?: { message?: string } } };
+      setError(apiErr?.response?.data?.message || "Failed to generate payroll");
     } finally {
       setIsGenerating(false);
     }
@@ -93,8 +95,9 @@ export default function PayrollPage() {
         setSuccess(`Payroll status updated to ${status}`);
         fetchData();
       } else setError(res.message);
-    } catch {
-      setError("Failed to update status");
+    } catch (err) {
+      const apiErr = err as { response?: { data?: { message?: string } } };
+      setError(apiErr?.response?.data?.message || "Failed to update status");
     }
   };
 

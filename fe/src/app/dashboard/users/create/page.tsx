@@ -4,6 +4,7 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Role } from "@/lib/types";
 import * as userService from "@/services/user-service";
+import { getErrorMessage } from "@/lib/api";
 
 export default function CreateUserPage() {
   const router = useRouter();
@@ -39,8 +40,8 @@ export default function CreateUserPage() {
       } else {
         setError(res.message);
       }
-    } catch {
-      setError("Failed to create user");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to create user"));
     } finally {
       setIsSubmitting(false);
     }

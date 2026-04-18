@@ -6,6 +6,7 @@ import { SquarePen, Trash } from "lucide-react";
 import { Company } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as companyService from "@/services/company-service";
+import { getErrorMessage } from "@/lib/api";
 import Pagination from "@/components/pagination";
 
 type SortField = "name" | "email" | "phone" | "npwp" | "is_active" | "created_at";
@@ -59,8 +60,8 @@ export default function CompaniesPage() {
         setTotalItems(res.data.total_items);
         setTotalPages(res.data.total_pages || 1);
       }
-    } catch {
-      setError("Failed to fetch companies");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to fetch companies"));
     } finally {
       setIsLoading(false);
     }
@@ -126,8 +127,8 @@ export default function CompaniesPage() {
       } else {
         setError(res.message);
       }
-    } catch {
-      setError("Failed to delete company");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to delete company"));
     }
   };
 
@@ -143,8 +144,8 @@ export default function CompaniesPage() {
       } else {
         setError(res.message);
       }
-    } catch {
-      setError("Failed to delete companies");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to delete companies"));
     } finally {
       setIsDeleting(false);
     }

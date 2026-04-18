@@ -7,6 +7,7 @@ import { Shift, Company } from "@/lib/types";
 import { useAuth } from "@/contexts/auth-context";
 import * as shiftService from "@/services/shift-service";
 import * as companyService from "@/services/company-service";
+import { getErrorMessage } from "@/lib/api";
 import Pagination from "@/components/pagination";
 
 type SortField = "name" | "company" | "start_time" | "end_time" | "is_active";
@@ -45,8 +46,8 @@ export default function ShiftsPage() {
       ]);
       if (shiftsRes.success && shiftsRes.data) setAllShifts(shiftsRes.data);
       if (companiesRes.success && companiesRes.data) setCompanies(companiesRes.data);
-    } catch {
-      setError("Failed to fetch shifts");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to fetch shifts"));
     } finally {
       setIsLoading(false);
     }
@@ -82,8 +83,8 @@ export default function ShiftsPage() {
       const res = await shiftService.deleteShift(id);
       if (res.success) setAllShifts((prev) => prev.filter((s) => s.id !== id));
       else setError(res.message);
-    } catch {
-      setError("Failed to delete shift");
+    } catch (err) {
+      setError(getErrorMessage(err, "Failed to delete shift"));
     }
   };
 
