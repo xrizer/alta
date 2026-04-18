@@ -1,13 +1,17 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import { useState, useEffect, useMemo, FormEvent } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Department, Position, Shift } from "@/lib/types";
+import { Department, Position, Shift, JobLevel, Grade, EmployeeStatus } from "@/lib/types";
 import * as employeeService from "@/services/employee-service";
 import * as departmentService from "@/services/department-service";
 import * as positionService from "@/services/position-service";
 import * as shiftService from "@/services/shift-service";
+import * as jobLevelService from "@/services/job-level-service";
+import * as gradeService from "@/services/grade-service";
 import { getErrorMessage } from "@/lib/api";
+
+const CONTRACT_STATUSES: EmployeeStatus[] = ["kontrak", "probation", "pkwt", "internship"];
 
 export default function EditEmployeePage() {
   const router = useRouter();
@@ -21,6 +25,8 @@ export default function EditEmployeePage() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
   const [shifts, setShifts] = useState<Shift[]>([]);
+  const [jobLevels, setJobLevels] = useState<JobLevel[]>([]);
+  const [grades, setGrades] = useState<Grade[]>([]);
 
   // Read-only display fields
   const [readOnly, setReadOnly] = useState({
@@ -34,13 +40,17 @@ export default function EditEmployeePage() {
     department_id: "",
     position_id: "",
     shift_id: "",
-    employee_status: "tetap" as string,
+    job_level_id: "",
+    grade_id: "",
+    employee_status: "tetap" as EmployeeStatus,
     nik: "",
     gender: "",
     birth_place: "",
     birth_date: "",
     marital_status: "",
     religion: "",
+    contract_start_date: "",
+    contract_end_date: "",
     resign_date: "",
     bank_name: "",
     bank_account: "",
@@ -52,17 +62,21 @@ export default function EditEmployeePage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [employeeRes, departmentsRes, positionsRes, shiftsRes] =
+        const [employeeRes, departmentsRes, positionsRes, shiftsRes, jobLevelsRes, gradesRes] =
           await Promise.all([
             employeeService.getEmployeeById(employeeId),
             departmentService.getDepartments(),
             positionService.getPositions(),
             shiftService.getShifts(),
+            jobLevelService.getJobLevels(),
+            gradeService.getGrades(),
           ]);
 
         if (departmentsRes.success && departmentsRes.data) setDepartments(departmentsRes.data);
         if (positionsRes.success && positionsRes.data) setPositions(positionsRes.data);
         if (shiftsRes.success && shiftsRes.data) setShifts(shiftsRes.data);
+        if (jobLevelsRes.success && jobLevelsRes.data) setJobLevels(jobLevelsRes.data);
+        if (gradesRes.success && gradesRes.data) setGrades(gradesRes.data);
 
         if (employeeRes.success && employeeRes.data) {
           const emp = employeeRes.data;
@@ -76,13 +90,17 @@ export default function EditEmployeePage() {
             department_id: emp.department_id,
             position_id: emp.position_id,
             shift_id: emp.shift_id,
-            employee_status: emp.employee_status || "tetap",
+            job_level_id: emp.job_level_id || "",
+            grade_id: emp.grade_id || "",
+            employee_status: (emp.employee_status || "tetap") as EmployeeStatus,
             nik: emp.nik || "",
             gender: emp.gender || "",
             birth_place: emp.birth_place || "",
             birth_date: emp.birth_date ? emp.birth_date.split("T")[0] : "",
             marital_status: emp.marital_status || "",
             religion: emp.religion || "",
+            contract_start_date: emp.contract_start_date ? emp.contract_start_date.split("T")[0] : "",
+            contract_end_date: emp.contract_end_date ? emp.contract_end_date.split("T")[0] : "",
             resign_date: emp.resign_date ? emp.resign_date.split("T")[0] : "",
             bank_name: emp.bank_name || "",
             bank_account: emp.bank_account || "",
@@ -102,10 +120,22 @@ export default function EditEmployeePage() {
     loadData();
   }, [employeeId]);
 
+  const filteredGrades = useMemo(() => {
+    if (!form.job_level_id) return grades;
+    return grades.filter((g) => g.job_level_id === form.job_level_id);
+  }, [grades, form.job_level_id]);
+
+  const showContractFields = CONTRACT_STATUSES.includes(form.employee_status);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "job_level_id") {
+      setForm({ ...form, job_level_id: value, grade_id: "" });
+      return;
+    }
+    setForm({ ...form, [name]: value });
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -117,13 +147,17 @@ export default function EditEmployeePage() {
         department_id: form.department_id,
         position_id: form.position_id,
         shift_id: form.shift_id,
-        employee_status: form.employee_status as "tetap" | "kontrak" | "probation",
+        job_level_id: form.job_level_id || undefined,
+        grade_id: form.grade_id || undefined,
+        employee_status: form.employee_status,
         nik: form.nik || undefined,
         gender: form.gender || undefined,
         birth_place: form.birth_place || undefined,
         birth_date: form.birth_date || undefined,
         marital_status: form.marital_status || undefined,
         religion: form.religion || undefined,
+        contract_start_date: showContractFields && form.contract_start_date ? form.contract_start_date : undefined,
+        contract_end_date: showContractFields && form.contract_end_date ? form.contract_end_date : undefined,
         resign_date: form.resign_date || undefined,
         bank_name: form.bank_name || undefined,
         bank_account: form.bank_account || undefined,
@@ -251,6 +285,41 @@ export default function EditEmployeePage() {
               </select>
             </div>
             <div>
+              <label className="block text-sm font-semibold text-gray-900">Job Level</label>
+              <select
+                name="job_level_id"
+                value={form.job_level_id}
+                onChange={handleChange}
+                className={inputClass}
+              >
+                <option value="">Select job level</option>
+                {jobLevels.map((jl) => (
+                  <option key={jl.id} value={jl.id}>
+                    {jl.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-900">Grade</label>
+              <select
+                name="grade_id"
+                value={form.grade_id}
+                onChange={handleChange}
+                className={inputClass}
+                disabled={!form.job_level_id}
+              >
+                <option value="">
+                  {form.job_level_id ? "Select grade" : "Select job level first"}
+                </option>
+                {filteredGrades.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
               <label className="block text-sm font-semibold text-gray-900">Employee Status</label>
               <select
                 name="employee_status"
@@ -258,11 +327,38 @@ export default function EditEmployeePage() {
                 onChange={handleChange}
                 className={inputClass}
               >
-                <option value="tetap">Tetap</option>
+                <option value="tetap">Tetap (PKWTT Permanent)</option>
+                <option value="pkwtt">PKWTT (Permanent)</option>
+                <option value="pkwt">PKWT (Fixed-term)</option>
                 <option value="kontrak">Kontrak</option>
                 <option value="probation">Probation</option>
+                <option value="internship">Internship / Magang</option>
               </select>
             </div>
+            {showContractFields && (
+              <>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Contract Start Date</label>
+                  <input
+                    name="contract_start_date"
+                    type="date"
+                    value={form.contract_start_date}
+                    onChange={handleChange}
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900">Contract End Date</label>
+                  <input
+                    name="contract_end_date"
+                    type="date"
+                    value={form.contract_end_date}
+                    onChange={handleChange}
+                    className={inputClass}
+                  />
+                </div>
+              </>
+            )}
             <div>
               <label className="block text-sm font-semibold text-gray-900">Resign Date</label>
               <input

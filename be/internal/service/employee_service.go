@@ -20,12 +20,14 @@ type EmployeeService interface {
 }
 
 type employeeService struct {
-	empRepo     repository.EmployeeRepository
-	userRepo    repository.UserRepository
-	companyRepo repository.CompanyRepository
-	deptRepo    repository.DepartmentRepository
-	posRepo     repository.PositionRepository
-	shiftRepo   repository.ShiftRepository
+	empRepo      repository.EmployeeRepository
+	userRepo     repository.UserRepository
+	companyRepo  repository.CompanyRepository
+	deptRepo     repository.DepartmentRepository
+	posRepo      repository.PositionRepository
+	shiftRepo    repository.ShiftRepository
+	jobLevelRepo repository.JobLevelRepository
+	gradeRepo    repository.GradeRepository
 }
 
 func NewEmployeeService(
@@ -35,14 +37,18 @@ func NewEmployeeService(
 	deptRepo repository.DepartmentRepository,
 	posRepo repository.PositionRepository,
 	shiftRepo repository.ShiftRepository,
+	jobLevelRepo repository.JobLevelRepository,
+	gradeRepo repository.GradeRepository,
 ) EmployeeService {
 	return &employeeService{
-		empRepo:     empRepo,
-		userRepo:    userRepo,
-		companyRepo: companyRepo,
-		deptRepo:    deptRepo,
-		posRepo:     posRepo,
-		shiftRepo:   shiftRepo,
+		empRepo:      empRepo,
+		userRepo:     userRepo,
+		companyRepo:  companyRepo,
+		deptRepo:     deptRepo,
+		posRepo:      posRepo,
+		shiftRepo:    shiftRepo,
+		jobLevelRepo: jobLevelRepo,
+		gradeRepo:    gradeRepo,
 	}
 }
 
@@ -123,6 +129,22 @@ func (s *employeeService) Create(req dto.CreateEmployeeRequest) (*dto.EmployeeRe
 		return nil, errors.New("shift not found")
 	}
 
+	// Validate job level if provided
+	if req.JobLevelID != "" {
+		_, err = s.jobLevelRepo.FindByID(req.JobLevelID)
+		if err != nil {
+			return nil, errors.New("job level not found")
+		}
+	}
+
+	// Validate grade if provided
+	if req.GradeID != "" {
+		_, err = s.gradeRepo.FindByID(req.GradeID)
+		if err != nil {
+			return nil, errors.New("grade not found")
+		}
+	}
+
 	// Parse join date
 	joinDate, err := time.Parse("2006-01-02", req.JoinDate)
 	if err != nil {
@@ -156,6 +178,15 @@ func (s *employeeService) Create(req dto.CreateEmployeeRequest) (*dto.EmployeeRe
 		emp.EmployeeStatus = model.StatusKontrak
 	}
 
+	if req.JobLevelID != "" {
+		jlID := req.JobLevelID
+		emp.JobLevelID = &jlID
+	}
+	if req.GradeID != "" {
+		gID := req.GradeID
+		emp.GradeID = &gID
+	}
+
 	// Parse optional birth date
 	if req.BirthDate != "" {
 		bd, err := time.Parse("2006-01-02", req.BirthDate)
@@ -163,6 +194,31 @@ func (s *employeeService) Create(req dto.CreateEmployeeRequest) (*dto.EmployeeRe
 			return nil, errors.New("invalid birth date format, use YYYY-MM-DD")
 		}
 		emp.BirthDate = &bd
+	}
+
+	// Parse optional contract start date
+	if req.ContractStartDate != "" {
+		csd, err := time.Parse("2006-01-02", req.ContractStartDate)
+		if err != nil {
+			return nil, errors.New("invalid contract start date format, use YYYY-MM-DD")
+		}
+		emp.ContractStartDate = &csd
+	}
+
+	// Parse optional contract end date
+	if req.ContractEndDate != "" {
+		ced, err := time.Parse("2006-01-02", req.ContractEndDate)
+		if err != nil {
+			return nil, errors.New("invalid contract end date format, use YYYY-MM-DD")
+		}
+		emp.ContractEndDate = &ced
+	}
+
+	// Validate contract dates if both provided
+	if emp.ContractStartDate != nil && emp.ContractEndDate != nil {
+		if emp.ContractEndDate.Before(*emp.ContractStartDate) {
+			return nil, errors.New("contract end date must be after start date")
+		}
 	}
 
 	if err := s.empRepo.Create(emp); err != nil {
@@ -206,6 +262,22 @@ func (s *employeeService) Update(id string, req dto.UpdateEmployeeRequest) (*dto
 		}
 		emp.ShiftID = req.ShiftID
 	}
+	if req.JobLevelID != "" {
+		_, err := s.jobLevelRepo.FindByID(req.JobLevelID)
+		if err != nil {
+			return nil, errors.New("job level not found")
+		}
+		jlID := req.JobLevelID
+		emp.JobLevelID = &jlID
+	}
+	if req.GradeID != "" {
+		_, err := s.gradeRepo.FindByID(req.GradeID)
+		if err != nil {
+			return nil, errors.New("grade not found")
+		}
+		gID := req.GradeID
+		emp.GradeID = &gID
+	}
 	if req.NIK != "" {
 		emp.NIK = req.NIK
 	}
@@ -233,6 +305,26 @@ func (s *employeeService) Update(id string, req dto.UpdateEmployeeRequest) (*dto
 	}
 	if req.LastEducation != "" {
 		emp.LastEducation = req.LastEducation
+	}
+	if req.ContractStartDate != "" {
+		csd, err := time.Parse("2006-01-02", req.ContractStartDate)
+		if err != nil {
+			return nil, errors.New("invalid contract start date format, use YYYY-MM-DD")
+		}
+		emp.ContractStartDate = &csd
+	}
+	if req.ContractEndDate != "" {
+		ced, err := time.Parse("2006-01-02", req.ContractEndDate)
+		if err != nil {
+			return nil, errors.New("invalid contract end date format, use YYYY-MM-DD")
+		}
+		emp.ContractEndDate = &ced
+	}
+	// Validate contract dates if both present after update
+	if emp.ContractStartDate != nil && emp.ContractEndDate != nil {
+		if emp.ContractEndDate.Before(*emp.ContractStartDate) {
+			return nil, errors.New("contract end date must be after start date")
+		}
 	}
 	if req.ResignDate != "" {
 		rd, err := time.Parse("2006-01-02", req.ResignDate)

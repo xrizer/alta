@@ -42,7 +42,7 @@ export default function GradesPage() {
     setError("");
     try {
       const [compRes, gradesRes, levelsRes] = await Promise.allSettled([
-        companyService.getCompanies(),
+        companyService.getCompaniesAll(),
         gradeService.getGrades(),
         jobLevelService.getJobLevels(),
       ]);

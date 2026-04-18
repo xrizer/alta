@@ -1,15 +1,19 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import { useState, useEffect, useMemo, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { User, Company, Department, Position, Shift } from "@/lib/types";
+import { User, Company, Department, Position, Shift, JobLevel, Grade, EmployeeStatus } from "@/lib/types";
 import * as employeeService from "@/services/employee-service";
 import * as userService from "@/services/user-service";
 import * as companyService from "@/services/company-service";
 import * as departmentService from "@/services/department-service";
 import * as positionService from "@/services/position-service";
 import * as shiftService from "@/services/shift-service";
+import * as jobLevelService from "@/services/job-level-service";
+import * as gradeService from "@/services/grade-service";
 import { getErrorMessage } from "@/lib/api";
+
+const CONTRACT_STATUSES: EmployeeStatus[] = ["kontrak", "probation", "pkwt", "internship"];
 
 export default function CreateEmployeePage() {
   const router = useRouter();
@@ -23,6 +27,8 @@ export default function CreateEmployeePage() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
   const [shifts, setShifts] = useState<Shift[]>([]);
+  const [jobLevels, setJobLevels] = useState<JobLevel[]>([]);
+  const [grades, setGrades] = useState<Grade[]>([]);
 
   const [form, setForm] = useState({
     user_id: "",
@@ -30,9 +36,13 @@ export default function CreateEmployeePage() {
     department_id: "",
     position_id: "",
     shift_id: "",
+    job_level_id: "",
+    grade_id: "",
     employee_number: "",
     join_date: "",
-    employee_status: "tetap" as string,
+    contract_start_date: "",
+    contract_end_date: "",
+    employee_status: "tetap" as EmployeeStatus,
     nik: "",
     gender: "",
     birth_place: "",
@@ -49,19 +59,23 @@ export default function CreateEmployeePage() {
   useEffect(() => {
     const loadDropdowns = async () => {
       try {
-        const [usersRes, companiesRes, departmentsRes, positionsRes, shiftsRes] =
+        const [usersRes, companiesRes, departmentsRes, positionsRes, shiftsRes, jobLevelsRes, gradesRes] =
           await Promise.all([
             userService.getUsers(),
             companyService.getCompaniesAll(),
             departmentService.getDepartments(),
             positionService.getPositions(),
             shiftService.getShifts(),
+            jobLevelService.getJobLevels(),
+            gradeService.getGrades(),
           ]);
         if (usersRes.success && usersRes.data) setUsers(usersRes.data);
         if (companiesRes.success && companiesRes.data) setCompanies(companiesRes.data);
         if (departmentsRes.success && departmentsRes.data) setDepartments(departmentsRes.data);
         if (positionsRes.success && positionsRes.data) setPositions(positionsRes.data);
         if (shiftsRes.success && shiftsRes.data) setShifts(shiftsRes.data);
+        if (jobLevelsRes.success && jobLevelsRes.data) setJobLevels(jobLevelsRes.data);
+        if (gradesRes.success && gradesRes.data) setGrades(gradesRes.data);
       } catch (err) {
         setError(getErrorMessage(err, "Failed to load dropdown data"));
       } finally {
@@ -71,10 +85,24 @@ export default function CreateEmployeePage() {
     loadDropdowns();
   }, []);
 
+  // Filter grades by selected job level
+  const filteredGrades = useMemo(() => {
+    if (!form.job_level_id) return grades;
+    return grades.filter((g) => g.job_level_id === form.job_level_id);
+  }, [grades, form.job_level_id]);
+
+  const showContractFields = CONTRACT_STATUSES.includes(form.employee_status);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    // Reset grade when job level changes
+    if (name === "job_level_id") {
+      setForm({ ...form, job_level_id: value, grade_id: "" });
+      return;
+    }
+    setForm({ ...form, [name]: value });
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -88,9 +116,13 @@ export default function CreateEmployeePage() {
         department_id: form.department_id,
         position_id: form.position_id,
         shift_id: form.shift_id,
+        job_level_id: form.job_level_id || undefined,
+        grade_id: form.grade_id || undefined,
         employee_number: form.employee_number,
         join_date: form.join_date,
-        employee_status: form.employee_status as "tetap" | "kontrak" | "probation",
+        contract_start_date: showContractFields && form.contract_start_date ? form.contract_start_date : undefined,
+        contract_end_date: showContractFields && form.contract_end_date ? form.contract_end_date : undefined,
+        employee_status: form.employee_status,
         nik: form.nik || undefined,
         gender: form.gender || undefined,
         birth_place: form.birth_place || undefined,
@@ -226,6 +258,41 @@ export default function CreateEmployeePage() {
                 ))}
               </select>
             </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Job Level</label>
+              <select
+                name="job_level_id"
+                value={form.job_level_id}
+                onChange={handleChange}
+                className={inputClass}
+              >
+                <option value="">Select job level</option>
+                {jobLevels.map((jl) => (
+                  <option key={jl.id} value={jl.id}>
+                    {jl.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Grade</label>
+              <select
+                name="grade_id"
+                value={form.grade_id}
+                onChange={handleChange}
+                className={inputClass}
+                disabled={!form.job_level_id}
+              >
+                <option value="">
+                  {form.job_level_id ? "Select grade" : "Select job level first"}
+                </option>
+                {filteredGrades.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -262,11 +329,38 @@ export default function CreateEmployeePage() {
                 onChange={handleChange}
                 className={inputClass}
               >
-                <option value="tetap">Tetap</option>
+                <option value="tetap">Tetap (PKWTT Permanent)</option>
+                <option value="pkwtt">PKWTT (Permanent)</option>
+                <option value="pkwt">PKWT (Fixed-term)</option>
                 <option value="kontrak">Kontrak</option>
                 <option value="probation">Probation</option>
+                <option value="internship">Internship / Magang</option>
               </select>
             </div>
+            {showContractFields && (
+              <>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Contract Start Date</label>
+                  <input
+                    name="contract_start_date"
+                    type="date"
+                    value={form.contract_start_date}
+                    onChange={handleChange}
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">Contract End Date</label>
+                  <input
+                    name="contract_end_date"
+                    type="date"
+                    value={form.contract_end_date}
+                    onChange={handleChange}
+                    className={inputClass}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
 
