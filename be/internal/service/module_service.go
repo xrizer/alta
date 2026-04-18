@@ -126,12 +126,24 @@ func (s *moduleService) SetForCompany(companyID, moduleKey, actorUserID string, 
 		}
 	}
 
+	// Config is a jsonb column; an empty string is not valid JSON and Postgres
+	// will reject it with SQLSTATE 22P02. When the caller omits config, keep
+	// whatever is already stored (or default to an empty object on insert).
+	cfg := strings.TrimSpace(req.Config)
+	if cfg == "" {
+		if existing, ferr := s.compModRepo.FindByCompanyAndKey(companyID, moduleKey); ferr == nil && existing != nil && strings.TrimSpace(existing.Config) != "" {
+			cfg = existing.Config
+		} else {
+			cfg = "{}"
+		}
+	}
+
 	now := time.Now()
 	cm := &model.CompanyModule{
 		CompanyID: companyID,
 		ModuleKey: moduleKey,
 		Enabled:   req.Enabled,
-		Config:    req.Config,
+		Config:    cfg,
 		EnabledBy: actorUserID,
 	}
 	if req.Enabled {
