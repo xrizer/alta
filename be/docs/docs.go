@@ -617,7 +617,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Retrieve all companies",
+                "description": "Retrieve companies with pagination, search, and sorting",
                 "produces": [
                     "application/json"
                 ],
@@ -625,6 +625,38 @@ const docTemplate = `{
                     "Companies"
                 ],
                 "summary": "Get all companies",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number (default 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Items per page (default 10)",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by name, email, phone, or NPWP",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort field: name, email, phone, npwp, is_active, created_at",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort direction: asc or desc",
+                        "name": "sort_order",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Companies retrieved",
@@ -637,10 +669,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/dto.CompanyResponse"
-                                            }
+                                            "$ref": "#/definitions/dto.PaginatedCompanyResponse"
                                         }
                                     }
                                 }
@@ -704,6 +733,49 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Delete multiple companies by IDs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Companies"
+                ],
+                "summary": "Delete multiple companies",
+                "parameters": [
+                    {
+                        "description": "Company IDs",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DeleteMultipleCompaniesRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Companies deleted",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or failed to delete",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -856,6 +928,132 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Failed to delete",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{id}/modules": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Superadmin view: every module + whether it is enabled for the given company.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modules"
+                ],
+                "summary": "List modules with enabled state for a specific company",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Company modules fetched",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.CompanyModuleResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to fetch modules",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{id}/modules/{key}": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Superadmin-only. Core modules cannot be disabled. Dependencies are validated.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modules"
+                ],
+                "summary": "Enable or disable a module for a company",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Module key (e.g. visit_tracking)",
+                        "name": "key",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Enable/disable + optional JSON config",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SetCompanyModuleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Module updated",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.CompanyModuleResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request or dependency violation",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -1278,6 +1476,58 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Employee salary not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/employee-salaries/seed-from-position/{employeeId}": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Create an employee salary record using the position's base salary and standard Indonesian BPJS rates. Fails if a salary record already exists.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Employee Salaries"
+                ],
+                "summary": "Seed salary from position base salary",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Employee ID",
+                        "name": "employeeId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Employee salary seeded",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.EmployeeSalaryResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Seed failed",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -2345,6 +2595,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/me/modules": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Used by the frontend to filter the sidebar. Superadmins receive all modules.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modules"
+                ],
+                "summary": "Get the enabled module keys for the current caller",
+                "responses": {
+                    "200": {
+                        "description": "Modules fetched",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.MyModulesResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "Employee or company not found for user",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/menu-access": {
             "get": {
                 "security": [
@@ -2529,6 +2822,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/modules": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Returns every feature module known to the system (core + opt-in). Authenticated.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Modules"
+                ],
+                "summary": "List the feature module catalog",
+                "responses": {
+                    "200": {
+                        "description": "Modules fetched",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.ModuleResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to fetch modules",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/notifications": {
             "get": {
                 "security": [
@@ -2554,7 +2893,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Notifications retrieved",
+                        "description": "OK",
                         "schema": {
                             "allOf": [
                                 {
@@ -2593,7 +2932,7 @@ const docTemplate = `{
                 "summary": "Mark all notifications as read",
                 "responses": {
                     "200": {
-                        "description": "All notifications marked as read",
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -2618,7 +2957,7 @@ const docTemplate = `{
                 "summary": "Get unread notification count",
                 "responses": {
                     "200": {
-                        "description": "Unread count retrieved",
+                        "description": "OK",
                         "schema": {
                             "allOf": [
                                 {
@@ -2663,7 +3002,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Notification marked as read",
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -2851,6 +3190,58 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/payrolls/me": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieve paid payroll records for the authenticated user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payrolls"
+                ],
+                "summary": "Get my payslips",
+                "responses": {
+                    "200": {
+                        "description": "Payslips retrieved",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.PayrollResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "Employee profile not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to fetch payslips",
                         "schema": {
                             "$ref": "#/definitions/response.Response"
                         }
@@ -3897,9 +4288,905 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/visit-plans": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "VisitPlans"
+                ],
+                "summary": "Create a visit plan for an employee on a specific date",
+                "parameters": [
+                    {
+                        "description": "Plan data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CreateVisitPlanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.VisitPlanResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/visit-plans/by-date": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Pass employee_id=me to look up the caller's plan.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "VisitPlans"
+                ],
+                "summary": "Fetch the plan for an employee on a given date",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Employee ID or 'me'",
+                        "name": "employee_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Plan date (YYYY-MM-DD)",
+                        "name": "date",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plan fetched",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.VisitPlanResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid date format",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Plan not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/visit-plans/employee/{employeeId}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Optionally filter by date range. Use employeeId=me for self-service.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "VisitPlans"
+                ],
+                "summary": "List plans for an employee",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Employee ID or 'me'",
+                        "name": "employeeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start date (YYYY-MM-DD)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End date (YYYY-MM-DD)",
+                        "name": "to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plans fetched",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.VisitPlanResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/visit-plans/items/{itemId}": {
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "VisitPlans"
+                ],
+                "summary": "Update a plan item (mark visited/skipped, edit fields)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Plan item ID",
+                        "name": "itemId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to update",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateVisitPlanItemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item updated",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.VisitPlanItemResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "VisitPlans"
+                ],
+                "summary": "Delete a plan item",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Plan item ID",
+                        "name": "itemId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item deleted",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/visit-plans/report": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Planned-vs-actual per employee for one date. The under_minimum flag is soft (default minimum 5).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "VisitPlans"
+                ],
+                "summary": "Daily visit adherence report",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company ID",
+                        "name": "company_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Report date (YYYY-MM-DD)",
+                        "name": "date",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Override the 5/day threshold",
+                        "name": "minimum",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Report generated",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.VisitAdherenceReport"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/visit-plans/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "VisitPlans"
+                ],
+                "summary": "Get a visit plan by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Plan ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plan fetched",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.VisitPlanResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "Plan not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "VisitPlans"
+                ],
+                "summary": "Update a visit plan (status / notes)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Plan ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to update",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateVisitPlanRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plan updated",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.VisitPlanResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Soft-deletes the plan and all its items. Admin only.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "VisitPlans"
+                ],
+                "summary": "Delete a visit plan",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Plan ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plan deleted",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/visit-plans/{id}/items": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "VisitPlans"
+                ],
+                "summary": "Add a stop to a visit plan",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Plan ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Plan item data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddVisitPlanItemRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Item added",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.VisitPlanItemResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/visits": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Admin/HR listing. Employees should use /visits/attendance/{attendanceId}.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "List visits with filters",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by employee ID",
+                        "name": "employee_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by company ID",
+                        "name": "company_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter start date (YYYY-MM-DD)",
+                        "name": "from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter end date (YYYY-MM-DD, inclusive)",
+                        "name": "to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Visits fetched",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.PaginatedVisitResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid date filter",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/visits/attendance/{attendanceId}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Timeline of visits nested inside one clock-in session, ordered by arrival.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "List visits within an attendance session",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Attendance ID",
+                        "name": "attendanceId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Visits fetched",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.VisitResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/visits/start": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Record arrival at a sub-location inside an active attendance session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "Start a visit",
+                "parameters": [
+                    {
+                        "description": "Visit start data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.StartVisitRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.VisitResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/visits/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Retrieve a single visit record.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "Get a visit by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Visit ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Visit fetched",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.VisitResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "Visit not found",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Soft-deletes a visit. Admin only.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "Delete a visit",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Visit ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Visit deleted",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed to delete visit",
+                        "schema": {
+                            "$ref": "#/definitions/response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/visits/{id}/end": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Finalize a visit with result notes and optional additional photos",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Visits"
+                ],
+                "summary": "End a visit",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Visit ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Visit end data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.EndVisitRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.VisitResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "dto.AddVisitPlanItemRequest": {
+            "type": "object",
+            "required": [
+                "location"
+            ],
+            "properties": {
+                "location": {
+                    "type": "string"
+                },
+                "purpose": {
+                    "type": "string"
+                },
+                "scheduled_time": {
+                    "type": "string"
+                },
+                "sequence_order": {
+                    "type": "integer"
+                },
+                "sub_location": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.ApproveLeaveRequest": {
             "type": "object",
             "required": [
@@ -3920,7 +5207,32 @@ const docTemplate = `{
                 "clock_in": {
                     "type": "string"
                 },
+                "clock_in_distance_m": {
+                    "type": "number"
+                },
+                "clock_in_lat": {
+                    "description": "GPS + photo (present when captured; omitted when null/empty)",
+                    "type": "number"
+                },
+                "clock_in_lng": {
+                    "type": "number"
+                },
+                "clock_in_photo": {
+                    "type": "string"
+                },
                 "clock_out": {
+                    "type": "string"
+                },
+                "clock_out_distance_m": {
+                    "type": "number"
+                },
+                "clock_out_lat": {
+                    "type": "number"
+                },
+                "clock_out_lng": {
+                    "type": "number"
+                },
+                "clock_out_photo": {
                     "type": "string"
                 },
                 "created_at": {
@@ -3961,10 +5273,25 @@ const docTemplate = `{
                 "employee_id"
             ],
             "properties": {
+                "distance_m": {
+                    "description": "meters from expected location",
+                    "type": "number"
+                },
                 "employee_id": {
                     "type": "string"
                 },
+                "lat": {
+                    "description": "Optional GPS + photo capture — required only when geo_attendance module is enabled.",
+                    "type": "number"
+                },
+                "lng": {
+                    "type": "number"
+                },
                 "notes": {
+                    "type": "string"
+                },
+                "photo": {
+                    "description": "URL to uploaded photo",
                     "type": "string"
                 }
             }
@@ -3972,7 +5299,51 @@ const docTemplate = `{
         "dto.ClockOutRequest": {
             "type": "object",
             "properties": {
+                "distance_m": {
+                    "type": "number"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "lng": {
+                    "type": "number"
+                },
                 "notes": {
+                    "type": "string"
+                },
+                "photo": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.CompanyModuleResponse": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "type": "string"
+                },
+                "config": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "enabled_at": {
+                    "type": "string"
+                },
+                "enabled_by": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "module": {
+                    "$ref": "#/definitions/dto.ModuleResponse"
+                },
+                "module_key": {
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -3999,6 +5370,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "npp": {
                     "type": "string"
                 },
                 "npwp": {
@@ -4064,6 +5438,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "npp": {
+                    "type": "string"
+                },
                 "npwp": {
                     "type": "string"
                 },
@@ -4126,6 +5503,12 @@ const docTemplate = `{
                 "company_id": {
                     "type": "string"
                 },
+                "contract_end_date": {
+                    "type": "string"
+                },
+                "contract_start_date": {
+                    "type": "string"
+                },
                 "department_id": {
                     "type": "string"
                 },
@@ -4136,6 +5519,12 @@ const docTemplate = `{
                     "$ref": "#/definitions/model.EmployeeStatus"
                 },
                 "gender": {
+                    "type": "string"
+                },
+                "grade_id": {
+                    "type": "string"
+                },
+                "job_level_id": {
                     "type": "string"
                 },
                 "join_date": {
@@ -4325,6 +5714,7 @@ const docTemplate = `{
                 },
                 "role": {
                     "enum": [
+                        "superadmin",
                         "admin",
                         "hr",
                         "employee"
@@ -4334,6 +5724,49 @@ const docTemplate = `{
                             "$ref": "#/definitions/model.Role"
                         }
                     ]
+                }
+            }
+        },
+        "dto.CreateVisitPlanRequest": {
+            "type": "object",
+            "required": [
+                "employee_id",
+                "plan_date"
+            ],
+            "properties": {
+                "employee_id": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.VisitPlanItemInput"
+                    }
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "plan_date": {
+                    "description": "YYYY-MM-DD",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "optional, defaults to draft",
+                    "type": "string"
+                }
+            }
+        },
+        "dto.DeleteMultipleCompaniesRequest": {
+            "type": "object",
+            "required": [
+                "ids"
+            ],
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -4396,6 +5829,12 @@ const docTemplate = `{
                 "company_id": {
                     "type": "string"
                 },
+                "contract_end_date": {
+                    "type": "string"
+                },
+                "contract_start_date": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -4414,7 +5853,19 @@ const docTemplate = `{
                 "gender": {
                     "type": "string"
                 },
+                "grade": {
+                    "$ref": "#/definitions/dto.GradeResponse"
+                },
+                "grade_id": {
+                    "type": "string"
+                },
                 "id": {
+                    "type": "string"
+                },
+                "job_level": {
+                    "$ref": "#/definitions/dto.JobLevelResponse"
+                },
+                "job_level_id": {
                     "type": "string"
                 },
                 "join_date": {
@@ -4520,6 +5971,21 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.EndVisitRequest": {
+            "type": "object",
+            "properties": {
+                "photos": {
+                    "description": "additional photos appended to existing",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "result_notes": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.GeneratePayrollRequest": {
             "type": "object",
             "required": [
@@ -4536,6 +6002,44 @@ const docTemplate = `{
                 },
                 "year": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.GradeResponse": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "job_level_id": {
+                    "type": "string"
+                },
+                "job_level_name": {
+                    "type": "string"
+                },
+                "max_salary": {
+                    "type": "number"
+                },
+                "min_salary": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
@@ -4559,6 +6063,35 @@ const docTemplate = `{
                 },
                 "is_national": {
                     "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.JobLevelResponse": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "level_order": {
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -4659,6 +6192,78 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.ModuleResponse": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "depends_on": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "is_core": {
+                    "type": "boolean"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.MyModulesResponse": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "type": "string"
+                },
+                "enabled_modules": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "dto.NotificationResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_read": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "read_at": {
+                    "type": "string"
+                },
+                "ref_id": {
+                    "type": "string"
+                },
+                "ref_type": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/model.NotificationType"
+                }
+            }
+        },
         "dto.OrgDepartmentNode": {
             "type": "object",
             "properties": {
@@ -4747,42 +6352,48 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.NotificationResponse": {
+        "dto.PaginatedCompanyResponse": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "type": "string"
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.CompanyResponse"
+                    }
                 },
-                "id": {
-                    "type": "string"
+                "limit": {
+                    "type": "integer"
                 },
-                "is_read": {
-                    "type": "boolean"
+                "page": {
+                    "type": "integer"
                 },
-                "message": {
-                    "type": "string"
+                "total_items": {
+                    "type": "integer"
                 },
-                "read_at": {
-                    "type": "string"
-                },
-                "ref_id": {
-                    "type": "string"
-                },
-                "ref_type": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "type": {
-                    "$ref": "#/definitions/model.NotificationType"
+                "total_pages": {
+                    "type": "integer"
                 }
             }
         },
-        "dto.UnreadCountResponse": {
+        "dto.PaginatedVisitResponse": {
             "type": "object",
             "properties": {
-                "count": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.VisitResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total_items": {
+                    "type": "integer"
+                },
+                "total_pages": {
                     "type": "integer"
                 }
             }
@@ -4907,6 +6518,18 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.SetCompanyModuleRequest": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "description": "raw JSON string; empty = keep existing",
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                }
+            }
+        },
         "dto.SetMenuAccessRequest": {
             "type": "object",
             "required": [
@@ -4957,6 +6580,43 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.StartVisitRequest": {
+            "type": "object",
+            "required": [
+                "attendance_id",
+                "location"
+            ],
+            "properties": {
+                "attendance_id": {
+                    "type": "string"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "lng": {
+                    "type": "number"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "photos": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "purpose": {
+                    "type": "string"
+                },
+                "sub_location": {
+                    "type": "string"
+                },
+                "visit_plan_item_id": {
+                    "description": "Optional — supplied when this visit realizes a planned item.",
+                    "type": "string"
+                }
+            }
+        },
         "dto.TokenResponse": {
             "type": "object",
             "properties": {
@@ -4968,6 +6628,14 @@ const docTemplate = `{
                 },
                 "token_type": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.UnreadCountResponse": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
                 }
             }
         },
@@ -5010,6 +6678,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "npp": {
                     "type": "string"
                 },
                 "npwp": {
@@ -5058,6 +6729,12 @@ const docTemplate = `{
                 "bpjs_tk_no": {
                     "type": "string"
                 },
+                "contract_end_date": {
+                    "type": "string"
+                },
+                "contract_start_date": {
+                    "type": "string"
+                },
                 "department_id": {
                     "type": "string"
                 },
@@ -5065,6 +6742,12 @@ const docTemplate = `{
                     "$ref": "#/definitions/model.EmployeeStatus"
                 },
                 "gender": {
+                    "type": "string"
+                },
+                "grade_id": {
+                    "type": "string"
+                },
+                "job_level_id": {
                     "type": "string"
                 },
                 "last_education": {
@@ -5230,6 +6913,41 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.UpdateVisitPlanItemRequest": {
+            "type": "object",
+            "properties": {
+                "location": {
+                    "type": "string"
+                },
+                "purpose": {
+                    "type": "string"
+                },
+                "scheduled_time": {
+                    "type": "string"
+                },
+                "sequence_order": {
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "pending | visited | skipped",
+                    "type": "string"
+                },
+                "sub_location": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UpdateVisitPlanRequest": {
+            "type": "object",
+            "properties": {
+                "notes": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UserMenuKeysResponse": {
             "type": "object",
             "properties": {
@@ -5273,6 +6991,205 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.VisitAdherenceReport": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "minimum": {
+                    "type": "integer"
+                },
+                "rows": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.VisitAdherenceRow"
+                    }
+                }
+            }
+        },
+        "dto.VisitAdherenceRow": {
+            "type": "object",
+            "properties": {
+                "actual_count": {
+                    "type": "integer"
+                },
+                "employee_id": {
+                    "type": "string"
+                },
+                "employee_name": {
+                    "type": "string"
+                },
+                "matched_count": {
+                    "description": "actual visits that linked to a plan item",
+                    "type": "integer"
+                },
+                "minimum_target": {
+                    "type": "integer"
+                },
+                "planned_count": {
+                    "type": "integer"
+                },
+                "under_minimum": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "dto.VisitPlanItemInput": {
+            "type": "object",
+            "required": [
+                "location"
+            ],
+            "properties": {
+                "location": {
+                    "type": "string"
+                },
+                "purpose": {
+                    "type": "string"
+                },
+                "scheduled_time": {
+                    "type": "string"
+                },
+                "sequence_order": {
+                    "type": "integer"
+                },
+                "sub_location": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.VisitPlanItemResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "linked_visit_id": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "purpose": {
+                    "type": "string"
+                },
+                "scheduled_time": {
+                    "type": "string"
+                },
+                "sequence_order": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "sub_location": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "visit_plan_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.VisitPlanResponse": {
+            "type": "object",
+            "properties": {
+                "company_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "string"
+                },
+                "employee_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.VisitPlanItemResponse"
+                    }
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "plan_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.VisitResponse": {
+            "type": "object",
+            "properties": {
+                "arrived_at": {
+                    "type": "string"
+                },
+                "attendance_id": {
+                    "type": "string"
+                },
+                "company_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "employee_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lat": {
+                    "type": "number"
+                },
+                "left_at": {
+                    "type": "string"
+                },
+                "lng": {
+                    "type": "number"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "photos": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "purpose": {
+                    "type": "string"
+                },
+                "result_notes": {
+                    "type": "string"
+                },
+                "sub_location": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "visit_plan_item_id": {
+                    "type": "string"
+                }
+            }
+        },
         "model.AttendanceStatus": {
             "type": "string",
             "enum": [
@@ -5303,12 +7220,18 @@ const docTemplate = `{
             "enum": [
                 "tetap",
                 "kontrak",
-                "probation"
+                "probation",
+                "pkwt",
+                "pkwtt",
+                "internship"
             ],
             "x-enum-varnames": [
                 "StatusTetap",
                 "StatusKontrak",
-                "StatusProbation"
+                "StatusProbation",
+                "StatusPKWT",
+                "StatusPKWTT",
+                "StatusInternship"
             ]
         },
         "model.LeaveStatus": {

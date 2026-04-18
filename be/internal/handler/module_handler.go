@@ -9,7 +9,7 @@ import (
 )
 
 type ModuleHandler struct {
-	service   service.ModuleService
+	service    service.ModuleService
 	empService service.EmployeeService
 }
 
@@ -17,7 +17,15 @@ func NewModuleHandler(s service.ModuleService, empService service.EmployeeServic
 	return &ModuleHandler{s, empService}
 }
 
-// ListCatalog returns every module in the catalog. Superadmin/admin only.
+// ListCatalog godoc
+// @Summary List the feature module catalog
+// @Description Returns every feature module known to the system (core + opt-in). Authenticated.
+// @Tags Modules
+// @Security Bearer
+// @Produce json
+// @Success 200 {object} response.Response{data=[]dto.ModuleResponse} "Modules fetched"
+// @Failure 500 {object} response.Response "Failed to fetch modules"
+// @Router /modules [get]
 func (h *ModuleHandler) ListCatalog(c *fiber.Ctx) error {
 	modules, err := h.service.ListAllModules()
 	if err != nil {
@@ -26,8 +34,16 @@ func (h *ModuleHandler) ListCatalog(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Modules fetched", modules)
 }
 
-// ListForCompany returns each module with its enabled/config state for one company.
-// Superadmin endpoint: /api/companies/:id/modules
+// ListForCompany godoc
+// @Summary List modules with enabled state for a specific company
+// @Description Superadmin view: every module + whether it is enabled for the given company.
+// @Tags Modules
+// @Security Bearer
+// @Produce json
+// @Param id path string true "Company ID"
+// @Success 200 {object} response.Response{data=[]dto.CompanyModuleResponse} "Company modules fetched"
+// @Failure 500 {object} response.Response "Failed to fetch modules"
+// @Router /companies/{id}/modules [get]
 func (h *ModuleHandler) ListForCompany(c *fiber.Ctx) error {
 	companyID := c.Params("id")
 	rows, err := h.service.ListForCompany(companyID)
@@ -37,8 +53,19 @@ func (h *ModuleHandler) ListForCompany(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Company modules fetched", rows)
 }
 
-// SetForCompany enables or disables a module for a company.
-// Superadmin endpoint: PUT /api/companies/:id/modules/:key
+// SetForCompany godoc
+// @Summary Enable or disable a module for a company
+// @Description Superadmin-only. Core modules cannot be disabled. Dependencies are validated.
+// @Tags Modules
+// @Security Bearer
+// @Accept json
+// @Produce json
+// @Param id path string true "Company ID"
+// @Param key path string true "Module key (e.g. visit_tracking)"
+// @Param request body dto.SetCompanyModuleRequest true "Enable/disable + optional JSON config"
+// @Success 200 {object} response.Response{data=dto.CompanyModuleResponse} "Module updated"
+// @Failure 400 {object} response.Response "Invalid request or dependency violation"
+// @Router /companies/{id}/modules/{key} [put]
 func (h *ModuleHandler) SetForCompany(c *fiber.Ctx) error {
 	companyID := c.Params("id")
 	moduleKey := c.Params("key")
@@ -56,8 +83,15 @@ func (h *ModuleHandler) SetForCompany(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Module updated", saved)
 }
 
-// GetMyModules returns the enabled module keys for the current user's company.
-// Used by the FE to filter the sidebar.
+// GetMyModules godoc
+// @Summary Get the enabled module keys for the current caller
+// @Description Used by the frontend to filter the sidebar. Superadmins receive all modules.
+// @Tags Modules
+// @Security Bearer
+// @Produce json
+// @Success 200 {object} response.Response{data=dto.MyModulesResponse} "Modules fetched"
+// @Failure 404 {object} response.Response "Employee or company not found for user"
+// @Router /me/modules [get]
 func (h *ModuleHandler) GetMyModules(c *fiber.Ctx) error {
 	userID, _ := c.Locals("userID").(string)
 	if userID == "" {

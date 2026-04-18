@@ -1,5 +1,20 @@
 basePath: /api
 definitions:
+  dto.AddVisitPlanItemRequest:
+    properties:
+      location:
+        type: string
+      purpose:
+        type: string
+      scheduled_time:
+        type: string
+      sequence_order:
+        type: integer
+      sub_location:
+        type: string
+    required:
+    - location
+    type: object
   dto.ApproveLeaveRequest:
     properties:
       rejection_reason:
@@ -13,7 +28,24 @@ definitions:
     properties:
       clock_in:
         type: string
+      clock_in_distance_m:
+        type: number
+      clock_in_lat:
+        description: GPS + photo (present when captured; omitted when null/empty)
+        type: number
+      clock_in_lng:
+        type: number
+      clock_in_photo:
+        type: string
       clock_out:
+        type: string
+      clock_out_distance_m:
+        type: number
+      clock_out_lat:
+        type: number
+      clock_out_lng:
+        type: number
+      clock_out_photo:
         type: string
       created_at:
         type: string
@@ -38,16 +70,57 @@ definitions:
     type: object
   dto.ClockInRequest:
     properties:
+      distance_m:
+        description: meters from expected location
+        type: number
       employee_id:
         type: string
+      lat:
+        description: Optional GPS + photo capture — required only when geo_attendance
+          module is enabled.
+        type: number
+      lng:
+        type: number
       notes:
+        type: string
+      photo:
+        description: URL to uploaded photo
         type: string
     required:
     - employee_id
     type: object
   dto.ClockOutRequest:
     properties:
+      distance_m:
+        type: number
+      lat:
+        type: number
+      lng:
+        type: number
       notes:
+        type: string
+      photo:
+        type: string
+    type: object
+  dto.CompanyModuleResponse:
+    properties:
+      company_id:
+        type: string
+      config:
+        type: string
+      enabled:
+        type: boolean
+      enabled_at:
+        type: string
+      enabled_by:
+        type: string
+      id:
+        type: string
+      module:
+        $ref: '#/definitions/dto.ModuleResponse'
+      module_key:
+        type: string
+      updated_at:
         type: string
     type: object
   dto.CompanyResponse:
@@ -65,6 +138,8 @@ definitions:
       logo:
         type: string
       name:
+        type: string
+      npp:
         type: string
       npwp:
         type: string
@@ -106,6 +181,8 @@ definitions:
         type: string
       name:
         type: string
+      npp:
+        type: string
       npwp:
         type: string
       phone:
@@ -143,6 +220,10 @@ definitions:
         type: string
       company_id:
         type: string
+      contract_end_date:
+        type: string
+      contract_start_date:
+        type: string
       department_id:
         type: string
       employee_number:
@@ -150,6 +231,10 @@ definitions:
       employee_status:
         $ref: '#/definitions/model.EmployeeStatus'
       gender:
+        type: string
+      grade_id:
+        type: string
+      job_level_id:
         type: string
       join_date:
         type: string
@@ -285,6 +370,7 @@ definitions:
         allOf:
         - $ref: '#/definitions/model.Role'
         enum:
+        - superadmin
         - admin
         - hr
         - employee
@@ -293,6 +379,35 @@ definitions:
     - name
     - password
     - role
+    type: object
+  dto.CreateVisitPlanRequest:
+    properties:
+      employee_id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/dto.VisitPlanItemInput'
+        type: array
+      notes:
+        type: string
+      plan_date:
+        description: YYYY-MM-DD
+        type: string
+      status:
+        description: optional, defaults to draft
+        type: string
+    required:
+    - employee_id
+    - plan_date
+    type: object
+  dto.DeleteMultipleCompaniesRequest:
+    properties:
+      ids:
+        items:
+          type: string
+        type: array
+    required:
+    - ids
     type: object
   dto.DepartmentResponse:
     properties:
@@ -333,6 +448,10 @@ definitions:
         $ref: '#/definitions/dto.CompanyResponse'
       company_id:
         type: string
+      contract_end_date:
+        type: string
+      contract_start_date:
+        type: string
       created_at:
         type: string
       department:
@@ -345,7 +464,15 @@ definitions:
         $ref: '#/definitions/model.EmployeeStatus'
       gender:
         type: string
+      grade:
+        $ref: '#/definitions/dto.GradeResponse'
+      grade_id:
+        type: string
       id:
+        type: string
+      job_level:
+        $ref: '#/definitions/dto.JobLevelResponse'
+      job_level_id:
         type: string
       join_date:
         type: string
@@ -415,6 +542,16 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.EndVisitRequest:
+    properties:
+      photos:
+        description: additional photos appended to existing
+        items:
+          type: string
+        type: array
+      result_notes:
+        type: string
+    type: object
   dto.GeneratePayrollRequest:
     properties:
       employee_id:
@@ -427,6 +564,31 @@ definitions:
     - employee_id
     - month
     - year
+    type: object
+  dto.GradeResponse:
+    properties:
+      company_id:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      job_level_id:
+        type: string
+      job_level_name:
+        type: string
+      max_salary:
+        type: number
+      min_salary:
+        type: number
+      name:
+        type: string
+      updated_at:
+        type: string
     type: object
   dto.HolidayResponse:
     properties:
@@ -442,6 +604,25 @@ definitions:
         type: string
       is_national:
         type: boolean
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.JobLevelResponse:
+    properties:
+      company_id:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      level_order:
+        type: integer
       name:
         type: string
       updated_at:
@@ -507,6 +688,53 @@ definitions:
       user_role:
         type: string
     type: object
+  dto.ModuleResponse:
+    properties:
+      category:
+        type: string
+      depends_on:
+        items:
+          type: string
+        type: array
+      description:
+        type: string
+      is_core:
+        type: boolean
+      key:
+        type: string
+      name:
+        type: string
+    type: object
+  dto.MyModulesResponse:
+    properties:
+      company_id:
+        type: string
+      enabled_modules:
+        items:
+          type: string
+        type: array
+    type: object
+  dto.NotificationResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      is_read:
+        type: boolean
+      message:
+        type: string
+      read_at:
+        type: string
+      ref_id:
+        type: string
+      ref_type:
+        type: string
+      title:
+        type: string
+      type:
+        $ref: '#/definitions/model.NotificationType'
+    type: object
   dto.OrgDepartmentNode:
     properties:
       id:
@@ -564,30 +792,34 @@ definitions:
       total_pages:
         type: integer
     type: object
-  dto.NotificationResponse:
+  dto.PaginatedCompanyResponse:
     properties:
-      created_at:
-        type: string
-      id:
-        type: string
-      is_read:
-        type: boolean
-      message:
-        type: string
-      read_at:
-        type: string
-      ref_id:
-        type: string
-      ref_type:
-        type: string
-      title:
-        type: string
-      type:
-        $ref: '#/definitions/model.NotificationType'
+      data:
+        items:
+          $ref: '#/definitions/dto.CompanyResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total_items:
+        type: integer
+      total_pages:
+        type: integer
     type: object
-  dto.UnreadCountResponse:
+  dto.PaginatedVisitResponse:
     properties:
-      count:
+      data:
+        items:
+          $ref: '#/definitions/dto.VisitResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total_items:
+        type: integer
+      total_pages:
         type: integer
     type: object
   dto.PayrollResponse:
@@ -669,6 +901,14 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.SetCompanyModuleRequest:
+    properties:
+      config:
+        description: raw JSON string; empty = keep existing
+        type: string
+      enabled:
+        type: boolean
+    type: object
   dto.SetMenuAccessRequest:
     properties:
       menu_keys:
@@ -702,6 +942,31 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.StartVisitRequest:
+    properties:
+      attendance_id:
+        type: string
+      lat:
+        type: number
+      lng:
+        type: number
+      location:
+        type: string
+      photos:
+        items:
+          type: string
+        type: array
+      purpose:
+        type: string
+      sub_location:
+        type: string
+      visit_plan_item_id:
+        description: Optional — supplied when this visit realizes a planned item.
+        type: string
+    required:
+    - attendance_id
+    - location
+    type: object
   dto.TokenResponse:
     properties:
       access_token:
@@ -710,6 +975,11 @@ definitions:
         type: integer
       token_type:
         type: string
+    type: object
+  dto.UnreadCountResponse:
+    properties:
+      count:
+        type: integer
     type: object
   dto.UpdateAttendanceRequest:
     properties:
@@ -737,6 +1007,8 @@ definitions:
       logo:
         type: string
       name:
+        type: string
+      npp:
         type: string
       npwp:
         type: string
@@ -768,11 +1040,19 @@ definitions:
         type: string
       bpjs_tk_no:
         type: string
+      contract_end_date:
+        type: string
+      contract_start_date:
+        type: string
       department_id:
         type: string
       employee_status:
         $ref: '#/definitions/model.EmployeeStatus'
       gender:
+        type: string
+      grade_id:
+        type: string
+      job_level_id:
         type: string
       last_education:
         type: string
@@ -880,6 +1160,29 @@ definitions:
       role:
         $ref: '#/definitions/model.Role'
     type: object
+  dto.UpdateVisitPlanItemRequest:
+    properties:
+      location:
+        type: string
+      purpose:
+        type: string
+      scheduled_time:
+        type: string
+      sequence_order:
+        type: integer
+      status:
+        description: pending | visited | skipped
+        type: string
+      sub_location:
+        type: string
+    type: object
+  dto.UpdateVisitPlanRequest:
+    properties:
+      notes:
+        type: string
+      status:
+        type: string
+    type: object
   dto.UserMenuKeysResponse:
     properties:
       menu_keys:
@@ -906,6 +1209,137 @@ definitions:
       role:
         $ref: '#/definitions/model.Role'
       updated_at:
+        type: string
+    type: object
+  dto.VisitAdherenceReport:
+    properties:
+      date:
+        type: string
+      minimum:
+        type: integer
+      rows:
+        items:
+          $ref: '#/definitions/dto.VisitAdherenceRow'
+        type: array
+    type: object
+  dto.VisitAdherenceRow:
+    properties:
+      actual_count:
+        type: integer
+      employee_id:
+        type: string
+      employee_name:
+        type: string
+      matched_count:
+        description: actual visits that linked to a plan item
+        type: integer
+      minimum_target:
+        type: integer
+      planned_count:
+        type: integer
+      under_minimum:
+        type: boolean
+    type: object
+  dto.VisitPlanItemInput:
+    properties:
+      location:
+        type: string
+      purpose:
+        type: string
+      scheduled_time:
+        type: string
+      sequence_order:
+        type: integer
+      sub_location:
+        type: string
+    required:
+    - location
+    type: object
+  dto.VisitPlanItemResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      linked_visit_id:
+        type: string
+      location:
+        type: string
+      purpose:
+        type: string
+      scheduled_time:
+        type: string
+      sequence_order:
+        type: integer
+      status:
+        type: string
+      sub_location:
+        type: string
+      updated_at:
+        type: string
+      visit_plan_id:
+        type: string
+    type: object
+  dto.VisitPlanResponse:
+    properties:
+      company_id:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      employee_id:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/dto.VisitPlanItemResponse'
+        type: array
+      notes:
+        type: string
+      plan_date:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.VisitResponse:
+    properties:
+      arrived_at:
+        type: string
+      attendance_id:
+        type: string
+      company_id:
+        type: string
+      created_at:
+        type: string
+      employee_id:
+        type: string
+      id:
+        type: string
+      lat:
+        type: number
+      left_at:
+        type: string
+      lng:
+        type: number
+      location:
+        type: string
+      photos:
+        items:
+          type: string
+        type: array
+      purpose:
+        type: string
+      result_notes:
+        type: string
+      sub_location:
+        type: string
+      updated_at:
+        type: string
+      visit_plan_item_id:
         type: string
     type: object
   model.AttendanceStatus:
@@ -935,11 +1369,17 @@ definitions:
     - tetap
     - kontrak
     - probation
+    - pkwt
+    - pkwtt
+    - internship
     type: string
     x-enum-varnames:
     - StatusTetap
     - StatusKontrak
     - StatusProbation
+    - StatusPKWT
+    - StatusPKWTT
+    - StatusInternship
   model.LeaveStatus:
     enum:
     - pending
@@ -1379,8 +1819,56 @@ paths:
       tags:
       - Authentication
   /companies:
+    delete:
+      consumes:
+      - application/json
+      description: Delete multiple companies by IDs
+      parameters:
+      - description: Company IDs
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DeleteMultipleCompaniesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Companies deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Invalid request or failed to delete
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Delete multiple companies
+      tags:
+      - Companies
     get:
-      description: Retrieve all companies
+      description: Retrieve companies with pagination, search, and sorting
+      parameters:
+      - description: Page number (default 1)
+        in: query
+        name: page
+        type: integer
+      - description: Items per page (default 10)
+        in: query
+        name: limit
+        type: integer
+      - description: Search by name, email, phone, or NPWP
+        in: query
+        name: search
+        type: string
+      - description: 'Sort field: name, email, phone, npwp, is_active, created_at'
+        in: query
+        name: sort_by
+        type: string
+      - description: 'Sort direction: asc or desc'
+        in: query
+        name: sort_order
+        type: string
       produces:
       - application/json
       responses:
@@ -1391,9 +1879,7 @@ paths:
             - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  items:
-                    $ref: '#/definitions/dto.CompanyResponse'
-                  type: array
+                  $ref: '#/definitions/dto.PaginatedCompanyResponse'
               type: object
         "500":
           description: Failed to fetch companies
@@ -1527,6 +2013,83 @@ paths:
       summary: Update a company
       tags:
       - Companies
+  /companies/{id}/modules:
+    get:
+      description: 'Superadmin view: every module + whether it is enabled for the
+        given company.'
+      parameters:
+      - description: Company ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Company modules fetched
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.CompanyModuleResponse'
+                  type: array
+              type: object
+        "500":
+          description: Failed to fetch modules
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: List modules with enabled state for a specific company
+      tags:
+      - Modules
+  /companies/{id}/modules/{key}:
+    put:
+      consumes:
+      - application/json
+      description: Superadmin-only. Core modules cannot be disabled. Dependencies
+        are validated.
+      parameters:
+      - description: Company ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Module key (e.g. visit_tracking)
+        in: path
+        name: key
+        required: true
+        type: string
+      - description: Enable/disable + optional JSON config
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SetCompanyModuleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Module updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CompanyModuleResponse'
+              type: object
+        "400":
+          description: Invalid request or dependency violation
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Enable or disable a module for a company
+      tags:
+      - Modules
   /departments:
     get:
       description: Retrieve all departments, optionally filtered by company
@@ -1863,6 +2426,37 @@ paths:
       security:
       - Bearer: []
       summary: Get latest salary for an employee
+      tags:
+      - Employee Salaries
+  /employee-salaries/seed-from-position/{employeeId}:
+    post:
+      description: Create an employee salary record using the position's base salary
+        and standard Indonesian BPJS rates. Fails if a salary record already exists.
+      parameters:
+      - description: Employee ID
+        in: path
+        name: employeeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Employee salary seeded
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.EmployeeSalaryResponse'
+              type: object
+        "400":
+          description: Seed failed
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Seed salary from position base salary
       tags:
       - Employee Salaries
   /employees:
@@ -2402,6 +2996,31 @@ paths:
       summary: Approve or reject a leave request
       tags:
       - Leaves
+  /me/modules:
+    get:
+      description: Used by the frontend to filter the sidebar. Superadmins receive
+        all modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Modules fetched
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MyModulesResponse'
+              type: object
+        "404":
+          description: Employee or company not found for user
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get the enabled module keys for the current caller
+      tags:
+      - Modules
   /menu-access:
     get:
       description: Retrieve all user menu access mappings (Admin only)
@@ -2514,6 +3133,33 @@ paths:
       summary: Get my menu access
       tags:
       - Menu Access
+  /modules:
+    get:
+      description: Returns every feature module known to the system (core + opt-in).
+        Authenticated.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Modules fetched
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.ModuleResponse'
+                  type: array
+              type: object
+        "500":
+          description: Failed to fetch modules
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: List the feature module catalog
+      tags:
+      - Modules
   /notifications:
     get:
       description: Returns the latest notifications for the authenticated user
@@ -2526,7 +3172,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Notifications retrieved
+          description: OK
           schema:
             allOf:
             - $ref: '#/definitions/response.Response'
@@ -2541,13 +3187,33 @@ paths:
       summary: Get notifications for the current user
       tags:
       - Notifications
+  /notifications/{id}/read:
+    put:
+      parameters:
+      - description: Notification ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Mark a notification as read
+      tags:
+      - Notifications
   /notifications/read-all:
     put:
       produces:
       - application/json
       responses:
         "200":
-          description: All notifications marked as read
+          description: OK
           schema:
             $ref: '#/definitions/response.Response'
       security:
@@ -2563,7 +3229,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Unread count retrieved
+          description: OK
           schema:
             allOf:
             - $ref: '#/definitions/response.Response'
@@ -2574,26 +3240,6 @@ paths:
       security:
       - Bearer: []
       summary: Get unread notification count
-      tags:
-      - Notifications
-  /notifications/{id}/read:
-    put:
-      parameters:
-      - description: Notification ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Notification marked as read
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - Bearer: []
-      summary: Mark a notification as read
       tags:
       - Notifications
   /organization/structure:
@@ -2836,6 +3482,36 @@ paths:
       security:
       - Bearer: []
       summary: Generate payroll
+      tags:
+      - Payrolls
+  /payrolls/me:
+    get:
+      description: Retrieve paid payroll records for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Payslips retrieved
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.PayrollResponse'
+                  type: array
+              type: object
+        "404":
+          description: Employee profile not found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to fetch payslips
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get my payslips
       tags:
       - Payrolls
   /positions:
@@ -3323,6 +3999,524 @@ paths:
       summary: Get current user
       tags:
       - Users
+  /visit-plans:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Plan data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateVisitPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.VisitPlanResponse'
+              type: object
+      security:
+      - Bearer: []
+      summary: Create a visit plan for an employee on a specific date
+      tags:
+      - VisitPlans
+  /visit-plans/{id}:
+    delete:
+      description: Soft-deletes the plan and all its items. Admin only.
+      parameters:
+      - description: Plan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Plan deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Delete a visit plan
+      tags:
+      - VisitPlans
+    get:
+      parameters:
+      - description: Plan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Plan fetched
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.VisitPlanResponse'
+              type: object
+        "404":
+          description: Plan not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get a visit plan by ID
+      tags:
+      - VisitPlans
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Plan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateVisitPlanRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Plan updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.VisitPlanResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Update a visit plan (status / notes)
+      tags:
+      - VisitPlans
+  /visit-plans/{id}/items:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Plan ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Plan item data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddVisitPlanItemRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Item added
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.VisitPlanItemResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Add a stop to a visit plan
+      tags:
+      - VisitPlans
+  /visit-plans/by-date:
+    get:
+      description: Pass employee_id=me to look up the caller's plan.
+      parameters:
+      - description: Employee ID or 'me'
+        in: query
+        name: employee_id
+        required: true
+        type: string
+      - description: Plan date (YYYY-MM-DD)
+        in: query
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Plan fetched
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.VisitPlanResponse'
+              type: object
+        "400":
+          description: Invalid date format
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Plan not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Fetch the plan for an employee on a given date
+      tags:
+      - VisitPlans
+  /visit-plans/employee/{employeeId}:
+    get:
+      description: Optionally filter by date range. Use employeeId=me for self-service.
+      parameters:
+      - description: Employee ID or 'me'
+        in: path
+        name: employeeId
+        required: true
+        type: string
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: from
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: to
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Plans fetched
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.VisitPlanResponse'
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: List plans for an employee
+      tags:
+      - VisitPlans
+  /visit-plans/items/{itemId}:
+    delete:
+      parameters:
+      - description: Plan item ID
+        in: path
+        name: itemId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Delete a plan item
+      tags:
+      - VisitPlans
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Plan item ID
+        in: path
+        name: itemId
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateVisitPlanItemRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item updated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.VisitPlanItemResponse'
+              type: object
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Update a plan item (mark visited/skipped, edit fields)
+      tags:
+      - VisitPlans
+  /visit-plans/report:
+    get:
+      description: Planned-vs-actual per employee for one date. The under_minimum
+        flag is soft (default minimum 5).
+      parameters:
+      - description: Company ID
+        in: query
+        name: company_id
+        required: true
+        type: string
+      - description: Report date (YYYY-MM-DD)
+        in: query
+        name: date
+        required: true
+        type: string
+      - description: Override the 5/day threshold
+        in: query
+        name: minimum
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Report generated
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.VisitAdherenceReport'
+              type: object
+        "400":
+          description: Invalid parameters
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Daily visit adherence report
+      tags:
+      - VisitPlans
+  /visits:
+    get:
+      description: Admin/HR listing. Employees should use /visits/attendance/{attendanceId}.
+      parameters:
+      - description: Filter by employee ID
+        in: query
+        name: employee_id
+        type: string
+      - description: Filter by company ID
+        in: query
+        name: company_id
+        type: string
+      - description: Filter start date (YYYY-MM-DD)
+        in: query
+        name: from
+        type: string
+      - description: Filter end date (YYYY-MM-DD, inclusive)
+        in: query
+        name: to
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Visits fetched
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.PaginatedVisitResponse'
+              type: object
+        "400":
+          description: Invalid date filter
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: List visits with filters
+      tags:
+      - Visits
+  /visits/{id}:
+    delete:
+      description: Soft-deletes a visit. Admin only.
+      parameters:
+      - description: Visit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Visit deleted
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Failed to delete visit
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Delete a visit
+      tags:
+      - Visits
+    get:
+      description: Retrieve a single visit record.
+      parameters:
+      - description: Visit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Visit fetched
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.VisitResponse'
+              type: object
+        "404":
+          description: Visit not found
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: Get a visit by ID
+      tags:
+      - Visits
+  /visits/{id}/end:
+    post:
+      consumes:
+      - application/json
+      description: Finalize a visit with result notes and optional additional photos
+      parameters:
+      - description: Visit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Visit end data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.EndVisitRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.VisitResponse'
+              type: object
+      security:
+      - Bearer: []
+      summary: End a visit
+      tags:
+      - Visits
+  /visits/attendance/{attendanceId}:
+    get:
+      description: Timeline of visits nested inside one clock-in session, ordered
+        by arrival.
+      parameters:
+      - description: Attendance ID
+        in: path
+        name: attendanceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Visits fetched
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.VisitResponse'
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: List visits within an attendance session
+      tags:
+      - Visits
+  /visits/start:
+    post:
+      consumes:
+      - application/json
+      description: Record arrival at a sub-location inside an active attendance session
+      parameters:
+      - description: Visit start data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.StartVisitRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.VisitResponse'
+              type: object
+      security:
+      - Bearer: []
+      summary: Start a visit
+      tags:
+      - Visits
 schemes:
 - http
 - https
