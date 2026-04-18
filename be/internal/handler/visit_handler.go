@@ -96,6 +96,14 @@ func (h *VisitHandler) End(c *fiber.Ctx) error {
 
 // GetByID godoc
 // @Summary Get a visit by ID
+// @Description Retrieve a single visit record.
+// @Tags Visits
+// @Security Bearer
+// @Produce json
+// @Param id path string true "Visit ID"
+// @Success 200 {object} response.Response{data=dto.VisitResponse} "Visit fetched"
+// @Failure 404 {object} response.Response "Visit not found"
+// @Router /visits/{id} [get]
 func (h *VisitHandler) GetByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 	v, err := h.service.GetByID(id)
@@ -107,6 +115,13 @@ func (h *VisitHandler) GetByID(c *fiber.Ctx) error {
 
 // GetByAttendanceID godoc
 // @Summary List visits within an attendance session
+// @Description Timeline of visits nested inside one clock-in session, ordered by arrival.
+// @Tags Visits
+// @Security Bearer
+// @Produce json
+// @Param attendanceId path string true "Attendance ID"
+// @Success 200 {object} response.Response{data=[]dto.VisitResponse} "Visits fetched"
+// @Router /visits/attendance/{attendanceId} [get]
 func (h *VisitHandler) GetByAttendanceID(c *fiber.Ctx) error {
 	attID := c.Params("attendanceId")
 	vs, err := h.service.GetByAttendanceID(attID)
@@ -118,8 +133,19 @@ func (h *VisitHandler) GetByAttendanceID(c *fiber.Ctx) error {
 
 // List godoc
 // @Summary List visits with filters
-// @Description Admin/HR listing. Employees should use /visits?employee_id=me or GetByAttendanceID.
-// Query: employee_id, company_id, from (YYYY-MM-DD), to (YYYY-MM-DD), page, limit
+// @Description Admin/HR listing. Employees should use /visits/attendance/{attendanceId}.
+// @Tags Visits
+// @Security Bearer
+// @Produce json
+// @Param employee_id query string false "Filter by employee ID"
+// @Param company_id query string false "Filter by company ID"
+// @Param from query string false "Filter start date (YYYY-MM-DD)"
+// @Param to query string false "Filter end date (YYYY-MM-DD, inclusive)"
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Items per page" default(20)
+// @Success 200 {object} response.Response{data=dto.PaginatedVisitResponse} "Visits fetched"
+// @Failure 400 {object} response.Response "Invalid date filter"
+// @Router /visits [get]
 func (h *VisitHandler) List(c *fiber.Ctx) error {
 	page, _ := strconv.Atoi(c.Query("page", "1"))
 	limit, _ := strconv.Atoi(c.Query("limit", "20"))
@@ -159,7 +185,15 @@ func (h *VisitHandler) List(c *fiber.Ctx) error {
 }
 
 // Delete godoc
-// @Summary Delete a visit (admin)
+// @Summary Delete a visit
+// @Description Soft-deletes a visit. Admin only.
+// @Tags Visits
+// @Security Bearer
+// @Produce json
+// @Param id path string true "Visit ID"
+// @Success 200 {object} response.Response "Visit deleted"
+// @Failure 400 {object} response.Response "Failed to delete visit"
+// @Router /visits/{id} [delete]
 func (h *VisitHandler) Delete(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if err := h.service.Delete(id); err != nil {

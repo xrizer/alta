@@ -45,6 +45,17 @@ func (h *VisitPlanHandler) Create(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusCreated, "Plan created", p)
 }
 
+// Update godoc
+// @Summary Update a visit plan (status / notes)
+// @Tags VisitPlans
+// @Security Bearer
+// @Accept json
+// @Produce json
+// @Param id path string true "Plan ID"
+// @Param request body dto.UpdateVisitPlanRequest true "Fields to update"
+// @Success 200 {object} response.Response{data=dto.VisitPlanResponse} "Plan updated"
+// @Failure 400 {object} response.Response "Invalid request"
+// @Router /visit-plans/{id} [put]
 func (h *VisitPlanHandler) Update(c *fiber.Ctx) error {
 	id := c.Params("id")
 	var req dto.UpdateVisitPlanRequest
@@ -58,6 +69,15 @@ func (h *VisitPlanHandler) Update(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Plan updated", p)
 }
 
+// GetByID godoc
+// @Summary Get a visit plan by ID
+// @Tags VisitPlans
+// @Security Bearer
+// @Produce json
+// @Param id path string true "Plan ID"
+// @Success 200 {object} response.Response{data=dto.VisitPlanResponse} "Plan fetched"
+// @Failure 404 {object} response.Response "Plan not found"
+// @Router /visit-plans/{id} [get]
 func (h *VisitPlanHandler) GetByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 	p, err := h.service.GetByID(id)
@@ -68,8 +88,17 @@ func (h *VisitPlanHandler) GetByID(c *fiber.Ctx) error {
 }
 
 // GetByEmployeeAndDate godoc
-// @Summary Fetch the plan for an employee on a given date (YYYY-MM-DD).
-// If employee_id=me, uses the calling user's employee record.
+// @Summary Fetch the plan for an employee on a given date
+// @Description Pass employee_id=me to look up the caller's plan.
+// @Tags VisitPlans
+// @Security Bearer
+// @Produce json
+// @Param employee_id query string true "Employee ID or 'me'"
+// @Param date query string true "Plan date (YYYY-MM-DD)"
+// @Success 200 {object} response.Response{data=dto.VisitPlanResponse} "Plan fetched"
+// @Failure 400 {object} response.Response "Invalid date format"
+// @Failure 404 {object} response.Response "Plan not found"
+// @Router /visit-plans/by-date [get]
 func (h *VisitPlanHandler) GetByEmployeeAndDate(c *fiber.Ctx) error {
 	empID := c.Query("employee_id")
 	dateStr := c.Query("date")
@@ -96,7 +125,16 @@ func (h *VisitPlanHandler) GetByEmployeeAndDate(c *fiber.Ctx) error {
 }
 
 // ListByEmployee godoc
-// @Summary List plans for an employee with optional date range.
+// @Summary List plans for an employee
+// @Description Optionally filter by date range. Use employeeId=me for self-service.
+// @Tags VisitPlans
+// @Security Bearer
+// @Produce json
+// @Param employeeId path string true "Employee ID or 'me'"
+// @Param from query string false "Start date (YYYY-MM-DD)"
+// @Param to query string false "End date (YYYY-MM-DD)"
+// @Success 200 {object} response.Response{data=[]dto.VisitPlanResponse} "Plans fetched"
+// @Router /visit-plans/employee/{employeeId} [get]
 func (h *VisitPlanHandler) ListByEmployee(c *fiber.Ctx) error {
 	empID := c.Params("employeeId")
 	if empID == "me" {
@@ -129,6 +167,15 @@ func (h *VisitPlanHandler) ListByEmployee(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Plans fetched", ps)
 }
 
+// Delete godoc
+// @Summary Delete a visit plan
+// @Description Soft-deletes the plan and all its items. Admin only.
+// @Tags VisitPlans
+// @Security Bearer
+// @Produce json
+// @Param id path string true "Plan ID"
+// @Success 200 {object} response.Response "Plan deleted"
+// @Router /visit-plans/{id} [delete]
 func (h *VisitPlanHandler) Delete(c *fiber.Ctx) error {
 	id := c.Params("id")
 	if err := h.service.Delete(id); err != nil {
@@ -137,6 +184,17 @@ func (h *VisitPlanHandler) Delete(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Plan deleted", nil)
 }
 
+// AddItem godoc
+// @Summary Add a stop to a visit plan
+// @Tags VisitPlans
+// @Security Bearer
+// @Accept json
+// @Produce json
+// @Param id path string true "Plan ID"
+// @Param request body dto.AddVisitPlanItemRequest true "Plan item data"
+// @Success 201 {object} response.Response{data=dto.VisitPlanItemResponse} "Item added"
+// @Failure 400 {object} response.Response "Invalid request"
+// @Router /visit-plans/{id}/items [post]
 func (h *VisitPlanHandler) AddItem(c *fiber.Ctx) error {
 	planID := c.Params("id")
 	var req dto.AddVisitPlanItemRequest
@@ -153,6 +211,17 @@ func (h *VisitPlanHandler) AddItem(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusCreated, "Item added", item)
 }
 
+// UpdateItem godoc
+// @Summary Update a plan item (mark visited/skipped, edit fields)
+// @Tags VisitPlans
+// @Security Bearer
+// @Accept json
+// @Produce json
+// @Param itemId path string true "Plan item ID"
+// @Param request body dto.UpdateVisitPlanItemRequest true "Fields to update"
+// @Success 200 {object} response.Response{data=dto.VisitPlanItemResponse} "Item updated"
+// @Failure 400 {object} response.Response "Invalid request"
+// @Router /visit-plans/items/{itemId} [put]
 func (h *VisitPlanHandler) UpdateItem(c *fiber.Ctx) error {
 	id := c.Params("itemId")
 	var req dto.UpdateVisitPlanItemRequest
@@ -166,6 +235,14 @@ func (h *VisitPlanHandler) UpdateItem(c *fiber.Ctx) error {
 	return response.Success(c, fiber.StatusOK, "Item updated", item)
 }
 
+// DeleteItem godoc
+// @Summary Delete a plan item
+// @Tags VisitPlans
+// @Security Bearer
+// @Produce json
+// @Param itemId path string true "Plan item ID"
+// @Success 200 {object} response.Response "Item deleted"
+// @Router /visit-plans/items/{itemId} [delete]
 func (h *VisitPlanHandler) DeleteItem(c *fiber.Ctx) error {
 	id := c.Params("itemId")
 	if err := h.service.DeleteItem(id); err != nil {
@@ -175,8 +252,17 @@ func (h *VisitPlanHandler) DeleteItem(c *fiber.Ctx) error {
 }
 
 // AdherenceReport godoc
-// @Summary Daily adherence report — planned vs actual + under-minimum flag.
-// Query: company_id (required), date (YYYY-MM-DD, required), minimum (int, default 5)
+// @Summary Daily visit adherence report
+// @Description Planned-vs-actual per employee for one date. The under_minimum flag is soft (default minimum 5).
+// @Tags VisitPlans
+// @Security Bearer
+// @Produce json
+// @Param company_id query string true "Company ID"
+// @Param date query string true "Report date (YYYY-MM-DD)"
+// @Param minimum query int false "Override the 5/day threshold"
+// @Success 200 {object} response.Response{data=dto.VisitAdherenceReport} "Report generated"
+// @Failure 400 {object} response.Response "Invalid parameters"
+// @Router /visit-plans/report [get]
 func (h *VisitPlanHandler) AdherenceReport(c *fiber.Ctx) error {
 	companyID := c.Query("company_id")
 	dateStr := c.Query("date")
