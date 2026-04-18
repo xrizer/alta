@@ -75,6 +75,7 @@ func main() {
 	moduleRepo := repository.NewModuleRepository(db)
 	compModuleRepo := repository.NewCompanyModuleRepository(db)
 	visitRepo := repository.NewVisitRepository(db)
+	visitPlanRepo := repository.NewVisitPlanRepository(db)
 
 	// Services
 	authService := service.NewAuthService(userRepo, cfg)
@@ -97,6 +98,7 @@ func main() {
 	gradeService := service.NewGradeService(gradeRepo, jobLevelRepo, companyRepo)
 	moduleService := service.NewModuleService(moduleRepo, compModuleRepo, companyRepo)
 	visitService := service.NewVisitService(visitRepo, attRepo, empRepo)
+	visitPlanService := service.NewVisitPlanService(visitPlanRepo, empRepo, visitRepo)
 
 	// Sync the code-defined module registry into the DB on every startup.
 	if err := moduleService.SyncRegistry(); err != nil {
@@ -123,6 +125,7 @@ func main() {
 	gradeHandler := handler.NewGradeHandler(gradeService)
 	moduleHandler := handler.NewModuleHandler(moduleService, empService)
 	visitHandler := handler.NewVisitHandler(visitService, empService)
+	visitPlanHandler := handler.NewVisitPlanHandler(visitPlanService, empService)
 
 	// Start Kafka consumer — processes events and writes notifications to DB
 	processor := kafka.NewEventProcessor(notifRepo, userRepo)
@@ -323,6 +326,19 @@ func main() {
 	visits.Get("/", middleware.RoleMiddleware("admin", "hr"), visitHandler.List)
 	visits.Get("/:id", visitHandler.GetByID)
 	visits.Delete("/:id", middleware.RoleMiddleware("admin"), visitHandler.Delete)
+
+	// Visit planning (opt-in module: visit_planning) — depends on visit_tracking
+	visitPlans := api.Group("/visit-plans", middleware.AuthMiddleware(cfg), middleware.RequireModule("visit_planning", moduleService, empService))
+	visitPlans.Get("/report", middleware.RoleMiddleware("admin", "hr"), visitPlanHandler.AdherenceReport)
+	visitPlans.Get("/by-date", visitPlanHandler.GetByEmployeeAndDate)
+	visitPlans.Get("/employee/:employeeId", visitPlanHandler.ListByEmployee)
+	visitPlans.Post("/", middleware.RoleMiddleware("admin", "hr"), visitPlanHandler.Create)
+	visitPlans.Get("/:id", visitPlanHandler.GetByID)
+	visitPlans.Put("/:id", middleware.RoleMiddleware("admin", "hr"), visitPlanHandler.Update)
+	visitPlans.Delete("/:id", middleware.RoleMiddleware("admin"), visitPlanHandler.Delete)
+	visitPlans.Post("/:id/items", middleware.RoleMiddleware("admin", "hr"), visitPlanHandler.AddItem)
+	visitPlans.Put("/items/:itemId", visitPlanHandler.UpdateItem)
+	visitPlans.Delete("/items/:itemId", middleware.RoleMiddleware("admin", "hr"), visitPlanHandler.DeleteItem)
 
 	// Swagger documentation
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
