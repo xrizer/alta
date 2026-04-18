@@ -4,15 +4,23 @@
 // leaves, payroll, payslips, menu_access_policy,
 // job_levels, grades
 //
-// Each tab and sub-item may also declare a `moduleKey` — the feature-module
-// toggle that gates visibility. If omitted, visibility is not gated by modules
-// (treated as always-available). See internal/modules/registry.go for the list.
+// Each tab and sub-item may also declare:
+//   - `moduleKey`: the feature-module toggle that gates visibility
+//                  (see internal/modules/registry.go)
+//   - `requiredRole`: one or more user roles allowed to see the item.
+//                     Omitted = any role may see it (subject to menu/module gates).
+//
+// Role gating is purely a UX nicety — the backend still enforces access.
+// Use it to hide admin/superadmin-only links from non-privileged users.
+
+import type { Role } from "@/lib/types";
 
 export interface SubMenuItem {
   name: string;
   key: string; // matches backend menu key
   href: string;
   moduleKey?: string; // optional feature module gate
+  requiredRole?: Role | Role[]; // optional role gate
 }
 
 export interface NavTab {
@@ -21,6 +29,7 @@ export interface NavTab {
   menuKeys: string[]; // all backend menu keys under this tab
   subItems: SubMenuItem[];
   moduleKey?: string; // optional feature module gate for the whole tab
+  requiredRole?: Role | Role[]; // optional role gate for the whole tab
 }
 
 export const navTabs: NavTab[] = [
@@ -98,6 +107,7 @@ export const navTabs: NavTab[] = [
         key: "attendance",
         href: "/dashboard/visit-plans/report",
         moduleKey: "visit_planning",
+        requiredRole: ["admin", "hr", "superadmin"],
       },
     ],
   },
@@ -121,9 +131,12 @@ export const navTabs: NavTab[] = [
         href: "/dashboard/menu-access",
       },
       {
+        // Backend enforces superadmin-only on /api/companies/:id/modules.
+        // Hide the link from admins/hr so they don't hit a dead-end page.
         name: "Module Management",
         key: "menu_access_policy",
         href: "/dashboard/settings/modules",
+        requiredRole: "superadmin",
       },
     ],
   },
@@ -189,20 +202,37 @@ function moduleAllowed(
 }
 
 /**
- * Filter nav tabs based on allowedMenuKeys and enabledModules.
+ * Check if the current role is allowed to see an item.
+ * Items with no `requiredRole` are visible to everyone.
+ * A null role (not signed in / still loading) is treated as "allow" to avoid flicker.
+ */
+function roleAllowed(
+  requiredRole: Role | Role[] | undefined,
+  role: Role | null
+): boolean {
+  if (!requiredRole) return true;
+  if (role === null) return true;
+  const allowed = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+  return allowed.includes(role);
+}
+
+/**
+ * Filter nav tabs based on allowedMenuKeys, enabledModules, and current role.
  * If allowedMenuKeys is null, all tabs pass the menu-key check (role defaults).
- * A tab is shown if it has at least one sub-item that passes BOTH filters.
+ * A tab is shown if it has at least one sub-item that passes ALL filters.
  */
 export function getVisibleTabs(
   allowedMenuKeys: string[] | null,
-  enabledModules: string[] | null = null
+  enabledModules: string[] | null = null,
+  role: Role | null = null
 ): NavTab[] {
   return navTabs.filter((tab) => {
     // Dashboard is always visible
     if (tab.name === "Dashboard") return true;
 
-    // Tab-level module gate
+    // Tab-level gates
     if (!moduleAllowed(tab.moduleKey, enabledModules)) return false;
+    if (!roleAllowed(tab.requiredRole, role)) return false;
 
     // Menu key gate
     const menuOk =
@@ -210,12 +240,16 @@ export function getVisibleTabs(
       tab.menuKeys.some((key) => allowedMenuKeys.includes(key));
     if (!menuOk) return false;
 
-    // At least one visible sub-item must remain after module filtering
+    // At least one visible sub-item must remain after module + role filtering
     if (tab.subItems.length > 0) {
       const anyVisibleSub = tab.subItems.some((sub) => {
         const keyOk =
           allowedMenuKeys === null || allowedMenuKeys.includes(sub.key);
-        return keyOk && moduleAllowed(sub.moduleKey, enabledModules);
+        return (
+          keyOk &&
+          moduleAllowed(sub.moduleKey, enabledModules) &&
+          roleAllowed(sub.requiredRole, role)
+        );
       });
       if (!anyVisibleSub) return false;
     }
@@ -225,17 +259,22 @@ export function getVisibleTabs(
 }
 
 /**
- * Filter sub-items based on allowedMenuKeys and enabledModules.
+ * Filter sub-items based on allowedMenuKeys, enabledModules, and current role.
  * If allowedMenuKeys is null, the menu-key check is skipped.
  */
 export function getVisibleSubItems(
   subItems: SubMenuItem[],
   allowedMenuKeys: string[] | null,
-  enabledModules: string[] | null = null
+  enabledModules: string[] | null = null,
+  role: Role | null = null
 ): SubMenuItem[] {
   return subItems.filter((sub) => {
     const keyOk =
       allowedMenuKeys === null || allowedMenuKeys.includes(sub.key);
-    return keyOk && moduleAllowed(sub.moduleKey, enabledModules);
+    return (
+      keyOk &&
+      moduleAllowed(sub.moduleKey, enabledModules) &&
+      roleAllowed(sub.requiredRole, role)
+    );
   });
 }
