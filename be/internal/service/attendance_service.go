@@ -163,12 +163,16 @@ func (s *attendanceService) ClockIn(req dto.ClockInRequest) (*dto.AttendanceResp
 	}
 
 	att := &model.Attendance{
-		EmployeeID: req.EmployeeID,
-		ShiftID:    emp.ShiftID,
-		Date:       today,
-		ClockIn:    &now,
-		Status:     status,
-		Notes:      req.Notes,
+		EmployeeID:       req.EmployeeID,
+		ShiftID:          emp.ShiftID,
+		Date:             today,
+		ClockIn:          &now,
+		Status:           status,
+		Notes:            req.Notes,
+		ClockInLat:       req.Lat,
+		ClockInLng:       req.Lng,
+		ClockInPhoto:     req.Photo,
+		ClockInDistanceM: req.DistanceM,
 	}
 
 	if err := s.attRepo.Create(att); err != nil {
@@ -203,6 +207,18 @@ func (s *attendanceService) ClockOut(id string, req dto.ClockOutRequest) (*dto.A
 
 	if req.Notes != "" {
 		att.Notes = req.Notes
+	}
+	if req.Lat != nil {
+		att.ClockOutLat = req.Lat
+	}
+	if req.Lng != nil {
+		att.ClockOutLng = req.Lng
+	}
+	if req.Photo != "" {
+		att.ClockOutPhoto = req.Photo
+	}
+	if req.DistanceM != nil {
+		att.ClockOutDistanceM = req.DistanceM
 	}
 
 	if err := s.attRepo.Update(att); err != nil {
